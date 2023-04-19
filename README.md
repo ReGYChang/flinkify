@@ -1,14 +1,8 @@
-<img align="right" width="159px" src="images/fiber-flink-logo.png" alt="A logo features two connected nodes, representing the connectivity and integration of Flink operators. The nodes are designed to resemble fiber optic cables, symbolizing the project's focus on enabling data transmission at high speeds. The simple, modern design of the logo communicates the project's values of simplicity and ease of use. The color scheme for the logo features shades of blue and green, which are often associated with technology and innovation. The blue-green gradient also adds depth and dimension to the design, giving it a more dynamic and visually interesting appearance.">
+<img align="right" width="200px" src="images/fiber-flink-logo.png" alt="A logo features two connected nodes, representing the connectivity and integration of Flink operators. The nodes are designed to resemble fiber optic cables, symbolizing the project's focus on enabling data transmission at high speeds. The simple, modern design of the logo communicates the project's values of simplicity and ease of use. The color scheme for the logo features shades of blue and green, which are often associated with technology and innovation. The blue-green gradient also adds depth and dimension to the design, giving it a more dynamic and visually interesting appearance.">
 
 # fiber-flink
 
 Application aims to provide an intuitive, browser-based editor that allows users to easily create and configure Flink operator pipelines. The editor will facilitate wiring together Flink operators within a user-friendly palette, simplifying the deployment process to the Flink runtime with a single click.
-
-# Objective
-
-Implement an application aims to provide an intuitive, browser-based editor that allows users to easily create and
-configure Flink operator pipelines. The editor will facilitate wiring together Flink operators within a user-friendly
-palette, simplifying the deployment process to the Flink runtime with a single click.
 
 # Agenda
 
