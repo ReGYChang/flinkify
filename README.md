@@ -1,48 +1,60 @@
-- [Objective](#objective)
-- [PRD](#prd)
-  - [Introduction](#introduction)
-  - [Problem Statement](#problem-statement)
-  - [Goals and Objectives](#goals-and-objectives)
-  - [User Stories](#user-stories)
-  - [Technical Requirements](#technical-requirements)
-  - [Benefits](#benefits)
-  - [KPIs](#kpis)
-  - [Development Risks](#development-risks)
-  - [Conclusion](#conclusion)
-- [Task](#task)
-- [API Design](#api-design)
-  - [Endpoints](#endpoints)
-    - [Pipeline Management](#pipeline-management)
-    - [Operator Management](#operator-management)
-    - [Deployment Management](#deployment-management)
-    - [Monitoring and Alerting](#monitoring-and-alerting)
-    - [Logging and Analytics](#logging-and-analytics)
-- [Database Design](#database-design)
-  - [PostgreSQL (Relational Database):](#postgresql-relational-database)
-  - [Elasticsearch (NoSQL Database):](#elasticsearch-nosql-database)
-- [High-Level Design](#high-level-design)
-  - [Frontend](#frontend)
-  - [Backend](#backend)
-  - [Infrastructure](#infrastructure)
-- [Detailed Design](#detailed-design)
-  - [Frontend](#frontend-1)
-  - [Backend](#backend-1)
-  - [Testing](#testing)
+<img align="right" width="159px" src="images/fiber-flink-logo.png" alt="A logo features two connected nodes, representing the connectivity and integration of Flink operators. The nodes are designed to resemble fiber optic cables, symbolizing the project's focus on enabling data transmission at high speeds. The simple, modern design of the logo communicates the project's values of simplicity and ease of use. The color scheme for the logo features shades of blue and green, which are often associated with technology and innovation. The blue-green gradient also adds depth and dimension to the design, giving it a more dynamic and visually interesting appearance.">
 
+# fiber-flink
+
+Application aims to provide an intuitive, browser-based editor that allows users to easily create and configure Flink operator pipelines. The editor will facilitate wiring together Flink operators within a user-friendly palette, simplifying the deployment process to the Flink runtime with a single click.
 
 # Objective
 
-Implement an application aims to provide an intuitive, browser-based editor that allows users to easily create and configure Flink operator pipelines. The editor will facilitate wiring together Flink operators within a user-friendly palette, simplifying the deployment process to the Flink runtime with a single click.
+Implement an application aims to provide an intuitive, browser-based editor that allows users to easily create and
+configure Flink operator pipelines. The editor will facilitate wiring together Flink operators within a user-friendly
+palette, simplifying the deployment process to the Flink runtime with a single click.
+
+# Agenda
+
+- [PRD](#prd)
+    - [Introduction](#introduction)
+    - [Problem Statement](#problem-statement)
+    - [Goals and Objectives](#goals-and-objectives)
+    - [User Stories](#user-stories)
+    - [Technical Requirements](#technical-requirements)
+    - [Benefits](#benefits)
+    - [KPIs](#kpis)
+    - [Development Risks](#development-risks)
+    - [Conclusion](#conclusion)
+- [Task](#task)
+- [API Design](#api-design)
+    - [Endpoints](#endpoints)
+        - [Pipeline Management](#pipeline-management)
+        - [Operator Management](#operator-management)
+        - [Deployment Management](#deployment-management)
+        - [Monitoring and Alerting](#monitoring-and-alerting)
+        - [Logging and Analytics](#logging-and-analytics)
+- [Database Design](#database-design)
+    - [PostgreSQL (Relational Database):](#postgresql-relational-database)
+    - [Elasticsearch (NoSQL Database):](#elasticsearch-nosql-database)
+- [High-Level Design](#high-level-design)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
+    - [Infrastructure](#infrastructure)
+- [Detailed Design](#detailed-design)
+    - [Frontend](#frontend-1)
+    - [Backend](#backend-1)
+    - [Testing](#testing)
 
 # PRD
 
 ## Introduction
 
-The application aims to provide an intuitive, browser-based editor that allows users to easily create and configure Flink operator pipelines. The editor will facilitate wiring together Flink operators within a user-friendly palette, simplifying the deployment process to the Flink runtime with a single click.
+The application aims to provide an intuitive, browser-based editor that allows users to easily create and configure
+Flink operator pipelines. The editor will facilitate wiring together Flink operators within a user-friendly palette,
+simplifying the deployment process to the Flink runtime with a single click.
 
 ## Problem Statement
 
-Developing and deploying Flink operator pipelines can be challenging and time-consuming, especially for users who are new to Flink or have limited experience with the technology. There is a need for an accessible and user-friendly interface to streamline the creation, configuration, and deployment of Flink operator pipelines.
+Developing and deploying Flink operator pipelines can be challenging and time-consuming, especially for users who are
+new to Flink or have limited experience with the technology. There is a need for an accessible and user-friendly
+interface to streamline the creation, configuration, and deployment of Flink operator pipelines.
 
 ## Goals and Objectives
 
@@ -53,8 +65,10 @@ Developing and deploying Flink operator pipelines can be challenging and time-co
 
 ## User Stories
 
-1. As a data engineer, I want to easily create and configure Flink operator pipelines so that I can rapidly develop and deploy streaming applications.
-2. As a data scientist, I need an intuitive interface to build Flink pipelines, allowing me to focus on analyzing data rather than dealing with complex configurations.
+1. As a data engineer, I want to easily create and configure Flink operator pipelines so that I can rapidly develop and
+   deploy streaming applications.
+2. As a data scientist, I need an intuitive interface to build Flink pipelines, allowing me to focus on analyzing data
+   rather than dealing with complex configurations.
 3. As a business analyst, I want to quickly deploy Flink pipelines in order to gain insights from real-time data.
 
 ## Technical Requirements
@@ -87,34 +101,37 @@ Developing and deploying Flink operator pipelines can be challenging and time-co
 
 ## Conclusion
 
-The browser-based Flink Operator Editor Application aims to simplify the creation, configuration, and deployment of Flink operator pipelines. By offering an accessible and user-friendly interface, this application will benefit data engineers, data scientists, and business analysts alike, ultimately driving increased adoption of Flink for real-time data processing.
+The browser-based Flink Operator Editor Application aims to simplify the creation, configuration, and deployment of
+Flink operator pipelines. By offering an accessible and user-friendly interface, this application will benefit data
+engineers, data scientists, and business analysts alike, ultimately driving increased adoption of Flink for real-time
+data processing.
 
 # Task
 
 - Develop a browser-based editor for creating and managing Flink operator pipelines. Key features include:
-   - Drag-and-drop user interface for placing operators onto a canvas
-   - Backend system to generate code and one-click deployment to Flink runtime
-   - Real-time monitoring and performance tracking
-   - Alerts and notifications for pipeline failures or errors
-   - Custom Flink operator creation and configuration
+    - Drag-and-drop user interface for placing operators onto a canvas
+    - Backend system to generate code and one-click deployment to Flink runtime
+    - Real-time monitoring and performance tracking
+    - Alerts and notifications for pipeline failures or errors
+    - Custom Flink operator creation and configuration
 
 - Enhance pipeline management and reusability with features such as:
-   - Save, load, and export pipelines as templates or YAML/JSON files
-   - Import existing pipelines from YAML/JSON files
-   - Schedule and automate pipeline deployment
-   - Auto-scaling for optimal performance and cost-efficiency
+    - Save, load, and export pipelines as templates or YAML/JSON files
+    - Import existing pipelines from YAML/JSON files
+    - Schedule and automate pipeline deployment
+    - Auto-scaling for optimal performance and cost-efficiency
 
 - Improve pipeline monitoring and troubleshooting with features such as:
-   - Detailed logs, error messages, and performance metrics
-   - Customizable alerts for specific performance thresholds
-   - Real-time pipeline status and performance monitoring
-   - Pre-deployment pipeline previews and testing within the editor
+    - Detailed logs, error messages, and performance metrics
+    - Customizable alerts for specific performance thresholds
+    - Real-time pipeline status and performance monitoring
+    - Pre-deployment pipeline previews and testing within the editor
 
 - Streamline the user experience with features such as:
-   - Search and filter functionality for operator selection
-   - Visual representation of pipelines within the editor
-   - Seamless integration of import, export, and preview features
-   - Saving pipelines for quick access and reuse
+    - Search and filter functionality for operator selection
+    - Visual representation of pipelines within the editor
+    - Seamless integration of import, export, and preview features
+    - Saving pipelines for quick access and reuse
 
 # API Design
 
@@ -165,42 +182,42 @@ The browser-based Flink Operator Editor Application aims to simplify the creatio
 
 Tables:
 
-   - `pipelines`:
-     - id: UUID (Primary Key)
-     - name: VARCHAR
-     - description: TEXT
-     - configuration: JSONB
-     - created_at: TIMESTAMP
-     - updated_at: TIMESTAMP
+- `pipelines`:
+    - id: UUID (Primary Key)
+    - name: VARCHAR
+    - description: TEXT
+    - configuration: JSONB
+    - created_at: TIMESTAMP
+    - updated_at: TIMESTAMP
 
-   - `operators`:
-     - id: UUID (Primary Key)
-     - name: VARCHAR
-     - description: TEXT
-     - configuration: JSONB
-     - created_at: TIMESTAMP
-     - updated_at: TIMESTAMP
+- `operators`:
+    - id: UUID (Primary Key)
+    - name: VARCHAR
+    - description: TEXT
+    - configuration: JSONB
+    - created_at: TIMESTAMP
+    - updated_at: TIMESTAMP
 
-   - `deployments`:
-     - id: UUID (Primary Key)
-     - pipeline_id: UUID (Foreign Key)
-     - status: VARCHAR
-     - created_at: TIMESTAMP
-     - updated_at: TIMESTAMP
+- `deployments`:
+    - id: UUID (Primary Key)
+    - pipeline_id: UUID (Foreign Key)
+    - status: VARCHAR
+    - created_at: TIMESTAMP
+    - updated_at: TIMESTAMP
 
-   - `alerts`:
-     - id: UUID (Primary Key)
-     - pipeline_id: UUID (Foreign Key)
-     - condition: JSONB
-     - created_at: TIMESTAMP
-     - updated_at: TIMESTAMP
+- `alerts`:
+    - id: UUID (Primary Key)
+    - pipeline_id: UUID (Foreign Key)
+    - condition: JSONB
+    - created_at: TIMESTAMP
+    - updated_at: TIMESTAMP
 
 ## Elasticsearch (NoSQL Database):
 
 Indexes:
 
-   - `logs`: Store logs and error messages
-   - `metrics`: Store performance metrics
+- `logs`: Store logs and error messages
+- `metrics`: Store performance metrics
 
 # High-Level Design
 
@@ -224,57 +241,62 @@ Indexes:
 
 # Detailed Design
 
-- Implement a modular folder structure for the backend codebase, separating microservices, models, routes, and controllers
+- Implement a modular folder structure for the backend codebase, separating microservices, models, routes, and
+  controllers
 - Use middleware for common functionalities like authentication, error handling, and request/response validation
 - Follow the SOLID design principles to create reusable and maintainable code
-- Use Spring Boot's built-in features for common functionalities like authentication, error handling, and request/response validation
+- Use Spring Boot's built-in features for common functionalities like authentication, error handling, and
+  request/response validation
 
 ## Frontend
 
 1. Components:
-   - Create reusable components for the editor, operator palette, pipeline canvas, and monitoring/alerting dashboards
-   - Use state management libraries, like Redux or MobX, to manage the application state
+    - Create reusable components for the editor, operator palette, pipeline canvas, and monitoring/alerting dashboards
+    - Use state management libraries, like Redux or MobX, to manage the application state
 
 2. Services:
-   - Implement services for interacting with the backend API and handling data processing, such as pipeline configuration and operator management
+    - Implement services for interacting with the backend API and handling data processing, such as pipeline
+      configuration and operator management
 
 3. Styling:
-   - Utilize CSS frameworks like Bootstrap or Tailwind CSS for consistent styling and responsive design
-   - Use CSS-in-JS libraries, like styled-components or Emotion, for component-specific styling
+    - Utilize CSS frameworks like Bootstrap or Tailwind CSS for consistent styling and responsive design
+    - Use CSS-in-JS libraries, like styled-components or Emotion, for component-specific styling
 
 ## Backend
 
 1. Microservices:
-   - Implement each microservice as a separate package, responsible for handling its specific set of features
-   - Use the repository pattern to separate the data access layer from the business logic
+    - Implement each microservice as a separate package, responsible for handling its specific set of features
+    - Use the repository pattern to separate the data access layer from the business logic
 
 2. Middleware:
-   - Utilize Spring Boot's built-in features, like security and exception handling, to secure access to API endpoints and handle errors
-   - Create custom validation and request/response transformation using filters and aspects, if necessary
+    - Utilize Spring Boot's built-in features, like security and exception handling, to secure access to API endpoints
+      and handle errors
+    - Create custom validation and request/response transformation using filters and aspects, if necessary
 
 3. Event-driven architecture:
-   - Use a message broker (e.g., Kafka or RabbitMQ) to allow microservices to communicate asynchronously, improving scalability and decoupling
+    - Use a message broker (e.g., Kafka or RabbitMQ) to allow microservices to communicate asynchronously, improving
+      scalability and decoupling
 
 4. Caching:
-   - Implement caching strategies using Spring Boot's caching abstraction with Redis or Hazelcast as cache providers
+    - Implement caching strategies using Spring Boot's caching abstraction with Redis or Hazelcast as cache providers
 
 5. Logging and Monitoring:
-   - Utilize Spring Boot's built-in logging with Logback or Log4j2 for structured logging
-   - Integrate with the ELK stack (Elasticsearch, Logstash, Kibana) for log aggregation, analysis, and visualization
-   - Implement Micrometer and Grafana for monitoring and alerting purposes
+    - Utilize Spring Boot's built-in logging with Logback or Log4j2 for structured logging
+    - Integrate with the ELK stack (Elasticsearch, Logstash, Kibana) for log aggregation, analysis, and visualization
+    - Implement Micrometer and Grafana for monitoring and alerting purposes
 
 ## Testing
 
 1. Unit testing:
-   - Use Jest or Mocha for unit testing in both frontend and backend
-   - Implement test cases covering individual functions, components, and API endpoints
+    - Use Jest or Mocha for unit testing in both frontend and backend
+    - Implement test cases covering individual functions, components, and API endpoints
 
 2. Integration testing:
-   - Test the interactions between microservices, databases, and external systems
-   - Utilize tools like Postman or Newman for API integration testing
+    - Test the interactions between microservices, databases, and external systems
+    - Utilize tools like Postman or Newman for API integration testing
 
 3. End-to-end testing:
-   - Use tools like Cypress or Selenium to test the application's functionality from the user's perspective
+    - Use tools like Cypress or Selenium to test the application's functionality from the user's perspective
 
 4. Performance testing:
-   - Utilize tools like JMeter or Locust to simulate load and evaluate the application's performance under stress
+    - Utilize tools like JMeter or Locust to simulate load and evaluate the application's performance under stress
