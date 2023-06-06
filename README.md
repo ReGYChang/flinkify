@@ -13,7 +13,7 @@ QuantaLink is designed for data scientists, data engineers, system administrator
 - Leverage the Power of Apache Flink: Perform efficient real-time data processing using Apache Flink.
 - Connect to Big Data Frameworks: Access a wide array of big data frameworks including OLAP and Data Lake, and expand your data processing capabilities.
 - Break Down Data Silos: Our live data platform connects data silos and provides fresh data to downstream applications & operational analytics.
-Manage Your Data Like a Pro: Our platform includes tools for ETL task development, operation and maintenance, and data lineage management.
+- Manage Your Data Like a Pro: Our platform includes tools for ETL task development, operation and maintenance, and data lineage management.
 
 # Prerequisites
 

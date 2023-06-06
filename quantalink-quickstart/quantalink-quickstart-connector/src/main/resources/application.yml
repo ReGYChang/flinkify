@@ -1,0 +1,8 @@
+flink:
+  sources:
+    - kafka:
+        - bootstrap-servers: kafka.nexdata.stg:9094
+          group-id: quantalink-traceability
+          topic: traceability_v1.data_collection_station.test
+          offset-reset-strategy: EARLIEST
+          data-type: com.regy.quantalink.quickstart.connector.kafka.entity.DcsEvent
