@@ -9,7 +9,6 @@ import org.apache.flink.table.types.DataType;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author regy
@@ -37,28 +36,6 @@ public class ConfigOptions {
 
         public ConfigOption<List<E>> noDefaultValue() {
             return new ConfigOption<>(this.key, this.clazz, ConfigOption.EMPTY_DESCRIPTION, null, true);
-        }
-    }
-
-    public static class MapConfigOptionBuilder {
-        private final String key;
-
-        MapConfigOptionBuilder(String key) {
-            this.key = key;
-        }
-
-        @SuppressWarnings("unchecked")
-        public ListConfigOptionBuilder<Map<String, ?>> asList() {
-            return new ListConfigOptionBuilder<>(this.key, (Class<Map<String, ?>>) (Class<?>) Map.class);
-        }
-
-        @SafeVarargs
-        public final ConfigOption<Map<String, ?>> defaultValue(Map.Entry<String, ?>... entries) {
-            return new ConfigOption<>(this.key, Map.class, ConfigOption.EMPTY_DESCRIPTION, Map.ofEntries(entries), false);
-        }
-
-        public ConfigOption<Map<String, ?>> noDefaultValue() {
-            return new ConfigOption<>(this.key, Map.class, Description.builder().text("").build(), null, false);
         }
     }
 
@@ -128,21 +105,12 @@ public class ConfigOptions {
             return new TypedConfigOptionBuilder<>(this.key, DataType.class);
         }
 
-//        @SuppressWarnings("unchecked")
-//        public <T> TypedConfigOptionBuilder<Class<? extends T>> interfaceType(Class<T> clazz) {
-//            return new TypedConfigOptionBuilder<>(this.key, (Class<Class<? extends T>>) clazz);
-//        }
-
         public <T extends Enum<T>> TypedConfigOptionBuilder<T> enumType(Class<T> enumClass) {
             return new TypedConfigOptionBuilder<>(this.key, enumClass);
         }
 
         public TypedConfigOptionBuilder<Configuration> configType() {
             return new TypedConfigOptionBuilder<>(this.key, Configuration.class);
-        }
-
-        public MapConfigOptionBuilder mapType() {
-            return new MapConfigOptionBuilder(this.key);
         }
     }
 
