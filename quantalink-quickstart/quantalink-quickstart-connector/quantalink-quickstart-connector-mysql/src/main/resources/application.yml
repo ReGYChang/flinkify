@@ -1,0 +1,12 @@
+flink:
+  sources:
+    - mysql-cdc:
+        hostname: 10.1.5.35
+        port: 3306
+        database-list: sandbox
+        table-list: sandbox.employees
+        username: root
+        password: regy
+        server-time-zone: UTC
+        include-schema: true
+        include-schema-changes: false

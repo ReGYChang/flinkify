@@ -23,8 +23,7 @@ public class KafkaSource extends FlinkStreaming {
                         sourceConnector ->
                                 sourceConnector.withDeserializationSchemaAdapter(KafkaDeserializationAdapter.valueOnlyDefault(TypeInformation.get(DcsEvent.class)))
                                         .withWatermarkStrategy(WatermarkStrategy.noWatermarks()),
-                        TypeInformation.get(DcsEvent.class)
-                ).build();
+                        TypeInformation.get(DcsEvent.class)).build();
 
         (new KafkaSource()).run(args, initializer);
     }

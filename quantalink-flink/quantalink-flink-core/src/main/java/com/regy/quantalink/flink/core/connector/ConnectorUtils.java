@@ -11,6 +11,8 @@ import com.regy.quantalink.flink.core.connector.doris.sink.DorisSinkConnector;
 import com.regy.quantalink.flink.core.connector.kafka.config.KafkaOptions;
 import com.regy.quantalink.flink.core.connector.kafka.sink.KafkaSinkConnector;
 import com.regy.quantalink.flink.core.connector.kafka.source.KafkaSourceConnector;
+import com.regy.quantalink.flink.core.connector.mysql.cdc.MySqlSourceConnector;
+import com.regy.quantalink.flink.core.connector.mysql.config.MySqlOptions;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.function.TriFunction;
@@ -33,6 +35,9 @@ public class ConnectorUtils {
                     if (connectorConfig.contains(KafkaOptions.CONNECTORS)) {
                         List<Configuration> kafkaConfigs = connectorConfig.getNotNull(KafkaOptions.CONNECTORS, "Could not find configuration of kafka source connector");
                         kafkaConfigs.forEach(kafkaConfig -> connectors.put(kafkaConfig.getNotNull(ConnectorOptions.DATA_TYPE, "Could not find data type of kafka source connector"), new KafkaSourceConnector<>(environment, kafkaConfig)));
+                    } else if (connectorConfig.contains(MySqlOptions.CDC)) {
+                        Configuration mysqlCdcConfig = connectorConfig.getNotNull(MySqlOptions.CDC, "Could not find configuration of mysql source cdc connector");
+                        connectors.put(TypeInformation.get(String.class), new MySqlSourceConnector(environment, mysqlCdcConfig));
                     } else {
                         throw new ConfigurationException(ErrCode.PARSING_CONFIG_FAILED, String.format("Unknown source connector type '%s', please check your configuration of connector", connectorConfig.toMap().keySet()));
                     }

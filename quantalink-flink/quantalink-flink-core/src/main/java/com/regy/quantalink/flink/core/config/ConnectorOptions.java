@@ -3,7 +3,6 @@ package com.regy.quantalink.flink.core.config;
 import com.regy.quantalink.common.config.ConfigOption;
 import com.regy.quantalink.common.config.ConfigOptions;
 import com.regy.quantalink.common.type.TypeInformation;
-import com.regy.quantalink.flink.core.connector.ConnectorType;
 
 import org.apache.flink.configuration.description.Description;
 import org.apache.flink.configuration.description.TextElement;
@@ -12,15 +11,6 @@ import org.apache.flink.configuration.description.TextElement;
  * @author regy
  */
 public interface ConnectorOptions {
-
-    ConfigOption<ConnectorType> CONNECTOR_TYPE = ConfigOptions.key("connector-type")
-            .enumType(ConnectorType.class)
-            .noDefaultValue()
-            .withDescription(
-                    Description.builder()
-                            .text("The type of source connector to be used for data extraction. Supported source connector type: ")
-                            .list(TextElement.text("kafka"), TextElement.text("rabbitmq"))
-                            .build());
 
     ConfigOption<TypeInformation<?>> DATA_TYPE = ConfigOptions.key("data-type")
             .type()

@@ -31,6 +31,7 @@
         <fastjson2.version>2.0.33</fastjson2.version>
 
         <flink.version>1.16.1</flink.version>
+        <flink-cdc.version>2.3.0</flink-cdc.version>
         <scala.binary.version>2.12</scala.binary.version>
         <nebula-graph-connector.version>3.5.0</nebula-graph-connector.version>
         <doris-connector.version>1.3.0</doris-connector.version>
