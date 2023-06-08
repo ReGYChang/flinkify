@@ -1,7 +1,6 @@
 package com.regy.quantalink.flink.core.connector;
 
 import com.regy.quantalink.common.config.Configuration;
-import com.regy.quantalink.common.type.TypeInformation;
 import com.regy.quantalink.flink.core.connector.serialization.SerializationAdapter;
 
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -11,14 +10,12 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 /**
  * @author regy
  */
-public abstract class SinkConnector<T> extends Connector {
+public abstract class SinkConnector<T> extends Connector<T> {
 
-    protected final String sinkName;
     protected SerializationAdapter<T> serializationAdapter;
 
-    public SinkConnector(StreamExecutionEnvironment env, Configuration config, int parallelism, String sinkName, TypeInformation<?> typeInfo) {
-        super(env, config, parallelism, typeInfo);
-        this.sinkName = sinkName;
+    public SinkConnector(StreamExecutionEnvironment env, Configuration config) {
+        super(env, config);
     }
 
     /**

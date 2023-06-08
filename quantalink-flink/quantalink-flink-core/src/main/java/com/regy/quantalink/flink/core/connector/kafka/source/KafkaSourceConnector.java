@@ -3,7 +3,6 @@ package com.regy.quantalink.flink.core.connector.kafka.source;
 import com.regy.quantalink.common.config.Configuration;
 import com.regy.quantalink.common.exception.ErrCode;
 import com.regy.quantalink.common.exception.FlinkException;
-import com.regy.quantalink.flink.core.config.ConnectorOptions;
 import com.regy.quantalink.flink.core.connector.SourceConnector;
 import com.regy.quantalink.flink.core.connector.kafka.config.KafkaOptions;
 import com.regy.quantalink.flink.core.connector.serialization.DeserializationAdapter;
@@ -28,16 +27,11 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
     private final OffsetResetStrategy offsetResetStrategy;
 
     public KafkaSourceConnector(StreamExecutionEnvironment env, Configuration config) {
-        super(env, config, config.get(ConnectorOptions.PARALLELISM), config.get(ConnectorOptions.NAME), config.getNotNull(ConnectorOptions.DATA_TYPE, "Kafka source connector data type must not be null"));
+        super(env, config);
         this.groupId = config.get(KafkaOptions.GROUP_ID);
         this.offsetResetStrategy = config.get(KafkaOptions.OFFSET_RESET_STRATEGY);
         this.bootStrapServers = config.getNotNull(KafkaOptions.BOOTSTRAP_SERVERS, "Kafka source connector bootstrap servers must not be null, please check your configuration");
         this.topics = config.getNotNull(KafkaOptions.TOPIC, "Kafka source topics must not be null, please check your configuration");
-    }
-
-    @Override
-    public void init() {
-
     }
 
     @Override
@@ -52,10 +46,10 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
                                     .setGroupId(groupId)
                                     .setStartingOffsets(OffsetsInitializer.committedOffsets(offsetResetStrategy))
                                     .setDeserializer(deserializer.getDeserializationSchema())
-                                    .build(), watermark, sourceName)
+                                    .build(), watermark, connectorName)
                     .setParallelism(parallelism);
         } catch (Exception e) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Could not get source from kafka connector '%s': ", super.sourceName), e);
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Could not get source from kafka connector '%s': ", super.connectorName), e);
         }
     }
 }

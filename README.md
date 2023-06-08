@@ -1,22 +1,81 @@
-<img align="right" width="200px" src="images/fiber-flink-logo.png" alt="A logo features two connected nodes, representing the connectivity and integration of Flink operators. The nodes are designed to resemble fiber optic cables, symbolizing the project's focus on enabling data transmission at high speeds. The simple, modern design of the logo communicates the project's values of simplicity and ease of use. The color scheme for the logo features shades of blue and green, which are often associated with technology and innovation. The blue-green gradient also adds depth and dimension to the design, giving it a more dynamic and visually interesting appearance.">
+# Quantalink
 
-# QuantaLink
+The Quantalink provides a comprehensive structure for building applications using Apache Flink's streaming API. The framework encapsulates all necessary steps for running a Flink streaming job including initialization, configuration, execution, and termination. It facilitates defining specific behaviors for Flink streaming jobs, acting as a blueprint for streaming data processing tasks.
 
-An all-in-one real-time computing platform designed to redefine how businesses handle, process, and analyze data. Seamlessly integrating stream and batch processing, QuantaLink offers unparalleled functionality, creating an ecosystem where data flow is fluid, efficient, and most importantly, unified.
+## Features
 
-QuantaLink is designed for data scientists, data engineers, system administrators, and enterprises who are keen on optimizing their data processing workflows, and are in search of a comprehensive solution that caters to all their data needs.
+* **Flexible Initialization:** Provides interfaces for custom initialization steps that can be applied to various aspects of the Flink environment, including the execution environment, configuration, source connectors, and sink connectors.
 
-# Features
+* **Auto-wiring Approach:** Provides an auto-wiring approach for source and sink connectors. This feature simplifies the process of integrating data sources and sinks into Flink jobs, eliminating the need for manual setup. Users can use Flink connectors through YAML configuration.
 
-- Streamline Your Workflow: With unified streaming and batch processing, you can handle all your data processing tasks in a single platform.
-- Consolidate Your Data: With our integrated Data Lake & Data Warehouse, you can keep all your data in one place, making it easier to manage and analyze.
-- Leverage the Power of Apache Flink: Perform efficient real-time data processing using Apache Flink.
-- Connect to Big Data Frameworks: Access a wide array of big data frameworks including OLAP and Data Lake, and expand your data processing capabilities.
-- Break Down Data Silos: Our live data platform connects data silos and provides fresh data to downstream applications & operational analytics.
-- Manage Your Data Like a Pro: Our platform includes tools for ETL task development, operation and maintenance, and data lineage management.
+## Usage
 
-# Prerequisites
+To use this framework, follow the provided examples and use the API to define your streaming jobs, configure sources and sinks, and launch the job in the desired environment.
 
-- Ensure you have the necessary hardware and software requirements for running Apache Flink and other big data frameworks.
-- Familiarity with the command line and basic knowledge of big data technologies.
+## Contributing
 
+The Quantalink is an open-source project. We encourage contributions from developers who want to improve the system or add new features.
+
+## Quickstart
+
+Check out Quantalink's [quickstart](./quantalink-quickstart/README.md) for more information, A simple quickstart of how you might use Quantalink is as follows:
+
+For the auto-wiring of connectors, you can simply provide a YAML configuration:
+
+```yaml
+flink:
+  sources:
+    - kafka:
+        - bootstrap-servers: kafka.bootstrap.servers:9092
+          group-id: test
+          topic: test
+          offset-reset-strategy: EARLIEST
+          data-type: com.regy.quantalink.quickstart.connector.kafka.entity.DcsEvent
+```
+
+Next, extend the `FlinkStreaming` class in your Java project. The `execute()` method should be implemented in order to create the graph topology. Initialize our Flink streaming job with a source connector setup. The source connector setup includes the `deserialization schema adapter` and watermark strategy.
+
+Here is an example of how to implement this:
+
+```java
+public class KafkaSource extends FlinkStreaming {
+
+    public static void main(String[] args) throws Exception {
+        FlinkStreamingInitializer initializer = new FlinkStreamingInitializer.Builder()
+                .withSourceConnectorSetup(
+                        sourceConnector ->
+                                sourceConnector.withDeserializationSchemaAdapter(KafkaDeserializationAdapter.valueOnlyDefault(TypeInformation.get(DcsEvent.class)))
+                                        .withWatermarkStrategy(WatermarkStrategy.noWatermarks()),
+                        TypeInformation.get(DcsEvent.class)
+                ).build();
+
+        (new KafkaSource()).run(args, initializer);
+    }
+
+    @Override
+    protected void execute(FlinkStreamingContext context) throws FlinkException {
+        DataStreamSource<DcsEvent> sourceStream = context.getSourceDataStream(TypeInformation.get(DcsEvent.class));
+        sourceStream.print();
+    }
+}
+```
+
+Then you just need to run the `KafkaSource` class. To run your `KafkaSource` class, you need to pass the `--conf` argument followed by the path to your configuration file.
+
+If you're using a terminal or command prompt, navigate to the directory containing your compiled Java files. Then, use the java command to run your program. Replace `path_to_your_config` with the path to the YAML file you created in step 1.
+
+```bash
+java KafkaSource --conf path_to_your_config
+```
+
+This will start your Flink job with the specified configuration. Be sure to monitor the logs for any potential issues during the execution.
+
+## Building from Source
+
+Refer to the instructions in the main [Apache Flink](https://github.com/apache/flink) repository for building the Quantalink from source.
+
+## Support
+
+Don’t hesitate to ask for help!
+
+Open an issue if you find a bug in the Quantalink.

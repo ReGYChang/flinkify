@@ -3,8 +3,6 @@ package com.regy.quantalink.flink.core.connector.mysql.cdc;
 
 import com.regy.quantalink.common.config.Configuration;
 import com.regy.quantalink.common.exception.FlinkException;
-import com.regy.quantalink.common.type.TypeInformation;
-import com.regy.quantalink.flink.core.config.ConnectorOptions;
 import com.regy.quantalink.flink.core.connector.SourceConnector;
 import com.regy.quantalink.flink.core.connector.mysql.config.MySqlOptions;
 
@@ -30,7 +28,7 @@ public class MySqlSourceConnector extends SourceConnector<String> {
     private final boolean includeSchemaChanges;
 
     public MySqlSourceConnector(StreamExecutionEnvironment env, Configuration config) {
-        super(env, config, config.get(ConnectorOptions.PARALLELISM), config.get(ConnectorOptions.NAME), TypeInformation.get(String.class));
+        super(env, config);
         this.hostname = config.getNotNull(MySqlOptions.HOSTNAME, "MySQL source CDC connector hostname must not be null");
         this.port = config.getNotNull(MySqlOptions.PORT, "MySQL source CDC connector port must not be null");
         this.databaseList = config.get(MySqlOptions.DATABASE_LIST);
@@ -40,11 +38,6 @@ public class MySqlSourceConnector extends SourceConnector<String> {
         this.serverTimeZone = config.get(MySqlOptions.SERVER_TIME_ZONE);
         this.includeSchema = config.get(MySqlOptions.INCLUDE_SCHEMA);
         this.includeSchemaChanges = config.get(MySqlOptions.INCLUDE_SCHEMA_CHANGES);
-    }
-
-    @Override
-    public void init() {
-
     }
 
     @Override
@@ -60,7 +53,7 @@ public class MySqlSourceConnector extends SourceConnector<String> {
                                 .serverTimeZone(serverTimeZone)
                                 .includeSchemaChanges(includeSchemaChanges)
                                 .deserializer(new JsonDebeziumDeserializationSchema(includeSchema))
-                                .build(), WatermarkStrategy.noWatermarks(), super.sourceName)
+                                .build(), WatermarkStrategy.noWatermarks(), super.connectorName)
                 .setParallelism(parallelism);
     }
 }
