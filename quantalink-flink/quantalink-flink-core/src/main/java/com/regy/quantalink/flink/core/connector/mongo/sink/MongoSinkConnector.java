@@ -1,13 +1,21 @@
 package com.regy.quantalink.flink.core.connector.mongo.sink;
 
 import com.regy.quantalink.common.config.Configuration;
+import com.regy.quantalink.common.exception.ErrCode;
+import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.flink.core.connector.SinkConnector;
 import com.regy.quantalink.flink.core.connector.mongo.config.MongoOptions;
+import com.regy.quantalink.flink.core.connector.mongo.serialization.MongoSerializationAdapter;
 
+import com.alibaba.fastjson2.JSON;
+import com.mongodb.client.model.InsertOneModel;
 import org.apache.flink.connector.mongodb.sink.MongoSink;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.bson.BsonDocument;
+
+import java.util.Optional;
 
 /**
  * @author regy
@@ -31,17 +39,29 @@ public class MongoSinkConnector<T> extends SinkConnector<T> {
         this.maxRetries = config.getNotNull(MongoOptions.MAX_RETRIES, "Mongo sink connector max-retries must not be null, please check your configuration");
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public DataStreamSink<T> getSinkDataStream(DataStream<T> stream) {
-        MongoSink<T> sink = MongoSink.<T>builder()
-                .setUri(uri)
-                .setDatabase(database)
-                .setCollection(collection)
-                .setBatchSize(batchSize)
-                .setBatchIntervalMs(batchIntervalMs)
-                .setMaxRetries(maxRetries)
-                .setSerializationSchema(super.serializationAdapter.getSerializationSchema())
-                .build();
-        return stream.sinkTo(sink).name(super.connectorName).setParallelism(super.parallelism).disableChaining();
+        try {
+            MongoSerializationAdapter<T> serializationAdapter =
+                    Optional.ofNullable((MongoSerializationAdapter<T>) super.serializationAdapter).orElse(
+                            new MongoSerializationAdapter<>(
+                                    (input, cxt) ->
+                                            new InsertOneModel<>(BsonDocument.parse(JSON.toJSONString(input))), super.typeInfo));
+            MongoSink<T> sink = MongoSink.<T>builder()
+                    .setUri(uri)
+                    .setDatabase(database)
+                    .setCollection(collection)
+                    .setBatchSize(batchSize)
+                    .setBatchIntervalMs(batchIntervalMs)
+                    .setMaxRetries(maxRetries)
+                    .setSerializationSchema(serializationAdapter.getSerializationSchema())
+                    .build();
+            return stream.sinkTo(sink).name(super.connectorName).setParallelism(super.parallelism).disableChaining();
+        } catch (ClassCastException e1) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("MongoDB sink connector '%s' serialization adapter must be '%s', could not assign other serialization adapter", super.connectorName, MongoSerializationAdapter.class), e1);
+        } catch (Exception e2) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize MongoDB sink connector '%s'", super.connectorName), e2);
+        }
     }
 }

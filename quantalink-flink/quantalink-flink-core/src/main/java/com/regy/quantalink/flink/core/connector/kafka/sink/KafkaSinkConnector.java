@@ -6,7 +6,6 @@ import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.flink.core.connector.SinkConnector;
 import com.regy.quantalink.flink.core.connector.kafka.config.KafkaOptions;
 import com.regy.quantalink.flink.core.connector.kafka.serialization.KafkaSerializationAdapter;
-import com.regy.quantalink.flink.core.connector.rabbitmq.serialization.RabbitmqSerializationAdapter;
 import com.regy.quantalink.flink.core.connector.serialization.DefaultSerializationSchema;
 
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
