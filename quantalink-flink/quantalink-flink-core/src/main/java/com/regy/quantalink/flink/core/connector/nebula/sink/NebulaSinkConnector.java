@@ -25,6 +25,7 @@ import org.apache.flink.types.Row;
 import org.apache.flink.util.OutputTag;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author regy
@@ -37,6 +38,7 @@ public class NebulaSinkConnector<T> extends SinkConnector<T> {
     private final String password;
     private final WriteModeEnum writeMode;
     private final int batchSize;
+    private final int batchIntervalMs;
     private final String graphSpace;
     private final NebulaRowType rowType;
     private String vertexName;
@@ -49,16 +51,18 @@ public class NebulaSinkConnector<T> extends SinkConnector<T> {
     private int edgeRandIndex;
     private List<String> edgeFields;
     private List<Integer> edgePositions;
+    private final OutputTag<Row> outputTag;
 
     public NebulaSinkConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
+        this.writeMode = config.get(NebulaOptions.NEBULA_WRITE_MODE);
+        this.batchSize = config.get(NebulaOptions.NEBULA_BATCH_SIZE);
+        this.batchIntervalMs = config.get(NebulaOptions.NEBULA_BATCH_INTERVAL_MS);
         this.graphAddress = config.getNotNull(NebulaOptions.NEBULA_GRAPH_ADDRESS, String.format("Nebula sink connector '%s' graph address must not be null", super.connectorName));
         this.metaAddress = config.getNotNull(NebulaOptions.NEBULA_META_ADDRESS, String.format("Nebula sink connector '%s' meta address must not be null", super.connectorName));
         this.username = config.getNotNull(NebulaOptions.NEBULA_USERNAME, String.format("Nebula sink connector '%s' username must not be null", super.connectorName));
         this.password = config.getNotNull(NebulaOptions.NEBULA_PASSWORD, String.format("Nebula sink connector '%s' password must not be null", super.connectorName));
         this.graphSpace = config.getNotNull(NebulaOptions.NEBULA_GRAPH_SPACE, String.format("Nebula sink connector '%s' graph space must not be null", super.connectorName));
-        this.writeMode = config.getNotNull(NebulaOptions.NEBULA_WRITE_MODE, String.format("Nebula sink connector '%s' write mode must not be null", super.connectorName));
-        this.batchSize = config.getNotNull(NebulaOptions.NEBULA_BATCH_SIZE, String.format("Nebula sink connector '%s' batch must not be null", super.connectorName));
         this.rowType = config.getNotNull(NebulaOptions.NEBULA_ROW_TYPE, String.format("Nebula sink connector '%s' row type must not be null", super.connectorName));
         if (rowType.equals(NebulaRowType.Vertex)) {
             this.vertexName = config.getNotNull(NebulaOptions.NEBULA_VERTEX_NAME, String.format("Nebula sink connector '%s' vertex name must not be null", super.connectorName));
@@ -73,6 +77,7 @@ public class NebulaSinkConnector<T> extends SinkConnector<T> {
             this.edgeFields = config.getNotNull(NebulaOptions.NEBULA_EDGE_FIELDS, String.format("Nebula sink connector '%s' must not be null", super.connectorName));
             this.edgePositions = config.getNotNull(NebulaOptions.NEBULA_EDGE_POSITIONS, String.format("Nebula sink connector '%s' must not be null", super.connectorName));
         }
+        this.outputTag = new OutputTag<>(String.format("%s-%s", Optional.ofNullable(vertexName).orElse(edgeName), rowType.name()), Types.GENERIC(Row.class));
     }
 
     @Override
@@ -82,8 +87,7 @@ public class NebulaSinkConnector<T> extends SinkConnector<T> {
         NebulaMetaConnectionProvider metaConnProvider = new NebulaMetaConnectionProvider(clientOptions);
         NebulaSinkFunction<Row> sinkFunc = getSinkFunc(graphConnProvider, metaConnProvider);
         try {
-            ((SingleOutputStreamOperator<?>) stream).getSideOutput(getOutputTag())
-                    .addSink(sinkFunc).name(connectorName).disableChaining();
+            ((SingleOutputStreamOperator<?>) stream).getSideOutput(outputTag).addSink(sinkFunc).name(connectorName).disableChaining();
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Could not add sink from stream '%s' to nebula connector: ", stream.toString()), e);
         }
@@ -101,6 +105,8 @@ public class NebulaSinkConnector<T> extends SinkConnector<T> {
                             .setFields(vertexFields)
                             .setPositions(vertexPositions)
                             .setBatchSize(batchSize)
+                            .setBatchIntervalMs(batchIntervalMs)
+                            .setWriteMode(writeMode)
                             .build();
             NebulaVertexBatchOutputFormat outputFormat =
                     new NebulaVertexBatchOutputFormat(graphConnProvider, metaConProvider, executionOptions);
@@ -115,18 +121,18 @@ public class NebulaSinkConnector<T> extends SinkConnector<T> {
                     .setFields(edgeFields)
                     .setPositions(edgePositions)
                     .setBatchSize(batchSize)
+                    .setBatchIntervalMs(batchIntervalMs)
+                    .setWriteMode(writeMode)
                     .build();
             NebulaEdgeBatchOutputFormat outputFormat =
                     new NebulaEdgeBatchOutputFormat(graphConnProvider, metaConProvider, executionOptions);
             return new NebulaSinkFunction<>(outputFormat);
         }
-
         throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Unknown Nebula row type: %s", rowType));
     }
 
     public OutputTag<Row> getOutputTag() {
-        String rowName = rowType.equals(NebulaRowType.Vertex) ? vertexName : edgeName;
-        return new OutputTag<>(String.format("%s-%s", rowName, writeMode.name()), Types.GENERIC(Row.class));
+        return this.outputTag;
     }
 
     public Integer getRowArity() {

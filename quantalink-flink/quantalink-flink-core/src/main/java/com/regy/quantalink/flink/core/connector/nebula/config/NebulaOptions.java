@@ -44,7 +44,7 @@ public interface NebulaOptions {
 
     ConfigOption<WriteModeEnum> NEBULA_WRITE_MODE = ConfigOptions.key("write-mode")
             .enumType(WriteModeEnum.class)
-            .noDefaultValue()
+            .defaultValue(WriteModeEnum.INSERT)
             .withDescription(
                     Description.builder()
                             .text("The write mode to use for Nebula Graph. Valid options are: ")
@@ -56,8 +56,15 @@ public interface NebulaOptions {
 
     ConfigOption<Integer> NEBULA_BATCH_SIZE = ConfigOptions.key("batch-size")
             .intType()
-            .noDefaultValue()
+            .defaultValue(100)
             .withDescription("The number of records to buffer before writing them to Nebula Graph in a single batch.");
+
+    ConfigOption<Integer> NEBULA_BATCH_INTERVAL_MS = ConfigOptions.key("batch-interval-ms")
+            .intType()
+            .defaultValue(500)
+            .withDescription(
+                    "The time interval in milliseconds to wait before writing records to Nebula Graph if the batch"
+                            + " size has not been reached.");
 
     ConfigOption<String> NEBULA_GRAPH_SPACE = ConfigOptions.key("graph-space")
             .stringType()
