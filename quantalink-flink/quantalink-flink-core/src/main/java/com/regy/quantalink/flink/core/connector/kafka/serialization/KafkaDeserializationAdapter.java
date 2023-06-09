@@ -15,46 +15,38 @@ import java.util.Map;
 /**
  * @author regy
  */
-public class KafkaDeserializationAdapter<T> implements DeserializationAdapter<T> {
+public class KafkaDeserializationAdapter<T> extends DeserializationAdapter<T, KafkaRecordDeserializationSchema<T>> {
 
     private final KafkaRecordDeserializationSchema<T> deserializationSchema;
-    private final TypeInformation<T> typeInfo;
 
-    private KafkaDeserializationAdapter(KafkaRecordDeserializationSchema<T> deserializationSchema, TypeInformation<T> typeInfo) {
+    private KafkaDeserializationAdapter(KafkaRecordDeserializationSchema<T> deserializationSchema) {
+        super(TypeInformation.get(deserializationSchema.getProducedType()));
         this.deserializationSchema = deserializationSchema;
-        this.typeInfo = typeInfo;
     }
 
-    public static <T> KafkaDeserializationAdapter<T> of(KafkaDeserializationSchema<T> kafkaDeserializationSchema, TypeInformation<T> typeInfo) {
-        return new KafkaDeserializationAdapter<>(KafkaRecordDeserializationSchema.of(kafkaDeserializationSchema), typeInfo);
+    public static <T> KafkaDeserializationAdapter<T> of(KafkaDeserializationSchema<T> kafkaDeserializationSchema) {
+        return new KafkaDeserializationAdapter<>(KafkaRecordDeserializationSchema.of(kafkaDeserializationSchema));
     }
 
     public static <T> KafkaDeserializationAdapter<T> valueOnly(DeserializationSchema<T> valueDeserializationSchema) {
-        TypeInformation<T> typeInfo = TypeInformation.get(valueDeserializationSchema.getProducedType());
-        return new KafkaDeserializationAdapter<>(KafkaRecordDeserializationSchema.valueOnly(valueDeserializationSchema), typeInfo);
+        return new KafkaDeserializationAdapter<>(KafkaRecordDeserializationSchema.valueOnly(valueDeserializationSchema));
     }
 
     public static <T> KafkaDeserializationAdapter<T> valueOnlyDefault(TypeInformation<T> typeInformation) {
         DefaultDeserializationSchema<T> deserializationSchema = new DefaultDeserializationSchema<>(typeInformation);
-        return new KafkaDeserializationAdapter<>(KafkaRecordDeserializationSchema.valueOnly(deserializationSchema), typeInformation);
+        return new KafkaDeserializationAdapter<>(KafkaRecordDeserializationSchema.valueOnly(deserializationSchema));
     }
 
-    public static <T> KafkaDeserializationAdapter<T> valueOnly(Class<? extends Deserializer<T>> valueDeserializerClass, TypeInformation<T> typeInfo) {
-        return valueOnly(valueDeserializerClass, Collections.emptyMap(), typeInfo);
+    public static <T> KafkaDeserializationAdapter<T> valueOnly(Class<? extends Deserializer<T>> valueDeserializerClass) {
+        return valueOnly(valueDeserializerClass, Collections.emptyMap());
     }
 
-    public static <T, D extends Deserializer<T>> KafkaDeserializationAdapter<T> valueOnly(Class<D> valueDeserializerClass, Map<String, String> config, TypeInformation<T> typeInfo) {
-        return new KafkaDeserializationAdapter<>(KafkaRecordDeserializationSchema.valueOnly(valueDeserializerClass, config), typeInfo);
+    public static <T, D extends Deserializer<T>> KafkaDeserializationAdapter<T> valueOnly(Class<D> valueDeserializerClass, Map<String, String> config) {
+        return new KafkaDeserializationAdapter<>(KafkaRecordDeserializationSchema.valueOnly(valueDeserializerClass, config));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public KafkaRecordDeserializationSchema<T> getDeserializationSchema() {
         return deserializationSchema;
-    }
-
-    @Override
-    public TypeInformation<T> getTypeInfo() {
-        return typeInfo;
     }
 }

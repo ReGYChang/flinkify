@@ -1,13 +1,14 @@
 package com.regy.quantalink.flink.core.connector.kafka.sink;
 
 import com.regy.quantalink.common.config.Configuration;
+import com.regy.quantalink.common.exception.ErrCode;
+import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.flink.core.connector.SinkConnector;
 import com.regy.quantalink.flink.core.connector.kafka.config.KafkaOptions;
 import com.regy.quantalink.flink.core.connector.kafka.serialization.KafkaSerializationAdapter;
+import com.regy.quantalink.flink.core.connector.rabbitmq.serialization.RabbitmqSerializationAdapter;
 import com.regy.quantalink.flink.core.connector.serialization.DefaultSerializationSchema;
-import com.regy.quantalink.flink.core.connector.serialization.SerializationAdapter;
 
-import com.google.common.base.Preconditions;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -30,16 +31,24 @@ public class KafkaSinkConnector<T> extends SinkConnector<T> {
         this.topic = config.getNotNull(KafkaOptions.TOPIC, String.format("Kafka sink connector '%s' topic must not be null", this.connectorName));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public DataStreamSink<T> getSinkDataStream(DataStream<T> stream) {
-        SerializationAdapter<T> serializationAdapter = Optional.ofNullable(super.serializationAdapter).orElse(new KafkaSerializationAdapter<>(new DefaultSerializationSchema<>(), super.typeInfo));
-        Preconditions.checkArgument(serializationAdapter instanceof KafkaSerializationAdapter, String.format("Kafka sink connector '%s' serialization adapter must be '%s', could not assign other serialization adapter", super.connectorName, KafkaSerializationAdapter.class));
-        KafkaSink<T> sink = KafkaSink.<T>builder()
-                .setBootstrapServers(bootStrapServers)
-                .setRecordSerializer(
-                        KafkaRecordSerializationSchema.builder()
-                                .setTopic(topic)
-                                .setValueSerializationSchema(((KafkaSerializationAdapter<T>) serializationAdapter).getSerializationSchema()).build()).build();
-        return stream.sinkTo(sink).name(super.connectorName).setParallelism(super.parallelism).disableChaining();
+        try {
+            KafkaSerializationAdapter<T> serializationAdapter =
+                    Optional.ofNullable((KafkaSerializationAdapter<T>) super.serializationAdapter)
+                            .orElse(new KafkaSerializationAdapter<>(new DefaultSerializationSchema<>(), super.typeInfo));
+            KafkaSink<T> sink = KafkaSink.<T>builder()
+                    .setBootstrapServers(bootStrapServers)
+                    .setRecordSerializer(
+                            KafkaRecordSerializationSchema.builder()
+                                    .setTopic(topic)
+                                    .setValueSerializationSchema(serializationAdapter.getSerializationSchema()).build()).build();
+            return stream.sinkTo(sink).name(super.connectorName).setParallelism(super.parallelism).disableChaining();
+        } catch (ClassCastException e1) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Kafka sink connector '%s' serialization adapter must be '%s', could not assign other serialization adapter", super.connectorName, KafkaSerializationAdapter.class), e1);
+        } catch (Exception e) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize Kafka sink connector '%s'", super.connectorName), e);
+        }
     }
 }

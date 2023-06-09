@@ -12,7 +12,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  */
 public abstract class SinkConnector<T> extends Connector<T> {
 
-    protected SerializationAdapter<T> serializationAdapter;
+    protected SerializationAdapter<T, ?> serializationAdapter;
 
     public SinkConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
@@ -24,7 +24,7 @@ public abstract class SinkConnector<T> extends Connector<T> {
      */
     public abstract DataStreamSink<T> getSinkDataStream(DataStream<T> stream);
 
-    public void withSerializationAdapter(SerializationAdapter<T> serializationAdapter) {
+    public void withSerializationAdapter(SerializationAdapter<T, ?> serializationAdapter) {
         this.serializationAdapter = serializationAdapter;
     }
 }

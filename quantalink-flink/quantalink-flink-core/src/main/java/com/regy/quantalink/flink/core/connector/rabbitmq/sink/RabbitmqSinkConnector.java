@@ -1,13 +1,13 @@
 package com.regy.quantalink.flink.core.connector.rabbitmq.sink;
 
 import com.regy.quantalink.common.config.Configuration;
+import com.regy.quantalink.common.exception.ErrCode;
+import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.flink.core.connector.SinkConnector;
 import com.regy.quantalink.flink.core.connector.rabbitmq.config.RabbitmqOptions;
 import com.regy.quantalink.flink.core.connector.rabbitmq.serialization.RabbitmqSerializationAdapter;
 import com.regy.quantalink.flink.core.connector.serialization.DefaultSerializationSchema;
-import com.regy.quantalink.flink.core.connector.serialization.SerializationAdapter;
 
-import com.google.common.base.Preconditions;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -35,15 +35,24 @@ public class RabbitmqSinkConnector<T> extends SinkConnector<T> {
         this.connectionConfig = new RMQConnectionConfig.Builder().setHost(host).setPort(port).setVirtualHost(virtualHost).setUserName(username).setPassword(password).build();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public DataStreamSink<T> getSinkDataStream(DataStream<T> stream) {
-        SerializationAdapter<T> serializationAdapter = Optional.ofNullable(super.serializationAdapter).orElse(new RabbitmqSerializationAdapter<>(new DefaultSerializationSchema<>(), super.typeInfo, null));
-        Preconditions.checkArgument(serializationAdapter instanceof RabbitmqSerializationAdapter, String.format("Rabbitmq sink connector '%s' serialization adapter must be '%s', could not assign other serialization adapter", super.connectorName, RabbitmqSerializationAdapter.class));
-        RabbitmqSinkPublishOptions<T> sinkPublishOpt = new RabbitmqSinkPublishOptions<>(super.config, ((RabbitmqSerializationAdapter<T>) serializationAdapter).getComputePropertiesFunc());
-        RMQSink<T> sink =
-                Optional.ofNullable(queueName).isPresent() ?
-                        new RMQSink<>(connectionConfig, queueName, serializationAdapter.getSerializationSchema()) :
-                        new RMQSink<>(connectionConfig, serializationAdapter.getSerializationSchema(), sinkPublishOpt);
-        return stream.addSink(sink).name(super.connectorName).setParallelism(super.parallelism).disableChaining();
+        try {
+            RabbitmqSerializationAdapter<T> serializationAdapter =
+                    Optional.ofNullable((RabbitmqSerializationAdapter<T>) super.serializationAdapter).orElse(
+                            new RabbitmqSerializationAdapter<>(
+                                    new DefaultSerializationSchema<>(), null, super.typeInfo));
+            RabbitmqSinkPublishOptions<T> sinkPublishOpts = new RabbitmqSinkPublishOptions<>(super.config, serializationAdapter.getComputePropertiesFunc());
+            RMQSink<T> sink =
+                    Optional.ofNullable(queueName).isPresent() ?
+                            new RMQSink<>(connectionConfig, queueName, serializationAdapter.getSerializationSchema()) :
+                            new RMQSink<>(connectionConfig, serializationAdapter.getSerializationSchema(), sinkPublishOpts);
+            return stream.addSink(sink).name(super.connectorName).setParallelism(super.parallelism).disableChaining();
+        } catch (ClassCastException e1) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Rabbitmq sink connector '%s' serialization adapter must be '%s', could not assign other serialization adapter", super.connectorName, RabbitmqSerializationAdapter.class), e1);
+        } catch (Exception e2) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize RabbitMQ sink connector '%s'", super.connectorName), e2);
+        }
     }
 }

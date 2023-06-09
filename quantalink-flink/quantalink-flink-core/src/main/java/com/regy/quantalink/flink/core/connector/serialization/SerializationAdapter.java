@@ -5,9 +5,16 @@ import com.regy.quantalink.common.type.TypeInformation;
 /**
  * @author regy
  */
-public interface SerializationAdapter<T> {
+public abstract class SerializationAdapter<T, D> {
+    private final TypeInformation<T> typeInfo;
 
-    <D> D getSerializationSchema();
+    protected SerializationAdapter(TypeInformation<T> typeInfo) {
+        this.typeInfo = typeInfo;
+    }
 
-    TypeInformation<T> getTypeInfo();
+    public abstract D getSerializationSchema();
+
+    public TypeInformation<T> getTypeInfo() {
+        return typeInfo;
+    }
 }

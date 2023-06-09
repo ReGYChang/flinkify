@@ -9,18 +9,13 @@ import org.apache.flink.api.common.serialization.SerializationSchema;
 /**
  * @author regy
  */
-public class RabbitmqSerializationAdapter<T> implements SerializationAdapter<T> {
+public class RabbitmqSerializationAdapter<T> extends SerializationAdapter<T, SerializationSchema<T>> {
     private final SerializationSchema<T> serializationSchema;
-    private final TypeInformation<T> typeInfo;
     private final ComputePropertiesFunc<T> computePropertiesFunc;
 
-    public RabbitmqSerializationAdapter(
-            SerializationSchema<T> serializationSchema,
-            TypeInformation<T> typeInfo,
-            ComputePropertiesFunc<T> computePropertiesFunc) {
-
+    public RabbitmqSerializationAdapter(SerializationSchema<T> serializationSchema, ComputePropertiesFunc<T> computePropertiesFunc, TypeInformation<T> typeInfo) {
+        super(typeInfo);
         this.serializationSchema = serializationSchema;
-        this.typeInfo = typeInfo;
         this.computePropertiesFunc = computePropertiesFunc;
     }
 
@@ -28,14 +23,8 @@ public class RabbitmqSerializationAdapter<T> implements SerializationAdapter<T> 
         return computePropertiesFunc;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public SerializationSchema<T> getSerializationSchema() {
         return serializationSchema;
-    }
-
-    @Override
-    public TypeInformation<T> getTypeInfo() {
-        return typeInfo;
     }
 }

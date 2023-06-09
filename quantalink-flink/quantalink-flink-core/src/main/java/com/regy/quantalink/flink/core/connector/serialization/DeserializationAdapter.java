@@ -5,10 +5,17 @@ import com.regy.quantalink.common.type.TypeInformation;
 /**
  * @author regy
  */
-public interface DeserializationAdapter<T> {
+public abstract class DeserializationAdapter<T, D> {
+    private final TypeInformation<T> typeInfo;
 
-    <D> D getDeserializationSchema();
+    protected DeserializationAdapter(TypeInformation<T> typeInfo) {
+        this.typeInfo = typeInfo;
+    }
 
-    TypeInformation<T> getTypeInfo();
+    public abstract D getDeserializationSchema();
+
+    public TypeInformation<T> getTypeInfo() {
+        return typeInfo;
+    }
 }
 

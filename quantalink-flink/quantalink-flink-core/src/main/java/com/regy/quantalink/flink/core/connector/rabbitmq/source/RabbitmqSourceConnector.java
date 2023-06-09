@@ -1,14 +1,13 @@
 package com.regy.quantalink.flink.core.connector.rabbitmq.source;
 
 import com.regy.quantalink.common.config.Configuration;
+import com.regy.quantalink.common.exception.ErrCode;
 import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.flink.core.connector.SourceConnector;
 import com.regy.quantalink.flink.core.connector.rabbitmq.config.RabbitmqOptions;
 import com.regy.quantalink.flink.core.connector.rabbitmq.serialization.RabbitmqDeserializationAdapter;
 import com.regy.quantalink.flink.core.connector.serialization.DefaultDeserializationSchema;
-import com.regy.quantalink.flink.core.connector.serialization.DeserializationAdapter;
 
-import com.google.common.base.Preconditions;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.rabbitmq.RMQSource;
@@ -37,12 +36,20 @@ public class RabbitmqSourceConnector<T> extends SourceConnector<T> {
         this.queueName = config.getNotNull(RabbitmqOptions.QUEUE_NAME, String.format("Rabbitmq sink connector '%s' queue-name must not be null", super.connectorName));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public DataStreamSource<T> getSourceDataStream() throws FlinkException {
-        DeserializationAdapter<T> deserializationAdapter = Optional.ofNullable(super.deserializationAdapter).orElse(new RabbitmqDeserializationAdapter<>(new DefaultDeserializationSchema<>(super.typeInfo)));
-        Preconditions.checkArgument(deserializationAdapter instanceof RabbitmqDeserializationAdapter, String.format("Rabbitmq sink connector '%s' serialization adapter must be [RabbitmqSerializationAdapter], could not assign other serialization adapter", super.connectorName));
-        return super.env.addSource(
-                new RMQSource<>(connectionConfig, queueName, usesCorrelationId,
-                        ((RabbitmqDeserializationAdapter<T>) deserializationAdapter).getDeserializationSchema()), super.connectorName);
+        try {
+            RabbitmqDeserializationAdapter<T> deserializationAdapter =
+                    Optional.ofNullable((RabbitmqDeserializationAdapter<T>) super.deserializationAdapter)
+                            .orElse(new RabbitmqDeserializationAdapter<>(new DefaultDeserializationSchema<>(super.typeInfo)));
+            return super.env.addSource(
+                    new RMQSource<>(connectionConfig, queueName, usesCorrelationId,
+                            deserializationAdapter.getDeserializationSchema()), super.connectorName);
+        } catch (ClassCastException e1) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Rabbitmq source connector '%s' deserialization adapter must be '%s', could not assign other deserialization adapter", super.connectorName, RabbitmqDeserializationAdapter.class), e1);
+        } catch (Exception e2) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize Rabbitmq sink connector '%s'", super.connectorName), e2);
+        }
     }
 }

@@ -8,23 +8,16 @@ import org.apache.flink.api.common.serialization.SerializationSchema;
 /**
  * @author regy
  */
-public class KafkaSerializationAdapter<T> implements SerializationAdapter<T> {
+public class KafkaSerializationAdapter<T> extends SerializationAdapter<T, SerializationSchema<T>> {
     private final SerializationSchema<T> serializationSchema;
-    private final TypeInformation<T> typeInfo;
 
     public KafkaSerializationAdapter(SerializationSchema<T> serializationSchema, TypeInformation<T> typeInfo) {
+        super(typeInfo);
         this.serializationSchema = serializationSchema;
-        this.typeInfo = typeInfo;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public SerializationSchema<T> getSerializationSchema() {
         return serializationSchema;
-    }
-
-    @Override
-    public TypeInformation<T> getTypeInfo() {
-        return typeInfo;
     }
 }

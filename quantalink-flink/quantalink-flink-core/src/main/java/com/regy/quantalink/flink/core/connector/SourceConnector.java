@@ -13,7 +13,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  */
 public abstract class SourceConnector<T> extends Connector<T> {
 
-    protected DeserializationAdapter<T> deserializationAdapter;
+    protected DeserializationAdapter<T, ?> deserializationAdapter;
     protected WatermarkStrategy<T> watermarkStrategy;
 
     public SourceConnector(StreamExecutionEnvironment env, Configuration config) {
@@ -26,7 +26,7 @@ public abstract class SourceConnector<T> extends Connector<T> {
      */
     public abstract DataStreamSource<T> getSourceDataStream() throws FlinkException;
 
-    public SourceConnector<T> withDeserializationSchemaAdapter(DeserializationAdapter<T> deserializationAdapter) {
+    public SourceConnector<T> withDeserializationSchemaAdapter(DeserializationAdapter<T, ?> deserializationAdapter) {
         this.deserializationAdapter = deserializationAdapter;
         return this;
     }

@@ -8,23 +8,16 @@ import org.apache.flink.api.common.serialization.DeserializationSchema;
 /**
  * @author regy
  */
-public class RabbitmqDeserializationAdapter<T> implements DeserializationAdapter<T> {
+public class RabbitmqDeserializationAdapter<T> extends DeserializationAdapter<T, DeserializationSchema<T>> {
     private final DeserializationSchema<T> deserializationSchema;
-    private final TypeInformation<T> typeInfo;
 
     public RabbitmqDeserializationAdapter(DeserializationSchema<T> deserializationSchema) {
+        super(TypeInformation.get(deserializationSchema.getProducedType()));
         this.deserializationSchema = deserializationSchema;
-        this.typeInfo = TypeInformation.get(deserializationSchema.getProducedType());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public DeserializationSchema<T> getDeserializationSchema() {
         return deserializationSchema;
-    }
-
-    @Override
-    public TypeInformation<T> getTypeInfo() {
-        return typeInfo;
     }
 }

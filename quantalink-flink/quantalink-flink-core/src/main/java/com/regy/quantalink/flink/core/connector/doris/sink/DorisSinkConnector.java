@@ -60,10 +60,12 @@ public class DorisSinkConnector<T> extends SinkConnector<T> {
     @SuppressWarnings("unchecked")
     private DorisSink<T> applyDorisSink(Class<T> clazz) {
         try {
-            DorisRecordSerializer<?> serializer = clazz.equals(RowData.class) ?
-                    RowDataSerializer.builder().setType("json")
-                            .setFieldNames(fields.toArray(new String[0]))
-                            .setFieldType(types.toArray(new DataType[0])).build() : new SimpleStringSerializer();
+            DorisRecordSerializer<?> serializer =
+                    clazz.equals(RowData.class) ?
+                            RowDataSerializer.builder().setType("json")
+                                    .setFieldNames(fields.toArray(new String[0]))
+                                    .setFieldType(types.toArray(new DataType[0])).build() :
+                            new SimpleStringSerializer();
 
             return DorisSink.<T>builder()
                     .setDorisReadOptions(DorisReadOptions.builder().build())
