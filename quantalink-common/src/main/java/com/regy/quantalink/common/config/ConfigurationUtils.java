@@ -4,7 +4,6 @@ import com.regy.quantalink.common.exception.ConfigurationException;
 import com.regy.quantalink.common.exception.ErrCode;
 import com.regy.quantalink.common.type.TypeInformation;
 
-import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.shaded.jackson2.org.yaml.snakeyaml.Yaml;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.types.DataType;
@@ -281,8 +280,8 @@ public final class ConfigurationUtils {
         return Double.parseDouble(o.toString());
     }
 
-    public static Configuration loadYamlConfigFromParameters(String[] args) {
-        return loadYamlResource(new File(ParameterTool.fromArgs(args).get("conf")));
+    public static Configuration loadYamlConfigFromPath(String path) throws NullPointerException {
+        return loadYamlResource(new File(path));
     }
 
     static Configuration loadYamlResource(File file) {

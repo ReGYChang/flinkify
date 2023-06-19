@@ -11,7 +11,6 @@
 
     <modules>
         <module>quantalink-flink</module>
-        <module>quantalink-flink</module>
         <module>quantalink-common</module>
         <module>quantalink-quickstart</module>
     </modules>
