@@ -8,7 +8,6 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.util.OutputTag;
 
 import java.util.Optional;
 
@@ -33,11 +32,22 @@ public class FlinkDataStream<T> {
         return new FlinkDataStream<>(stream, context);
     }
 
-    public DataStream<T> getSideStream(OutputTag<T> tag) {
+    public <T2> FlinkDataStream<T> sideSink(com.regy.quantalink.common.type.TypeInformation<T2> typeInfo) {
         if (this.dataStream instanceof SingleOutputStreamOperator) {
-            return ((SingleOutputStreamOperator<T>) this.dataStream).getSideOutput(tag);
+            SinkConnector<T2> sinkConnector = this.context.getSinkConnector(typeInfo);
+            sinkConnector.getSinkDataStream(((SingleOutputStreamOperator<T>) this.dataStream).getSideOutput(sinkConnector.getOutputTag()));
+            return this;
         }
-        throw new FlinkException(ErrCode.STREAMING_EXECUTION_FAILED, String.format("Could not get side output stream from '%s'", typeInformation));
+        throw new FlinkException(ErrCode.STREAMING_EXECUTION_FAILED, String.format("Could not sink from side output stream with type: '%s'", typeInfo));
+    }
+
+    public <T2> FlinkDataStream<T> sidePrint(com.regy.quantalink.common.type.TypeInformation<T2> typeInfo) {
+        if (this.dataStream instanceof SingleOutputStreamOperator) {
+            SinkConnector<T2> sinkConnector = this.context.getSinkConnector(typeInfo);
+            ((SingleOutputStreamOperator<T>) this.dataStream).getSideOutput(sinkConnector.getOutputTag()).print();
+            return this;
+        }
+        throw new FlinkException(ErrCode.STREAMING_EXECUTION_FAILED, String.format("Could not sink from side output stream with type: '%s'", typeInfo));
     }
 
     public void sink() {

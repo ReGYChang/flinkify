@@ -15,9 +15,6 @@
     <modules>
         <module>quantalink-quickstart-connector</module>
         <module>quantalink-quickstart-datastream</module>
-        <module>quantalink-quickstart-datastream/quantalink-quickstart-datastream-v1.16</module>
-        <module>quantalink-quickstart-connector/quantalink-quickstart-connector-kafka</module>
-        <module>quantalink-quickstart-connector/quantalink-quickstart-connector-mysql</module>
     </modules>
 
     <properties>

@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface NebulaOptions {
 
-    ConfigOption<List<Configuration>> CONNECTORS = ConfigOptions.key("connectors")
+    ConfigOption<List<Configuration>> CONNECTORS = ConfigOptions.key("nebula")
             .configType()
             .asList()
             .noDefaultValue()

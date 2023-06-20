@@ -10,6 +10,11 @@
     </parent>
 
     <artifactId>quantalink-quickstart-datastream</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>quantalink-quickstart-datastream-v1.16</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

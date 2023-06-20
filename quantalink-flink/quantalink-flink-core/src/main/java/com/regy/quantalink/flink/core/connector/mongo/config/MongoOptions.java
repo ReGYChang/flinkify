@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface MongoOptions {
 
-    ConfigOption<List<Configuration>> CONNECTORS = ConfigOptions.key("connectors")
+    ConfigOption<List<Configuration>> CONNECTORS = ConfigOptions.key("mongodb")
             .configType()
             .asList()
             .noDefaultValue();

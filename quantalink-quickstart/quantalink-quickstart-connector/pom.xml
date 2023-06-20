@@ -10,6 +10,13 @@
     </parent>
 
     <artifactId>quantalink-quickstart-connector</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>quantalink-quickstart-connector-kafka</module>
+        <module>quantalink-quickstart-connector-mysql</module>
+        <module>quantalink-quickstart-connector-nebula</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

@@ -6,15 +6,17 @@ import com.regy.quantalink.flink.core.config.ConnectorOptions;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
+import java.io.Serializable;
+
 /**
  * @author regy
  */
-public abstract class Connector<T> {
+public abstract class Connector<T> implements Serializable {
 
     protected final TypeInformation<T> typeInfo;
     protected final int parallelism;
     protected final String connectorName;
-    protected final StreamExecutionEnvironment env;
+    protected transient final StreamExecutionEnvironment env;
     protected final Configuration config;
 
     @SuppressWarnings("unchecked")

@@ -85,7 +85,7 @@ public class ConnectorUtils {
                         List<Configuration> nebulaConfigs = connectorConfig.getNotNull(NebulaOptions.CONNECTORS, "Could not find configuration of nebula graph sink connector");
                         nebulaConfigs.forEach(
                                 nebulaConfig ->
-                                        connectors.put(nebulaConfig.getNotNull(ConnectorOptions.DATA_TYPE, "Could not find data type of nebula graph sink connector"), new NebulaSinkConnector<>(environment, nebulaConfig)));
+                                        connectors.put(nebulaConfig.getNotNull(ConnectorOptions.DATA_TYPE, "Could not find data type of nebula graph sink connector"), new NebulaSinkConnector(environment, nebulaConfig)));
                     } else if (connectorConfig.contains(MongoOptions.CONNECTORS)) {
                         List<Configuration> mongoConfigs = connectorConfig.getNotNull(MongoOptions.CONNECTORS, "Could not find configuration of mongo sink connector");
                         mongoConfigs.forEach(

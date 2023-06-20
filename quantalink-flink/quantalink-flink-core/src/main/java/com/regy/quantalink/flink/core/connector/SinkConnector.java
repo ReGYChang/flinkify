@@ -6,13 +6,17 @@ import com.regy.quantalink.flink.core.connector.serialization.SerializationAdapt
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.util.OutputTag;
+
+import java.io.Serializable;
 
 /**
  * @author regy
  */
-public abstract class SinkConnector<T> extends Connector<T> {
+public abstract class SinkConnector<T> extends Connector<T> implements Serializable {
 
     protected SerializationAdapter<T, ?> serializationAdapter;
+    protected OutputTag<T> outputTag;
 
     public SinkConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
@@ -26,5 +30,9 @@ public abstract class SinkConnector<T> extends Connector<T> {
 
     public void withSerializationAdapter(SerializationAdapter<T, ?> serializationAdapter) {
         this.serializationAdapter = serializationAdapter;
+    }
+
+    public OutputTag<T> getOutputTag() {
+        return outputTag;
     }
 }

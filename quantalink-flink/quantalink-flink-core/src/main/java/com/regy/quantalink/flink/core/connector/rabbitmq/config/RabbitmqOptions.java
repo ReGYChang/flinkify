@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface RabbitmqOptions {
 
-    ConfigOption<List<Configuration>> CONNECTORS = ConfigOptions.key("connectors")
+    ConfigOption<List<Configuration>> CONNECTORS = ConfigOptions.key("rabbitmq")
             .configType()
             .asList()
             .noDefaultValue()
