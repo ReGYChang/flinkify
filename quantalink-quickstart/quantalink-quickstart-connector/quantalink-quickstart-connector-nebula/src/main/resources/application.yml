@@ -1,0 +1,121 @@
+flink:
+  sources:
+    - kafka:
+        - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.DcsEvent
+          name: kafka-dcs-source
+          bootstrap-servers: kafka.nexdata.stg:9094
+          group-id: flink-esg-graph
+          topic: test.traceability_v1.data_collection_station
+          offset-reset-strategy: EARLIEST
+        - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.SensorMap
+          name: kafka-sensor-map-source
+          bootstrap-servers: kafka.nexdata.stg:9094
+          group-id: flink-esg-graph
+          topic: traceability.sensormap.test
+          offset-reset-strategy: EARLIEST
+
+  sinks:
+    - nebula:
+        - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.NebulaTag$ProductionLine
+          graph-address: nebula-graph.nexdata.stg:9669
+          meta-address: nebula-metad.nexdata.stg:9559
+          username: root
+          password: 123
+          write-mode: INSERT
+          batch-size: 100
+          batch-interval-ms: 500
+          graph-space: esg_v23
+          row-type: Vertex
+          vertex-name: production_line
+          vertex-id-index: 0
+          vertex-fields:
+            - id
+            - oid
+            - name
+          vertex-positions:
+            - 1
+            - 2
+            - 3
+        - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.NebulaTag$Workstation
+          graph-address: nebula-graph.nexdata.stg:9669
+          meta-address: nebula-metad.nexdata.stg:9559
+          username: root
+          password: 123
+          write-mode: INSERT
+          batch-size: 100
+          batch-interval-ms: 500
+          graph-space: esg_v23
+          row-type: Vertex
+          vertex-name: work_station
+          vertex-id-index: 0
+          vertex-fields:
+            - id
+            - oid
+            - name
+            - station_type
+            - sequence_position
+            - base_station_id
+            - offset
+            - processing_time
+          vertex-positions:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+        - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.NebulaTag$BelongsTo
+          graph-address: nebula-graph.nexdata.stg:9669
+          meta-address: nebula-metad.nexdata.stg:9559
+          username: root
+          password: 123
+          write-mode: INSERT
+          batch-size: 100
+          batch-interval-ms: 500
+          graph-space: esg_v23
+          row-type: Edge
+          edge-name: belongs_to
+          edge-src-index: 0
+          edge-dst-index: 1
+          edge-rank-index: -1
+          edge-fields: [ ]
+          edge-positions: [ ]
+        - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.NebulaTag$WorkOrder
+          graph-address: nebula-graph.nexdata.stg:9669
+          meta-address: nebula-metad.nexdata.stg:9559
+          username: root
+          password: 123
+          write-mode: INSERT
+          batch-size: 100
+          batch-interval-ms: 500
+          graph-space: esg_v23
+          row-type: Vertex
+          vertex-name: work_order
+          vertex-id-index: 0
+          vertex-fields:
+            - work_order_id
+          vertex-positions:
+            - 1
+        - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.NebulaTag$ProducedOn
+          graph-address: nebula-graph.nexdata.stg:9669
+          meta-address: nebula-metad.nexdata.stg:9559
+          username: root
+          password: 123
+          write-mode: INSERT
+          batch-size: 100
+          batch-interval-ms: 500
+          graph-space: esg_v23
+          row-type: Edge
+          edge-name: produced_on
+          edge-src-index: 0
+          edge-dst-index: 1
+          edge-fields:
+            - started_at
+            - ended_at
+            - produced_count
+          edge-positions:
+            - 2
+            - 3
+            - 4
