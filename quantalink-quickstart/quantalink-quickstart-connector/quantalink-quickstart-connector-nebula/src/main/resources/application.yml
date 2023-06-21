@@ -1,11 +1,13 @@
 flink:
+  job-name: Create Nebula Graph of ESG
+
   sources:
     - kafka:
         - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.DcsEvent
           name: kafka-dcs-source
           bootstrap-servers: kafka.nexdata.stg:9094
           group-id: flink-esg-graph
-          topic: test.traceability_v1.data_collection_station
+          topic: traceability_v1.data_collection_station
           offset-reset-strategy: EARLIEST
         - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.SensorMap
           name: kafka-sensor-map-source
@@ -17,6 +19,7 @@ flink:
   sinks:
     - nebula:
         - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.NebulaTag$ProductionLine
+          name: nebula-production-line-sink
           graph-address: nebula-graph.nexdata.stg:9669
           meta-address: nebula-metad.nexdata.stg:9559
           username: root
@@ -24,7 +27,7 @@ flink:
           write-mode: INSERT
           batch-size: 100
           batch-interval-ms: 500
-          graph-space: esg_v23
+          graph-space: esg_v22
           row-type: Vertex
           vertex-name: production_line
           vertex-id-index: 0
@@ -37,6 +40,7 @@ flink:
             - 2
             - 3
         - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.NebulaTag$Workstation
+          name: nebula-workstation-sink
           graph-address: nebula-graph.nexdata.stg:9669
           meta-address: nebula-metad.nexdata.stg:9559
           username: root
@@ -44,7 +48,7 @@ flink:
           write-mode: INSERT
           batch-size: 100
           batch-interval-ms: 500
-          graph-space: esg_v23
+          graph-space: esg_v22
           row-type: Vertex
           vertex-name: work_station
           vertex-id-index: 0
@@ -67,6 +71,7 @@ flink:
             - 7
             - 8
         - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.NebulaTag$BelongsTo
+          name: nebula-belongs-to-sink
           graph-address: nebula-graph.nexdata.stg:9669
           meta-address: nebula-metad.nexdata.stg:9559
           username: root
@@ -74,7 +79,7 @@ flink:
           write-mode: INSERT
           batch-size: 100
           batch-interval-ms: 500
-          graph-space: esg_v23
+          graph-space: esg_v22
           row-type: Edge
           edge-name: belongs_to
           edge-src-index: 0
@@ -90,7 +95,7 @@ flink:
           write-mode: INSERT
           batch-size: 100
           batch-interval-ms: 500
-          graph-space: esg_v23
+          graph-space: esg_v22
           row-type: Vertex
           vertex-name: work_order
           vertex-id-index: 0
@@ -99,6 +104,7 @@ flink:
           vertex-positions:
             - 1
         - data-type: com.regy.quantalink.quickstart.connector.nebula.entity.NebulaTag$ProducedOn
+          name: nebula-produced-on-sink
           graph-address: nebula-graph.nexdata.stg:9669
           meta-address: nebula-metad.nexdata.stg:9559
           username: root
@@ -106,7 +112,7 @@ flink:
           write-mode: INSERT
           batch-size: 100
           batch-interval-ms: 500
-          graph-space: esg_v23
+          graph-space: esg_v22
           row-type: Edge
           edge-name: produced_on
           edge-src-index: 0

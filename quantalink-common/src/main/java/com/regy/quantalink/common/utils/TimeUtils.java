@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Date;
 
 /**
  * @author regy
@@ -24,6 +25,10 @@ public class TimeUtils {
 
     public static LocalDateTime toDateTime(Duration duration) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(toMillis(duration)), ZoneOffset.UTC);
+    }
+
+    public static Date toDate(LocalDateTime dateTime) {
+        return Date.from(dateTime.toInstant(ZoneOffset.UTC));
     }
 
     public static Duration toDuration(long millis) {
