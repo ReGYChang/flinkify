@@ -9,12 +9,14 @@ import com.regy.quantalink.flink.core.connector.ConnectorUtils;
 
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author regy
@@ -26,9 +28,19 @@ public abstract class FlinkStreaming {
 
     protected void init(String[] args) {
         try {
-            String path = Optional.ofNullable(ParameterTool.fromArgs(args).get("conf"))
-                    .orElse(Objects.requireNonNull(this.getClass().getClassLoader().getResource("application.yml")).getPath());
-            Configuration config = ConfigurationUtils.loadYamlConfigFromPath(path);
+            String conf = ParameterTool.fromArgs(args).get("conf");
+            Configuration config;
+            if (conf != null) {
+                config = ConfigurationUtils.loadYamlConfigFromPath(conf);
+            } else {
+                try (InputStream stream = Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("application.yml"))) {
+                    config = ConfigurationUtils.loadYamlConfigFromStream(stream);
+                } catch (IOException e) {
+                    throw new RuntimeException("Error closing YAML configuration InputStream", e);
+                }
+            }
+            org.apache.flink.configuration.Configuration configuration = new org.apache.flink.configuration.Configuration();
+            configuration.setInteger(RestOptions.PORT, 8089);
             StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
             this.context = new FlinkStreamingContext.Builder()

@@ -9,9 +9,9 @@ import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.util.TimeUtils;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.Arrays;
@@ -280,18 +280,18 @@ public final class ConfigurationUtils {
         return Double.parseDouble(o.toString());
     }
 
-    public static Configuration loadYamlConfigFromPath(String path) throws NullPointerException {
-        return loadYamlResource(new File(path));
+    public static Configuration loadYamlConfigFromPath(String path) {
+        try (FileInputStream stream = new FileInputStream(path)) {
+            return loadYamlConfigFromStream(stream);
+        } catch (IOException e) {
+            throw new ConfigurationException(ErrCode.PARSING_CONFIG_FAILED, "Error reading YAML configuration file.", e);
+        }
     }
 
-    static Configuration loadYamlResource(File file) {
-        try (FileInputStream fileInputStream = new FileInputStream(file)) {
-            Yaml yaml = new Yaml();
-            Map<String, Object> configMap = yaml.load(fileInputStream);
-            return Configuration.fromMap(configMap);
-        } catch (IOException e) {
-            throw new ConfigurationException(ErrCode.PARSING_CONFIG_FAILED, "Error parsing YAML configuration.", e);
-        }
+    public static Configuration loadYamlConfigFromStream(InputStream stream) {
+        Yaml yaml = new Yaml();
+        Map<String, Object> configMap = yaml.load(stream);
+        return Configuration.fromMap(configMap);
     }
 
     public static Configuration convertToConfiguration(Object o) {

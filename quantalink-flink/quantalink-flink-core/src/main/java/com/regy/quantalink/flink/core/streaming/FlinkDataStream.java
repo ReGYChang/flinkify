@@ -51,7 +51,7 @@ public class FlinkDataStream<T> {
     }
 
     public void sink() {
-        com.regy.quantalink.common.type.TypeInformation<T> typeInfo = com.regy.quantalink.common.type.TypeInformation.get(this.typeInformation);
+        com.regy.quantalink.common.type.TypeInformation<T> typeInfo = com.regy.quantalink.common.type.TypeInformation.get(this.typeInformation.getTypeClass());
         SinkConnector<T> sinkConnector = this.context.getSinkConnector(typeInfo);
         sinkConnector.getSinkDataStream(this.dataStream);
     }
