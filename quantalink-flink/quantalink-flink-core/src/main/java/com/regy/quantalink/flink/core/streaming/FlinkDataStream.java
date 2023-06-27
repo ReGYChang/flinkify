@@ -7,6 +7,7 @@ import com.regy.quantalink.flink.core.connector.SinkConnector;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.datastream.SideOutputDataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 
 import java.util.Optional;
@@ -29,6 +30,10 @@ public class FlinkDataStream<T> {
     }
 
     public static <T> FlinkDataStream<T> ofDataStream(SingleOutputStreamOperator<T> stream, FlinkStreamingContext context) throws FlinkException {
+        return new FlinkDataStream<>(stream, context);
+    }
+
+    public static <T> FlinkDataStream<T> ofDataStream(SideOutputDataStream<T> stream, FlinkStreamingContext context) throws FlinkException {
         return new FlinkDataStream<>(stream, context);
     }
 

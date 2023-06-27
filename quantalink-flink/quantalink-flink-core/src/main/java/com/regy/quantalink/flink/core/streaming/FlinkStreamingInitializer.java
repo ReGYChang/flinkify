@@ -13,7 +13,6 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author regy
@@ -51,7 +50,7 @@ public interface FlinkStreamingInitializer {
         public <T> Builder withSourceConnectorSetup(SourceConnectorInitializer<T> initializer, TypeInformation<T> typeInformation) {
             initializers.add((ctx) -> {
                 try {
-                    initializer.init(ctx.getSourceConnector(typeInformation));
+                    initializer.init(ctx.getSourceConnector(typeInformation), ctx.getConfig());
                 } catch (Exception e) {
                     throw new ConfigurationException(ErrCode.STREAMING_CONFIG_FAILED, "Failed to initialize Flink source connectors", e);
                 }
@@ -59,10 +58,10 @@ public interface FlinkStreamingInitializer {
             return this;
         }
 
-        public Builder withSinkConnectorSetup(SinkConnectorInitializer initializer) {
+        public <T> Builder withSinkConnectorSetup(SinkConnectorInitializer<T> initializer, TypeInformation<T> typeInformation) {
             initializers.add((ctx) -> {
                 try {
-                    initializer.init(ctx.getSinkConnectors());
+                    initializer.init(ctx.getSinkConnector(typeInformation), ctx.getConfig());
                 } catch (Exception e) {
                     throw new ConfigurationException(ErrCode.STREAMING_CONFIG_FAILED, "Failed to initialize Flink sink connectors", e);
                 }
@@ -91,12 +90,12 @@ public interface FlinkStreamingInitializer {
 
     @FunctionalInterface
     interface SourceConnectorInitializer<T> {
-        void init(SourceConnector<T> sourceConnector) throws Exception;
+        void init(SourceConnector<T> sourceConnector, Configuration config) throws Exception;
     }
 
     @FunctionalInterface
-    interface SinkConnectorInitializer {
-        void init(Map<TypeInformation<?>, SinkConnector<?>> sinkConnectors) throws Exception;
+    interface SinkConnectorInitializer<T> {
+        void init(SinkConnector<T> sinkConnector, Configuration config) throws Exception;
     }
 
     // You can define similar interfaces for other initialization phases...

@@ -38,7 +38,7 @@ public class NebulaSink extends FlinkStreaming {
                             env.setParallelism(1);
                         })
                 .withSourceConnectorSetup(
-                        sourceConnector ->
+                        (sourceConnector, config) ->
                                 sourceConnector.withDeserializationSchemaAdapter(
                                         KafkaDeserializationAdapter.valueOnly(new PayloadDeserializationSchema<>(TypeInformation.get(DcsEvent.class)))),
                         TypeInformation.get(DcsEvent.class)).build();

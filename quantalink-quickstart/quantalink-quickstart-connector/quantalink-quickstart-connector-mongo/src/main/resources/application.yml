@@ -26,4 +26,4 @@ flink:
           batch-size: 1000
           batch-interval-ms: 1000
           max-retries: 3
-          sink-name: mongo-traceability_record-sink
+          sink-name: mongo-esg-serial-number-production-line-sink
