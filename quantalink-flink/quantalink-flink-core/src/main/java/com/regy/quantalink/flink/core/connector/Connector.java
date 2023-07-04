@@ -15,7 +15,7 @@ public abstract class Connector<T> implements Serializable {
 
     protected final TypeInformation<T> typeInfo;
     protected final int parallelism;
-    protected final String connectorName;
+    protected final String name;
     protected transient final StreamExecutionEnvironment env;
     protected final Configuration config;
 
@@ -24,7 +24,7 @@ public abstract class Connector<T> implements Serializable {
         this.env = env;
         this.config = config;
         this.parallelism = config.get(ConnectorOptions.PARALLELISM);
-        this.connectorName = config.get(ConnectorOptions.NAME);
-        this.typeInfo = (TypeInformation<T>) config.getNotNull(ConnectorOptions.DATA_TYPE, String.format("Connector '%s' data type must not be null", connectorName));
+        this.name = config.get(ConnectorOptions.NAME);
+        this.typeInfo = (TypeInformation<T>) config.getNotNull(ConnectorOptions.DATA_TYPE, String.format("Connector '%s' data type must not be null", name));
     }
 }

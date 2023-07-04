@@ -53,7 +53,7 @@ public class MySqlSourceConnector extends SourceConnector<String> {
                                 .serverTimeZone(serverTimeZone)
                                 .includeSchemaChanges(includeSchemaChanges)
                                 .deserializer(new JsonDebeziumDeserializationSchema(includeSchema))
-                                .build(), WatermarkStrategy.noWatermarks(), super.connectorName)
+                                .build(), WatermarkStrategy.noWatermarks(), super.name)
                 .setParallelism(parallelism);
     }
 }

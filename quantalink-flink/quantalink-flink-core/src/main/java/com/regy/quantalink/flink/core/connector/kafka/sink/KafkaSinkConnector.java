@@ -26,8 +26,8 @@ public class KafkaSinkConnector<T> extends SinkConnector<T> {
 
     public KafkaSinkConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
-        this.bootStrapServers = config.getNotNull(KafkaOptions.BOOTSTRAP_SERVERS, String.format("Kafka sink connector '%s' bootstrap servers must not be null", this.connectorName));
-        this.topic = config.getNotNull(KafkaOptions.TOPIC, String.format("Kafka sink connector '%s' topic must not be null", this.connectorName));
+        this.bootStrapServers = config.getNotNull(KafkaOptions.BOOTSTRAP_SERVERS, String.format("Kafka sink connector '%s' bootstrap servers must not be null", name));
+        this.topic = config.getNotNull(KafkaOptions.TOPIC, String.format("Kafka sink connector '%s' topic must not be null", name));
     }
 
     @SuppressWarnings("unchecked")
@@ -43,11 +43,11 @@ public class KafkaSinkConnector<T> extends SinkConnector<T> {
                             KafkaRecordSerializationSchema.builder()
                                     .setTopic(topic)
                                     .setValueSerializationSchema(serializationAdapter.getSerializationSchema()).build()).build();
-            return stream.sinkTo(sink).name(super.connectorName).setParallelism(super.parallelism).disableChaining();
+            return stream.sinkTo(sink).name(name).setParallelism(parallelism).disableChaining();
         } catch (ClassCastException e1) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Kafka sink connector '%s' serialization adapter must be '%s', could not assign other serialization adapter", super.connectorName, KafkaSerializationAdapter.class), e1);
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Kafka sink connector '%s' com.nexdata.flink.traceability.serialization adapter must be '%s', could not assign other com.nexdata.flink.traceability.serialization adapter", name, KafkaSerializationAdapter.class), e1);
         } catch (Exception e) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize Kafka sink connector '%s'", super.connectorName), e);
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize Kafka sink connector '%s'", name), e);
         }
     }
 }

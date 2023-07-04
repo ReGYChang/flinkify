@@ -22,21 +22,11 @@ public class SimpleAppWithConfig extends FlinkStreaming {
     public static void main(String[] args) throws Exception {
         FlinkStreamingInitializer initializer =
                 new FlinkStreamingInitializer.Builder()
-
-                        .withConfigurationSetup(
-                                (config) -> {
-                                    config.set(FlinkOptions.JOB_NAME, "Awesome Job");
-                                })
-
-                        .withExecutionEnvironmentSetup(
-                                (env) -> {
-                                    env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
-                                })
-
+                        .withConfigurationSetup((config) -> config.set(FlinkOptions.JOB_NAME, "Awesome Job"))
+                        .withExecutionEnvironmentSetup((env) -> env.setRuntimeMode(RuntimeExecutionMode.STREAMING))
                         .withSourceConnectorSetup(
-                                (sourceConnector) -> {
-                                    sourceConnector.withDeserializationSchemaAdapter(KafkaDeserializationAdapter.valueOnlyDefault(TypeInformation.get(DcsEvent.class)));
-                                },
+                                (sourceConnector, config) ->
+                                        sourceConnector.withDeserializationSchemaAdapter(KafkaDeserializationAdapter.valueOnlyDefault(TypeInformation.get(DcsEvent.class))),
                                 TypeInformation.get(DcsEvent.class)).build();
 
         (new SimpleAppWithConfig()).run(args, initializer);

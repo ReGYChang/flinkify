@@ -7,7 +7,6 @@ import com.regy.quantalink.flink.core.connector.SourceConnector;
 import com.regy.quantalink.flink.core.connector.kafka.config.KafkaOptions;
 import com.regy.quantalink.flink.core.connector.kafka.serialization.KafkaDeserializationAdapter;
 
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -39,9 +38,8 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
     public DataStreamSource<T> getSourceDataStream() throws FlinkException {
         try {
             KafkaDeserializationAdapter<T> deserializer =
-                    Optional.ofNullable((KafkaDeserializationAdapter<T>) deserializationAdapter)
+                    Optional.ofNullable((KafkaDeserializationAdapter<T>) getDeserializationAdapter())
                             .orElse(KafkaDeserializationAdapter.valueOnlyDefault(super.typeInfo));
-            WatermarkStrategy<T> watermark = Optional.ofNullable(watermarkStrategy).orElse(WatermarkStrategy.noWatermarks());
             return env.fromSource(
                             KafkaSource.<T>builder()
                                     .setBootstrapServers(bootStrapServers)
@@ -49,12 +47,12 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
                                     .setGroupId(groupId)
                                     .setStartingOffsets(OffsetsInitializer.committedOffsets(offsetResetStrategy))
                                     .setDeserializer(deserializer.getDeserializationSchema())
-                                    .build(), watermark, connectorName)
+                                    .build(), getWatermarkStrategy(), name)
                     .setParallelism(parallelism);
         } catch (ClassCastException e1) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Kafka source connector '%s' deserialization adapter must be '%s', could not assign other deserialization adapter", super.connectorName, KafkaDeserializationAdapter.class), e1);
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Kafka source connector '%s' deserialization adapter must be '%s', could not assign other deserialization adapter", super.name, KafkaDeserializationAdapter.class), e1);
         } catch (Exception e2) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Could not get source from kafka source connector '%s': ", super.connectorName), e2);
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Could not get source from kafka source connector '%s': ", super.name), e2);
         }
     }
 }

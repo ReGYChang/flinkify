@@ -1,0 +1,21 @@
+flink:
+  job-name: Doris Source
+
+  sources:
+    - doris:
+        - data-type: org.apache.flink.table.data.RowData
+          name: doris-source
+          fe-nodes: 10.1.5.35:8030
+          table: test.test
+          username: root
+          password: ""
+          fields:
+            - siteid
+            - city
+            - username
+            - pv
+          types:
+            - INT
+            - VARCHAR-32
+            - VARCHAR-32
+            - BIGINT

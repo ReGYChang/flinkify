@@ -52,4 +52,64 @@ public interface DorisOptions {
             .noDefaultValue()
             .withDescription("");
 
+    ConfigOption<String> READ_FIELDS = ConfigOptions.key("read-fields")
+            .stringType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<String> FILTER_QUERY = ConfigOptions.key("filter-query")
+            .stringType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<Integer> REQUEST_TABLET_SIZE = ConfigOptions.key("request-tablet-size")
+            .intType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<Integer> REQUEST_CONNECT_TIMEOUT_MS = ConfigOptions.key("request-connect-timeout-ms")
+            .intType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<Integer> REQUEST_READ_TIMEOUT_MS = ConfigOptions.key("request-read-timeout-ms")
+            .intType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<Integer> REQUEST_QUERY_TIMEOUT_S = ConfigOptions.key("request-query-timeout-s")
+            .intType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<Integer> REQUEST_RETRIES = ConfigOptions.key("request-retries")
+            .intType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<Integer> REQUEST_BATCH_SIZE = ConfigOptions.key("request-batch-size")
+            .intType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<Long> EXEC_MEM_LIMIT = ConfigOptions.key("exec-mem-limit")
+            .longType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<Integer> DESERIALIZE_QUEUE_SIZE = ConfigOptions.key("deserialize-queue-size")
+            .intType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<Boolean> DESERIALIZE_ARROW_ASYNC = ConfigOptions.key("deserialize-arrow-async")
+            .booleanType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<Boolean> USE_OLD_API = ConfigOptions.key("use-old-api")
+            .booleanType()
+            .defaultValue(false)
+            .withDescription("");
+
 }

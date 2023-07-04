@@ -61,6 +61,11 @@ public class FlinkDataStream<T> {
         sinkConnector.getSinkDataStream(this.dataStream);
     }
 
+    public void sink(com.regy.quantalink.common.type.TypeInformation<T> typeInformation) {
+        SinkConnector<T> sinkConnector = this.context.getSinkConnector(typeInformation);
+        sinkConnector.getSinkDataStream(this.dataStream);
+    }
+
     private FlinkDataStream(DataStream<T> dataStream, FlinkStreamingContext context) {
         this.dataStream = Optional.ofNullable(dataStream).orElseThrow(() -> new FlinkException(ErrCode.STREAMING_EXECUTION_FAILED, "Initialize Flink data stream failed, data stream must not be null"));
         this.context = context;

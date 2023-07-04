@@ -26,12 +26,12 @@ public class RabbitmqSinkConnector<T> extends SinkConnector<T> {
 
     public RabbitmqSinkConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
-        String host = config.getNotNull(RabbitmqOptions.HOST, String.format("Rabbitmq sink connector '%s' host must not be null", super.connectorName));
-        Integer port = config.getNotNull(RabbitmqOptions.PORT, String.format("Rabbitmq sink connector '%s' port must not be null", super.connectorName));
-        String virtualHost = config.getNotNull(RabbitmqOptions.VIRTUAL_HOST, String.format("Rabbitmq sink connector '%s' virtual host must not be null", super.connectorName));
-        String username = config.getNotNull(RabbitmqOptions.USERNAME, String.format("Rabbitmq sink connector '%s' username must not be null", super.connectorName));
-        String password = config.getNotNull(RabbitmqOptions.PASSWORD, String.format("Rabbitmq sink connector '%s' password must not be null", super.connectorName));
-        this.queueName = config.getNotNull(RabbitmqOptions.QUEUE_NAME, String.format("Rabbitmq sink connector '%s' queue-name must not be null", super.connectorName));
+        String host = config.getNotNull(RabbitmqOptions.HOST, String.format("Rabbitmq sink connector '%s' host must not be null", super.name));
+        Integer port = config.getNotNull(RabbitmqOptions.PORT, String.format("Rabbitmq sink connector '%s' port must not be null", super.name));
+        String virtualHost = config.getNotNull(RabbitmqOptions.VIRTUAL_HOST, String.format("Rabbitmq sink connector '%s' virtual host must not be null", super.name));
+        String username = config.getNotNull(RabbitmqOptions.USERNAME, String.format("Rabbitmq sink connector '%s' username must not be null", super.name));
+        String password = config.getNotNull(RabbitmqOptions.PASSWORD, String.format("Rabbitmq sink connector '%s' password must not be null", super.name));
+        this.queueName = config.get(RabbitmqOptions.QUEUE_NAME);
         this.connectionConfig = new RMQConnectionConfig.Builder().setHost(host).setPort(port).setVirtualHost(virtualHost).setUserName(username).setPassword(password).build();
     }
 
@@ -48,11 +48,11 @@ public class RabbitmqSinkConnector<T> extends SinkConnector<T> {
                     Optional.ofNullable(queueName).isPresent() ?
                             new RMQSink<>(connectionConfig, queueName, serializationAdapter.getSerializationSchema()) :
                             new RMQSink<>(connectionConfig, serializationAdapter.getSerializationSchema(), sinkPublishOpts);
-            return stream.addSink(sink).name(super.connectorName).setParallelism(super.parallelism).disableChaining();
+            return stream.addSink(sink).name(name).setParallelism(parallelism).disableChaining();
         } catch (ClassCastException e1) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Rabbitmq sink connector '%s' serialization adapter must be '%s', could not assign other serialization adapter", super.connectorName, RabbitmqSerializationAdapter.class), e1);
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Rabbitmq sink connector '%s' com.nexdata.flink.traceability.serialization adapter must be '%s', could not assign other com.nexdata.flink.traceability.serialization adapter", name, RabbitmqSerializationAdapter.class), e1);
         } catch (Exception e2) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize RabbitMQ sink connector '%s'", super.connectorName), e2);
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize RabbitMQ sink connector '%s'", name), e2);
         }
     }
 }

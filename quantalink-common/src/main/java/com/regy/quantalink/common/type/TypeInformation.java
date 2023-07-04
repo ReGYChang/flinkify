@@ -11,7 +11,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 
 /**
  * @author regy
@@ -68,11 +67,7 @@ public class TypeInformation<T> implements Serializable {
 
     @Override
     public String toString() {
-        return "TypeInformation{" +
-                "rawType=" + rawType +
-                ", type=" + type +
-                ", actualTypeArguments=" + Arrays.toString(actualTypeArguments) +
-                '}';
+        return rawType.getSimpleName();
     }
 
     public static <T> TypeInformation<T> get(Class<T> rawType, Type... actualTypeArguments) {
