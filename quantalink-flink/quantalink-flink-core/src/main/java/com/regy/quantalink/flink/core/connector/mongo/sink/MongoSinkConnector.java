@@ -5,15 +5,14 @@ import com.regy.quantalink.common.exception.ErrCode;
 import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.flink.core.connector.SinkConnector;
 import com.regy.quantalink.flink.core.connector.mongo.config.MongoOptions;
+import com.regy.quantalink.flink.core.connector.mongo.serialization.BsonDocumentParser;
 import com.regy.quantalink.flink.core.connector.mongo.serialization.MongoSerializationAdapter;
 
-import com.alibaba.fastjson2.JSON;
 import com.mongodb.client.model.InsertOneModel;
 import org.apache.flink.connector.mongodb.sink.MongoSink;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.bson.BsonDocument;
 
 import java.util.Optional;
 
@@ -46,8 +45,13 @@ public class MongoSinkConnector<T> extends SinkConnector<T> {
             MongoSerializationAdapter<T> serializationAdapter =
                     Optional.ofNullable((MongoSerializationAdapter<T>) super.serializationAdapter).orElse(
                             new MongoSerializationAdapter<>(
-                                    (input, cxt) ->
-                                            new InsertOneModel<>(BsonDocument.parse(JSON.toJSONString(input))), super.typeInfo));
+                                    (input, cxt) -> {
+                                        try {
+                                            return new InsertOneModel<>(BsonDocumentParser.parse(input));
+                                        } catch (IllegalAccessException e) {
+                                            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to parse data into BsonDocument: %s", input));
+                                        }
+                                    }, super.typeInfo));
             MongoSink<T> sink = MongoSink.<T>builder()
                     .setUri(uri)
                     .setDatabase(database)
