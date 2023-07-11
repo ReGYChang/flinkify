@@ -11,9 +11,9 @@ public class Record {
 
     @JSONField(name = "serial_number")
     public String serialNumber;
-    @JSONField(name = "started_at", format = "millis")
+    @JSONField(name = "started_at")
     public LocalDateTime startedAt;
-    @JSONField(name = "ended_at", format = "millis")
+    @JSONField(name = "ended_at")
     public LocalDateTime endedAt;
     @JSONField(name = "production_line_id")
     public String lineId;
@@ -26,26 +26,6 @@ public class Record {
         this.endedAt = endedAt;
         this.lineId = lineId;
         this.lineName = lineName;
-    }
-
-    public String getSerialNumber() {
-        return serialNumber;
-    }
-
-    public LocalDateTime getStartedAt() {
-        return startedAt;
-    }
-
-    public LocalDateTime getEndedAt() {
-        return endedAt;
-    }
-
-    public String getLineId() {
-        return lineId;
-    }
-
-    public String getLineName() {
-        return lineName;
     }
 
     @Override
