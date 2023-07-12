@@ -15,6 +15,7 @@
     <modules>
         <module>quantalink-quickstart-connector</module>
         <module>quantalink-quickstart-datastream</module>
+        <module>quantalink-quickstart-table</module>
     </modules>
 
     <properties>

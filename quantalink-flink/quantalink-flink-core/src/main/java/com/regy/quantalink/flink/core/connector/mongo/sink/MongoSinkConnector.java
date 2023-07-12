@@ -62,10 +62,12 @@ public class MongoSinkConnector<T> extends SinkConnector<T> {
                     .setSerializationSchema(serializationAdapter.getSerializationSchema())
                     .build();
             return stream.sinkTo(sink).name(super.name).setParallelism(super.parallelism).disableChaining();
-        } catch (ClassCastException e1) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("MongoDB sink connector '%s' com.nexdata.flink.traceability.serialization adapter must be '%s', could not assign other com.nexdata.flink.traceability.serialization adapter", name, MongoSerializationAdapter.class), e1);
-        } catch (Exception e2) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize MongoDB sink connector '%s'", name), e2);
+        } catch (ClassCastException e) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED,
+                    String.format("MongoDB sink connector '%s' serialization adapter must be '%s', could not assign other serialization adapter", name, MongoSerializationAdapter.class), e);
+        } catch (Exception e) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED,
+                    String.format("Failed to initialize MongoDB sink connector '%s'", name), e);
         }
     }
 }

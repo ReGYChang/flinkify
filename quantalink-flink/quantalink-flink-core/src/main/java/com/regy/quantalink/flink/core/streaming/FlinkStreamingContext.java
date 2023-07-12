@@ -14,6 +14,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +25,7 @@ import java.util.Optional;
  */
 public class FlinkStreamingContext {
     private final StreamExecutionEnvironment env;
+    private final StreamTableEnvironment tEnv;
     private final Configuration config;
     private final String jobName;
     private final JobID jobId;
@@ -41,11 +43,13 @@ public class FlinkStreamingContext {
         this.resources = builder.resources;
         this.sourceConnectors = builder.sourceConnectors;
         this.sinkConnectors = builder.sinkConnectors;
+        this.tEnv = builder.tEnv;
     }
 
     @SuppressWarnings("unchecked")
     public <T> SourceConnector<T> getSourceConnector(TypeInformation<T> typeInformation) {
-        return (SourceConnector<T>) sourceConnectors.get(typeInformation);
+        return Optional.ofNullable((SourceConnector<T>) sourceConnectors.get(typeInformation))
+                .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Source connector could not be found with type: [%s]", typeInformation)));
     }
 
     @SuppressWarnings("unchecked")
@@ -54,23 +58,22 @@ public class FlinkStreamingContext {
                 .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_EXECUTION_FAILED, String.format("Sink connector could not be found with type: [%s]", typeInformation)));
     }
 
-    @SuppressWarnings("unchecked")
     public <T> DataStreamSource<T> getSourceDataStream(TypeInformation<T> typeInformation) throws FlinkException {
-        return (DataStreamSource<T>) sourceConnectors.get(typeInformation).getSourceDataStream();
+        return Optional.ofNullable(this.getSourceConnector(typeInformation).getSourceDataStream())
+                .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Source data stream could not be found with type: [%s]", typeInformation)));
     }
 
-    @SuppressWarnings("unchecked")
     public <T> DataStreamSink<T> getSinkDataStream(TypeInformation<T> typeInformation, DataStream<T> stream) {
-        return ((SinkConnector<T>) sinkConnectors.get(typeInformation)).getSinkDataStream(stream);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> SinkConnector<T> getSinkDataStream(TypeInformation<T> typeInformation) {
-        return (SinkConnector<T>) sinkConnectors.get(typeInformation);
+        return Optional.ofNullable(this.getSinkConnector(typeInformation).getSinkDataStream(stream))
+                .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Sink data stream could not be found with type: [%s]", typeInformation)));
     }
 
     public StreamExecutionEnvironment getEnv() {
         return env;
+    }
+
+    public StreamTableEnvironment getTEnv() {
+        return tEnv;
     }
 
     public Configuration getConfig() {
@@ -103,6 +106,7 @@ public class FlinkStreamingContext {
 
     public static class Builder {
         private StreamExecutionEnvironment env;
+        private StreamTableEnvironment tEnv;
         private Configuration config;
         private String jobName;
         private JobID jobId;
@@ -113,6 +117,11 @@ public class FlinkStreamingContext {
 
         public Builder withEnv(StreamExecutionEnvironment env) {
             this.env = env;
+            return this;
+        }
+
+        public Builder withTEnv(StreamTableEnvironment tEnv) {
+            this.tEnv = tEnv;
             return this;
         }
 
