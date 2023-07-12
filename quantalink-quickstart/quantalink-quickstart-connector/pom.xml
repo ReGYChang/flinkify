@@ -18,6 +18,7 @@
         <module>quantalink-quickstart-connector-nebula</module>
         <module>quantalink-quickstart-connector-mongo</module>
         <module>quantalink-quickstart-connector-rabbitmq</module>
+        <module>quantalink-quickstart-connector-doris</module>
     </modules>
 
     <properties>

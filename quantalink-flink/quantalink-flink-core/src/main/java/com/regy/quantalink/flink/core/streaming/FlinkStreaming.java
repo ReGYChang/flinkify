@@ -2,7 +2,6 @@ package com.regy.quantalink.flink.core.streaming;
 
 import com.regy.quantalink.common.config.Configuration;
 import com.regy.quantalink.common.config.ConfigurationUtils;
-import com.regy.quantalink.common.exception.ErrCode;
 import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.flink.core.config.FlinkOptions;
 import com.regy.quantalink.flink.core.connector.ConnectorUtils;
@@ -11,12 +10,14 @@ import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author regy
@@ -27,31 +28,19 @@ public abstract class FlinkStreaming {
     protected FlinkStreamingContext context;
 
     protected void init(String[] args) {
-        try {
-            String conf = ParameterTool.fromArgs(args).get("conf");
-            Configuration config;
-            if (conf != null) {
-                config = ConfigurationUtils.loadYamlConfigFromPath(conf);
-            } else {
-                try (InputStream stream = Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("application.yml"))) {
-                    config = ConfigurationUtils.loadYamlConfigFromStream(stream);
-                } catch (IOException e) {
-                    throw new RuntimeException("Error closing YAML configuration InputStream", e);
-                }
-            }
-            org.apache.flink.configuration.Configuration configuration = new org.apache.flink.configuration.Configuration();
-            configuration.setInteger(RestOptions.PORT, 8089);
-            StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        org.apache.flink.configuration.Configuration flinkConf =
+                new org.apache.flink.configuration.Configuration();
+        flinkConf.setInteger(RestOptions.PORT, 8089);
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(flinkConf);
+        Configuration config = loadConfig(args);
 
-            this.context = new FlinkStreamingContext.Builder()
-                    .withEnv(env)
-                    .withConfig(config)
-                    .withSourceConnectors(ConnectorUtils.initSourceConnectors(env, config))
-                    .withSinkConnectors(ConnectorUtils.initSinkConnectors(env, config))
-                    .build();
-        } catch (NullPointerException e) {
-            throw new FlinkException(ErrCode.MISSING_CONFIG_FILE, "Failed to initialize application, configuration files must be provided");
-        }
+        this.context = new FlinkStreamingContext.Builder()
+                .withEnv(env)
+                .withTEnv(StreamTableEnvironment.create(env))
+                .withConfig(config)
+                .withSourceConnectors(ConnectorUtils.initSourceConnectors(env, config))
+                .withSinkConnectors(ConnectorUtils.initSinkConnectors(env, config))
+                .build();
     }
 
     protected void config(FlinkStreamingInitializer initializer) throws FlinkException {
@@ -82,6 +71,21 @@ public abstract class FlinkStreaming {
         terminate();
 
         LOG.info("[QuantaLink]: Flink job finished with result: {}", executionRes);
+    }
+
+    private Configuration loadConfig(String[] args) {
+        Optional<String> confPathOpt = Optional.ofNullable(ParameterTool.fromArgs(args).get("conf"));
+        return confPathOpt.map(ConfigurationUtils::loadYamlConfigFromPath)
+                .orElseGet(this::loadDefaultConfig);
+    }
+
+    private Configuration loadDefaultConfig() {
+        try (InputStream stream = Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("application.yml"))) {
+            return ConfigurationUtils.loadYamlConfigFromStream(stream);
+        } catch (IOException | NullPointerException e) {
+            LOG.warn("Configuration files not found, initial flink job with empty configuration", e);
+            return new Configuration();
+        }
     }
 }
 

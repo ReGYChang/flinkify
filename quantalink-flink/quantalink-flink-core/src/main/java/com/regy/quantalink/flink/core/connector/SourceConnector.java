@@ -8,6 +8,8 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
+import java.util.Optional;
+
 /**
  * @author regy
  */
@@ -25,6 +27,14 @@ public abstract class SourceConnector<T> extends Connector<T> {
      * Subclasses must provide the specific implementation.
      */
     public abstract DataStreamSource<T> getSourceDataStream() throws FlinkException;
+
+    public DeserializationAdapter<T, ?> getDeserializationAdapter() {
+        return deserializationAdapter;
+    }
+
+    public WatermarkStrategy<T> getWatermarkStrategy() {
+        return Optional.ofNullable(watermarkStrategy).orElse(WatermarkStrategy.noWatermarks());
+    }
 
     public SourceConnector<T> withDeserializationSchemaAdapter(DeserializationAdapter<T, ?> deserializationAdapter) {
         this.deserializationAdapter = deserializationAdapter;
