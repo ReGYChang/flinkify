@@ -1,4 +1,4 @@
-package com.regy.quantalink.quickstart.connector.mysql;
+package com.regy.quantalink.quickstart.connector.mysql.cdc;
 
 import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.common.type.TypeInformation;
@@ -11,7 +11,7 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 /**
  * @author regy
  */
-public class MySqlSource extends FlinkStreaming {
+public class MySqlCdc extends FlinkStreaming {
 
     public static void main(String[] args) throws Exception {
         FlinkStreamingInitializer initializer = new FlinkStreamingInitializer.Builder()
@@ -21,7 +21,7 @@ public class MySqlSource extends FlinkStreaming {
                             env.setParallelism(1);
                         }).build();
 
-        (new MySqlSource()).run(args, initializer);
+        (new MySqlCdc()).run(args, initializer);
     }
 
     @Override

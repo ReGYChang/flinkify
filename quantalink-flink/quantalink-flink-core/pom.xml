@@ -106,6 +106,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.ververica</groupId>
+            <artifactId>flink-connector-oracle-cdc</artifactId>
+            <version>${flink-cdc.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
             <version>${mongo-driver.version}</version>

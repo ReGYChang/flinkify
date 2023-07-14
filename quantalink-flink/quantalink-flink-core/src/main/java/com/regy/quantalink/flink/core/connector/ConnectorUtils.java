@@ -14,11 +14,13 @@ import com.regy.quantalink.flink.core.connector.kafka.sink.KafkaSinkConnector;
 import com.regy.quantalink.flink.core.connector.kafka.source.KafkaSourceConnector;
 import com.regy.quantalink.flink.core.connector.mongo.config.MongoOptions;
 import com.regy.quantalink.flink.core.connector.mongo.sink.MongoSinkConnector;
-import com.regy.quantalink.flink.core.connector.mysql.cdc.MySqlSourceConnector;
+import com.regy.quantalink.flink.core.connector.mysql.cdc.MySqlCdcConnector;
 import com.regy.quantalink.flink.core.connector.mysql.config.MySqlOptions;
 import com.regy.quantalink.flink.core.connector.nebula.config.NebulaOptions;
 import com.regy.quantalink.flink.core.connector.nebula.sink.NebulaSinkConnector;
 import com.regy.quantalink.flink.core.connector.nebula.source.NebulaSourceConnector;
+import com.regy.quantalink.flink.core.connector.oracle.cdc.OracleCdcConnector;
+import com.regy.quantalink.flink.core.connector.oracle.config.OracleOptions;
 import com.regy.quantalink.flink.core.connector.rabbitmq.config.RabbitmqOptions;
 import com.regy.quantalink.flink.core.connector.rabbitmq.sink.RabbitmqSinkConnector;
 import com.regy.quantalink.flink.core.connector.rabbitmq.source.RabbitmqSourceConnector;
@@ -56,14 +58,19 @@ public class ConnectorUtils {
                         nebulaConfigs.forEach(
                                 nebulaConfig ->
                                         connectors.put(nebulaConfig.getNotNull(ConnectorOptions.DATA_TYPE, "Could not find data type of nebula graph source connector"), new NebulaSourceConnector<>(environment, nebulaConfig)));
-                    } else if (connectorConfig.contains(MySqlOptions.CDC)) {
-                        Configuration mysqlCdcConfig = connectorConfig.getNotNull(MySqlOptions.CDC, "Could not find configuration of mysql source cdc connector");
-                        connectors.put(TypeInformation.get(String.class), new MySqlSourceConnector(environment, mysqlCdcConfig));
                     } else if (connectorConfig.contains(DorisOptions.CONNECTORS)) {
                         List<Configuration> dorisConfigs = connectorConfig.getNotNull(DorisOptions.CONNECTORS, "Could not find configuration of doris source connector");
                         dorisConfigs.forEach(
                                 dorisConfig ->
                                         connectors.put(dorisConfig.getNotNull(ConnectorOptions.DATA_TYPE, "Could not find data type of doris source connector"), new DorisSourceConnector(environment, dorisConfig)));
+                    } else if (connectorConfig.contains(MySqlOptions.CDC)) {
+                        Configuration mysqlCdcConfig = connectorConfig.getNotNull(MySqlOptions.CDC, "Could not find configuration of mysql cdc connector");
+                        mysqlCdcConfig.set(ConnectorOptions.DATA_TYPE, TypeInformation.get(String.class));
+                        connectors.put(TypeInformation.get(String.class), new MySqlCdcConnector(environment, mysqlCdcConfig));
+                    } else if (connectorConfig.contains(OracleOptions.CDC)) {
+                        Configuration oracleCdcConfig = connectorConfig.getNotNull(OracleOptions.CDC, "Could not find configuration of oracle cdc connector");
+                        oracleCdcConfig.set(ConnectorOptions.DATA_TYPE, TypeInformation.get(String.class));
+                        connectors.put(TypeInformation.get(String.class), new OracleCdcConnector(environment, oracleCdcConfig));
                     } else {
                         throw new ConfigurationException(ErrCode.PARSING_CONFIG_FAILED, String.format("Unknown source connector type '%s', please check your configuration of connector", connectorConfig.toMap().keySet()));
                     }

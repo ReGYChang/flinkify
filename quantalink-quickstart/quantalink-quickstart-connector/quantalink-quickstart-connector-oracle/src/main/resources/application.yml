@@ -1,0 +1,13 @@
+flink:
+  sources:
+    - oracle-cdc:
+        hostname: 10.90.1.207
+        port: 1521
+        username: logminer
+        password: logminer
+        database: EMESHY
+        schema-list:
+          - EMESP
+        table-list:
+          - EMESP.TP_SN_LOG
+        startup-mode: initial # earliest_offset, latest_offset, specific_offset, timestamp

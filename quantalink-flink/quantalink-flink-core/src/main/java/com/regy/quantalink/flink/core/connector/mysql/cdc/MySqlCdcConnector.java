@@ -15,7 +15,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 /**
  * @author regy
  */
-public class MySqlSourceConnector extends SourceConnector<String> {
+public class MySqlCdcConnector extends SourceConnector<String> {
 
     private final String hostname;
     private final Integer port;
@@ -27,7 +27,7 @@ public class MySqlSourceConnector extends SourceConnector<String> {
     private final boolean includeSchema;
     private final boolean includeSchemaChanges;
 
-    public MySqlSourceConnector(StreamExecutionEnvironment env, Configuration config) {
+    public MySqlCdcConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
         this.hostname = config.getNotNull(MySqlOptions.HOSTNAME, "MySQL source CDC connector hostname must not be null");
         this.port = config.getNotNull(MySqlOptions.PORT, "MySQL source CDC connector port must not be null");
@@ -53,7 +53,9 @@ public class MySqlSourceConnector extends SourceConnector<String> {
                                 .serverTimeZone(serverTimeZone)
                                 .includeSchemaChanges(includeSchemaChanges)
                                 .deserializer(new JsonDebeziumDeserializationSchema(includeSchema))
-                                .build(), WatermarkStrategy.noWatermarks(), super.name)
+                                .build(),
+                        WatermarkStrategy.noWatermarks(),
+                        super.name)
                 .setParallelism(parallelism);
     }
 }
