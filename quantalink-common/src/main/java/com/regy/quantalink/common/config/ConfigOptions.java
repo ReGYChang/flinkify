@@ -34,6 +34,10 @@ public class ConfigOptions {
             return new ConfigOption<>(this.key, this.clazz, ConfigOption.EMPTY_DESCRIPTION, Arrays.asList(values), true);
         }
 
+        public final ConfigOption<List<E>> defaultValues(List<E> list) {
+            return new ConfigOption<>(this.key, this.clazz, ConfigOption.EMPTY_DESCRIPTION, list, true);
+        }
+
         public ConfigOption<List<E>> noDefaultValue() {
             return new ConfigOption<>(this.key, this.clazz, ConfigOption.EMPTY_DESCRIPTION, null, true);
         }

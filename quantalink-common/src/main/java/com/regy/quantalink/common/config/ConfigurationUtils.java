@@ -62,8 +62,12 @@ public final class ConfigurationUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> T convertToList(Object rawValue, Class<?> atomicClass) {
-        return (T) ((List<?>) rawValue).stream().map(
-                s -> convertValue(s, atomicClass)).collect(Collectors.toList());
+        try {
+            return (T) ((List<?>) rawValue).stream().map(
+                    s -> convertValue(s, atomicClass)).collect(Collectors.toList());
+        } catch (ClassCastException e) {
+            throw new ConfigurationException(ErrCode.PARSING_CONFIG_FAILED, "Failed to parse field into list, please check your configuration format");
+        }
     }
 
     @SuppressWarnings("unchecked")

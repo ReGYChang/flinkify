@@ -5,6 +5,7 @@ import com.regy.quantalink.common.config.ConfigOptions;
 import com.regy.quantalink.common.config.Configuration;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,12 +21,12 @@ public interface FlinkOptions {
     ConfigOption<List<Configuration>> SOURCE_CONNECTORS = ConfigOptions.key("flink.sources")
             .configType()
             .asList()
-            .noDefaultValue()
+            .defaultValues(new ArrayList<>())
             .withDescription("A list of source connector configurations.");
 
     ConfigOption<List<Configuration>> SINK_CONNECTORS = ConfigOptions.key("flink.sinks")
             .configType()
             .asList()
-            .defaultValues()
+            .defaultValues(new ArrayList<>())
             .withDescription("A list of sink connector configurations.");
 }

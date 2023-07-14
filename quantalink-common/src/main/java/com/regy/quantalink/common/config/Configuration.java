@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 
 /**
  * @author regy
@@ -42,15 +43,27 @@ public class Configuration implements Serializable {
         return Optional.ofNullable(this.get(configOption)).orElseThrow(() -> new ConfigurationException(ErrCode.MISSING_CONFIG_FIELD, message));
     }
 
+    // TODO: Test
     @SuppressWarnings("unchecked")
     public <T> void set(ConfigOption<T> option, T value) {
-        String[] parentPrefix = option.key().split("\\.");
-        Optional<Object> parent = getValueFromPrefix(Arrays.copyOfRange(parentPrefix, 0, parentPrefix.length), this.confData, null);
-        Object parentObj = parent.orElseThrow(() -> new ConfigurationException(ErrCode.MISSING_CONFIG_FIELD, String.format("Could not set value '%s' for key '%s'", value, option.key())));
-        if (parentObj instanceof Map) {
-            ((Map<String, Object>) parentObj).put(parentPrefix[parentPrefix.length - 1], value);
+        String[] keyHierarchy = option.key().split("\\.");
+
+        if (keyHierarchy.length == 1) {
+            setValueInternal(option.key(), value);
+            return;
+        }
+
+        Optional<Object> parentOpt = getValueFromPrefix(Arrays.copyOfRange(keyHierarchy, 0, keyHierarchy.length), this.confData, null);
+        Object parentObject = parentOpt.orElseThrow(() ->
+                new ConfigurationException(ErrCode.MISSING_CONFIG_FIELD,
+                        String.format("Could not set value '%s' for key '%s'", value, option.key())));
+
+        if (parentObject instanceof Map) {
+            ((Map<String, Object>) parentObject).put(keyHierarchy[keyHierarchy.length - 1], value);
         } else {
-            throw new ConfigurationException(ErrCode.MISSING_CONFIG_FIELD, String.format("Could not set value '%s' for key '%s' because the parent field '%s' is not a map", value, option.key(), parentPrefix[parentPrefix.length - 1]));
+            throw new ConfigurationException(ErrCode.MISSING_CONFIG_FIELD,
+                    String.format("Could not set value '%s' for key '%s' because the parent field '%s' is not a map",
+                            value, option.key(), keyHierarchy[keyHierarchy.length - 1]));
         }
     }
 
@@ -116,6 +129,12 @@ public class Configuration implements Serializable {
         synchronized (this.confData) {
             return CopyUtils.deepCopy(this.confData);
         }
+    }
+
+    public Properties toProperties() {
+        Properties properties = new Properties();
+        properties.putAll(toMap());
+        return properties;
     }
 }
 
