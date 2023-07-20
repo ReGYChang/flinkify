@@ -19,35 +19,35 @@ import java.util.Optional;
 /**
  * @author regy
  */
-public class KafkaSinkConnector<T> extends SinkConnector<T> {
+public class KafkaSinkConnector<T> extends SinkConnector<T, T> {
 
     private final String bootStrapServers;
     private final String topic;
 
     public KafkaSinkConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
-        this.bootStrapServers = config.getNotNull(KafkaOptions.BOOTSTRAP_SERVERS, String.format("Kafka sink connector '%s' bootstrap servers must not be null", name));
-        this.topic = config.getNotNull(KafkaOptions.TOPIC, String.format("Kafka sink connector '%s' topic must not be null", name));
+        this.bootStrapServers = config.getNotNull(KafkaOptions.BOOTSTRAP_SERVERS, String.format("Kafka sink connector '%s' bootstrap servers must not be null", getName()));
+        this.topic = config.getNotNull(KafkaOptions.TOPIC, String.format("Kafka sink connector '%s' topic must not be null", getName()));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public DataStreamSink<T> getSinkDataStream(DataStream<T> stream) {
+    public DataStreamSink<T> createSinkDataStream(DataStream<T> stream) {
         try {
             KafkaSerializationAdapter<T> serializationAdapter =
-                    Optional.ofNullable((KafkaSerializationAdapter<T>) super.serializationAdapter)
-                            .orElse(new KafkaSerializationAdapter<>(new DefaultSerializationSchema<>(), super.typeInfo));
+                    Optional.ofNullable((KafkaSerializationAdapter<T>) getSerializationAdapter())
+                            .orElse(new KafkaSerializationAdapter<>(new DefaultSerializationSchema<>(), getOutputType()));
             KafkaSink<T> sink = KafkaSink.<T>builder()
                     .setBootstrapServers(bootStrapServers)
                     .setRecordSerializer(
                             KafkaRecordSerializationSchema.builder()
                                     .setTopic(topic)
                                     .setValueSerializationSchema(serializationAdapter.getSerializationSchema()).build()).build();
-            return stream.sinkTo(sink).name(name).setParallelism(parallelism).disableChaining();
-        } catch (ClassCastException e1) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Kafka sink connector '%s' com.nexdata.flink.traceability.serialization adapter must be '%s', could not assign other com.nexdata.flink.traceability.serialization adapter", name, KafkaSerializationAdapter.class), e1);
+            return stream.sinkTo(sink).name(getName()).setParallelism(getParallelism()).disableChaining();
+        } catch (ClassCastException e) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Kafka sink connector '%s' com.nexdata.flink.traceability.serialization adapter must be '%s', could not assign other com.nexdata.flink.traceability.serialization adapter", getName(), KafkaSerializationAdapter.class), e);
         } catch (Exception e) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize Kafka sink connector '%s'", name), e);
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize Kafka sink connector '%s'", getName()), e);
         }
     }
 }

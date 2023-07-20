@@ -2,7 +2,6 @@ package com.regy.quantalink.flink.core.streaming;
 
 import com.regy.quantalink.common.exception.ErrCode;
 import com.regy.quantalink.common.exception.FlinkException;
-import com.regy.quantalink.flink.core.connector.SinkConnector;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -37,33 +36,15 @@ public class FlinkDataStream<T> {
         return new FlinkDataStream<>(stream, context);
     }
 
-    public <T2> FlinkDataStream<T> sideSink(com.regy.quantalink.common.type.TypeInformation<T2> typeInfo) {
-        if (this.dataStream instanceof SingleOutputStreamOperator) {
-            SinkConnector<T2> sinkConnector = this.context.getSinkConnector(typeInfo);
-            sinkConnector.getSinkDataStream(((SingleOutputStreamOperator<T>) this.dataStream).getSideOutput(sinkConnector.getOutputTag()));
-            return this;
-        }
-        throw new FlinkException(ErrCode.STREAMING_EXECUTION_FAILED, String.format("Could not sink from side output stream with type: '%s'", typeInfo));
-    }
-
-    public <T2> FlinkDataStream<T> sidePrint(com.regy.quantalink.common.type.TypeInformation<T2> typeInfo) {
-        if (this.dataStream instanceof SingleOutputStreamOperator) {
-            SinkConnector<T2> sinkConnector = this.context.getSinkConnector(typeInfo);
-            ((SingleOutputStreamOperator<T>) this.dataStream).getSideOutput(sinkConnector.getOutputTag()).print();
-            return this;
-        }
-        throw new FlinkException(ErrCode.STREAMING_EXECUTION_FAILED, String.format("Could not sink from side output stream with type: '%s'", typeInfo));
-    }
-
     public void sink() {
         com.regy.quantalink.common.type.TypeInformation<T> typeInfo = com.regy.quantalink.common.type.TypeInformation.get(this.typeInformation.getTypeClass());
-        SinkConnector<T> sinkConnector = this.context.getSinkConnector(typeInfo);
-        sinkConnector.getSinkDataStream(this.dataStream);
+        context.getSinkDataStream(typeInfo, typeInfo, dataStream);
     }
 
-    public void sink(com.regy.quantalink.common.type.TypeInformation<T> typeInformation) {
-        SinkConnector<T> sinkConnector = this.context.getSinkConnector(typeInformation);
-        sinkConnector.getSinkDataStream(this.dataStream);
+    public void sink(com.regy.quantalink.common.type.TypeInformation<?> outputTypeInfo) {
+        context.getSinkDataStream(
+                com.regy.quantalink.common.type.TypeInformation.get(typeInformation.getTypeClass()),
+                outputTypeInfo, dataStream);
     }
 
     private FlinkDataStream(DataStream<T> dataStream, FlinkStreamingContext context) {

@@ -66,7 +66,7 @@ public class OracleCdcConnector extends SourceConnector<String> {
 
     @Override
     public DataStreamSource<String> getSourceDataStream() throws FlinkException {
-        return env.addSource(
+        return getEnv().addSource(
                         OracleSource.<String>builder()
                                 .url(url)
                                 .hostname(hostname)
@@ -79,7 +79,7 @@ public class OracleCdcConnector extends SourceConnector<String> {
                                 .startupOptions(startupOptions)
                                 .debeziumProperties(debeziumProperties)
                                 .deserializer(new JsonDebeziumDeserializationSchema()).build(),
-                        super.name)
+                        getName())
                 .setParallelism(1);
     }
 }

@@ -26,14 +26,14 @@ public class RabbitmqSourceConnector<T> extends SourceConnector<T> {
 
     public RabbitmqSourceConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
-        String host = config.getNotNull(RabbitmqOptions.HOST, String.format("Rabbitmq sink connector '%s' host must not be null", super.name));
-        Integer port = config.getNotNull(RabbitmqOptions.PORT, String.format("Rabbitmq sink connector '%s' port must not be null", super.name));
-        String virtualHost = config.getNotNull(RabbitmqOptions.VIRTUAL_HOST, String.format("Rabbitmq sink connector '%s' virtual host must not be null", super.name));
-        String username = config.getNotNull(RabbitmqOptions.USERNAME, String.format("Rabbitmq sink connector '%s' username must not be null", super.name));
-        String password = config.getNotNull(RabbitmqOptions.PASSWORD, String.format("Rabbitmq sink connector '%s' password must not be null", super.name));
+        String host = config.getNotNull(RabbitmqOptions.HOST, String.format("Rabbitmq sink connector '%s' host must not be null", getName()));
+        Integer port = config.getNotNull(RabbitmqOptions.PORT, String.format("Rabbitmq sink connector '%s' port must not be null", getName()));
+        String virtualHost = config.getNotNull(RabbitmqOptions.VIRTUAL_HOST, String.format("Rabbitmq sink connector '%s' virtual host must not be null", getName()));
+        String username = config.getNotNull(RabbitmqOptions.USERNAME, String.format("Rabbitmq sink connector '%s' username must not be null", getName()));
+        String password = config.getNotNull(RabbitmqOptions.PASSWORD, String.format("Rabbitmq sink connector '%s' password must not be null", getName()));
         this.usesCorrelationId = config.get(RabbitmqOptions.USES_CORRELATION_ID);
         this.connectionConfig = new RMQConnectionConfig.Builder().setHost(host).setPort(port).setVirtualHost(virtualHost).setUserName(username).setPassword(password).build();
-        this.queueName = config.getNotNull(RabbitmqOptions.QUEUE_NAME, String.format("Rabbitmq sink connector '%s' queue-name must not be null", super.name));
+        this.queueName = config.getNotNull(RabbitmqOptions.QUEUE_NAME, String.format("Rabbitmq sink connector '%s' queue-name must not be null", getName()));
     }
 
     @SuppressWarnings("unchecked")
@@ -41,15 +41,15 @@ public class RabbitmqSourceConnector<T> extends SourceConnector<T> {
     public DataStreamSource<T> getSourceDataStream() throws FlinkException {
         try {
             RabbitmqDeserializationAdapter<T> deserializationAdapter =
-                    Optional.ofNullable((RabbitmqDeserializationAdapter<T>) super.deserializationAdapter)
-                            .orElse(new RabbitmqDeserializationAdapter<>(new DefaultDeserializationSchema<>(super.typeInfo)));
-            return super.env.addSource(
+                    Optional.ofNullable((RabbitmqDeserializationAdapter<T>) getDeserializationAdapter())
+                            .orElse(new RabbitmqDeserializationAdapter<>(new DefaultDeserializationSchema<>(getTypeInfo())));
+            return getEnv().addSource(
                     new RMQSource<>(connectionConfig, queueName, usesCorrelationId,
-                            deserializationAdapter.getDeserializationSchema()), super.name);
-        } catch (ClassCastException e1) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Rabbitmq source connector '%s' deserialization adapter must be '%s', could not assign other deserialization adapter", super.name, RabbitmqDeserializationAdapter.class), e1);
-        } catch (Exception e2) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize Rabbitmq sink connector '%s'", super.name), e2);
+                            deserializationAdapter.getDeserializationSchema()), getName());
+        } catch (ClassCastException e) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Rabbitmq source connector '%s' deserialization adapter must be '%s', could not assign other deserialization adapter", getName(), RabbitmqDeserializationAdapter.class), e);
+        } catch (Exception e) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize Rabbitmq sink connector '%s'", getName()), e);
         }
     }
 }

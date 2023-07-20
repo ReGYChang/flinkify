@@ -32,7 +32,7 @@ public class FlinkStreamingContext {
     private final MetricGroup metricGroup;
     private final Map<String, AutoCloseable> resources;
     private final Map<TypeInformation<?>, SourceConnector<?>> sourceConnectors;
-    private final Map<TypeInformation<?>, SinkConnector<?>> sinkConnectors;
+    private final Map<TypeInformation<?>, SinkConnector<?, ?>> sinkConnectors;
 
     private FlinkStreamingContext(Builder builder) {
         this.env = builder.env;
@@ -53,9 +53,12 @@ public class FlinkStreamingContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> SinkConnector<T> getSinkConnector(TypeInformation<T> typeInformation) {
-        return Optional.ofNullable((SinkConnector<T>) sinkConnectors.get(typeInformation))
-                .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_EXECUTION_FAILED, String.format("Sink connector could not be found with type: [%s]", typeInformation)));
+    public <I, O> SinkConnector<I, O> getSinkConnector(TypeInformation<I> inputTypeInfo, TypeInformation<O> outputTypeInfo) {
+        return Optional.ofNullable((SinkConnector<I, O>) sinkConnectors.get(inputTypeInfo))
+                .or(
+                        () ->
+                                Optional.ofNullable((SinkConnector<I, O>) sinkConnectors.get(outputTypeInfo)))
+                .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Sink connector could not be found with input type '%s' & output type '%s' ", inputTypeInfo, outputTypeInfo)));
     }
 
     public <T> DataStreamSource<T> getSourceDataStream(TypeInformation<T> typeInformation) throws FlinkException {
@@ -63,9 +66,11 @@ public class FlinkStreamingContext {
                 .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Source data stream could not be found with type: [%s]", typeInformation)));
     }
 
-    public <T> DataStreamSink<T> getSinkDataStream(TypeInformation<T> typeInformation, DataStream<T> stream) {
-        return Optional.ofNullable(this.getSinkConnector(typeInformation).getSinkDataStream(stream))
-                .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Sink data stream could not be found with type: [%s]", typeInformation)));
+    @SuppressWarnings("UnusedReturnValue")
+    public <I, O> DataStreamSink<O> getSinkDataStream(TypeInformation<I> inputTypeInfo, TypeInformation<O> outputTypeInfo, DataStream<I> stream) {
+        SinkConnector<I, O> sinkConnector = this.getSinkConnector(inputTypeInfo, outputTypeInfo);
+        return Optional.ofNullable(sinkConnector.getSinkDataStream(stream))
+                .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Sink connector could not be found with input type '%s' & output type '%s' ", inputTypeInfo, outputTypeInfo)));
     }
 
     public StreamExecutionEnvironment getEnv() {
@@ -100,7 +105,7 @@ public class FlinkStreamingContext {
         return sourceConnectors;
     }
 
-    public Map<TypeInformation<?>, SinkConnector<?>> getSinkConnectors() {
+    public Map<TypeInformation<?>, SinkConnector<?, ?>> getSinkConnectors() {
         return sinkConnectors;
     }
 
@@ -113,7 +118,7 @@ public class FlinkStreamingContext {
         private MetricGroup metricGroup;
         private final Map<String, AutoCloseable> resources = new HashMap<>();
         private Map<TypeInformation<?>, SourceConnector<?>> sourceConnectors;
-        private Map<TypeInformation<?>, SinkConnector<?>> sinkConnectors;
+        private Map<TypeInformation<?>, SinkConnector<?, ?>> sinkConnectors;
 
         public Builder withEnv(StreamExecutionEnvironment env) {
             this.env = env;
@@ -155,7 +160,7 @@ public class FlinkStreamingContext {
             return this;
         }
 
-        public Builder withSinkConnectors(Map<TypeInformation<?>, SinkConnector<?>> sinkConnectors) {
+        public Builder withSinkConnectors(Map<TypeInformation<?>, SinkConnector<?, ?>> sinkConnectors) {
             this.sinkConnectors = sinkConnectors;
             return this;
         }

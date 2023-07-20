@@ -49,32 +49,34 @@ public interface FlinkStreamingInitializer {
         }
 
         public <T> Builder withSourceConnectorSetup(SourceConnectorInitializer<T> initializer, TypeInformation<T> typeInformation) {
-            initializers.add((ctx) -> {
-                try {
-                    SourceConnector<T> sourceConnector = Optional.ofNullable(ctx.getSourceConnector(typeInformation))
-                            .orElseThrow(() -> new ConfigurationException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Source connector '%s' not found, please check your connector data-type in the configuration", typeInformation)));
-                    Configuration config = Optional.ofNullable(ctx.getConfig())
-                            .orElseThrow(() -> new ConfigurationException(ErrCode.MISSING_CONFIG_FILE, "Config file not found"));
-                    initializer.init(sourceConnector, config);
-                } catch (Exception e) {
-                    throw new ConfigurationException(ErrCode.STREAMING_CONFIG_FAILED, String.format("Failed to initialize Flink source connector '%s'", typeInformation), e);
-                }
-            });
+            initializers.add(
+                    (ctx) -> {
+                        try {
+                            SourceConnector<T> sourceConnector = Optional.ofNullable(ctx.getSourceConnector(typeInformation))
+                                    .orElseThrow(() -> new ConfigurationException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Source connector '%s' not found, please check your connector data-type in the configuration", typeInformation)));
+                            Configuration config = Optional.ofNullable(ctx.getConfig())
+                                    .orElseThrow(() -> new ConfigurationException(ErrCode.MISSING_CONFIG_FILE, "Config file not found"));
+                            initializer.init(sourceConnector, config);
+                        } catch (Exception e) {
+                            throw new ConfigurationException(ErrCode.STREAMING_CONFIG_FAILED, String.format("Failed to initialize Flink source connector '%s'", typeInformation), e);
+                        }
+                    });
             return this;
         }
 
-        public <T> Builder withSinkConnectorSetup(SinkConnectorInitializer<T> initializer, TypeInformation<T> typeInformation) {
-            initializers.add((ctx) -> {
-                try {
-                    SinkConnector<T> sinkConnector = Optional.ofNullable(ctx.getSinkConnector(typeInformation))
-                            .orElseThrow(() -> new ConfigurationException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Sink connector '%s' not found, please check your connector data-type in the configuration", typeInformation)));
-                    Configuration config = Optional.ofNullable(ctx.getConfig())
-                            .orElseThrow(() -> new ConfigurationException(ErrCode.MISSING_CONFIG_FILE, "Config file not found"));
-                    initializer.init(sinkConnector, config);
-                } catch (Exception e) {
-                    throw new ConfigurationException(ErrCode.STREAMING_CONFIG_FAILED, String.format("Failed to initialize Flink sink connector '%s'", typeInformation), e);
-                }
-            });
+        public <I, O> Builder withSinkConnectorSetup(SinkConnectorInitializer<I, O> initializer, TypeInformation<I> inputTypeInfo, TypeInformation<O> outputTypeInfo) {
+            initializers.add(
+                    (ctx) -> {
+                        try {
+                            SinkConnector<I, O> sinkConnector = Optional.ofNullable(ctx.getSinkConnector(inputTypeInfo, outputTypeInfo))
+                                    .orElseThrow(() -> new ConfigurationException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Sink connector not found with input type '%s' and output type '%s', please check your connector data-type in the configuration", inputTypeInfo, outputTypeInfo)));
+                            Configuration config = Optional.ofNullable(ctx.getConfig())
+                                    .orElseThrow(() -> new ConfigurationException(ErrCode.MISSING_CONFIG_FILE, "Config file not found"));
+                            initializer.init(sinkConnector, config);
+                        } catch (Exception e) {
+                            throw new ConfigurationException(ErrCode.STREAMING_CONFIG_FAILED, String.format("Failed to initialize Flink sink connector '%s'", inputTypeInfo), e);
+                        }
+                    });
             return this;
         }
 
@@ -103,8 +105,8 @@ public interface FlinkStreamingInitializer {
     }
 
     @FunctionalInterface
-    interface SinkConnectorInitializer<T> {
-        void init(SinkConnector<T> sinkConnector, Configuration config) throws Exception;
+    interface SinkConnectorInitializer<I, O> {
+        void init(SinkConnector<I, O> sinkConnector, Configuration config) throws Exception;
     }
 
     // You can define similar interfaces for other initialization phases...

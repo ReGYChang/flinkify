@@ -11,9 +11,9 @@ import java.util.Map;
  * @author regy
  */
 public abstract class GraphBroadcastProcessFunc<IN1, IN2> extends BroadcastProcessFunction<IN1, IN2, Void> {
-    protected final Map<Class<?>, SinkConnector<?>> connectorMap;
+    protected final Map<Class<?>, SinkConnector<?, ?>> connectorMap;
 
-    public GraphBroadcastProcessFunc(Map<Class<?>, SinkConnector<?>> connectorMap) {
+    public GraphBroadcastProcessFunc(Map<Class<?>, SinkConnector<?, ?>> connectorMap) {
         this.connectorMap = connectorMap;
     }
 
@@ -30,5 +30,5 @@ public abstract class GraphBroadcastProcessFunc<IN1, IN2> extends BroadcastProce
             IN1 input,
             BroadcastProcessFunction<IN1, IN2, Void>.ReadOnlyContext readOnlyFuncCtx,
             Collector<Void> collector,
-            Map<Class<?>, SinkConnector<?>> connectorMap) throws Exception;
+            Map<Class<?>, SinkConnector<?, ?>> connectorMap) throws Exception;
 }

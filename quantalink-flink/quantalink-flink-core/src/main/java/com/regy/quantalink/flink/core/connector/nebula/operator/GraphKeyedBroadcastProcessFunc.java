@@ -13,9 +13,9 @@ import java.util.Map;
  * @author regy
  */
 public abstract class GraphKeyedBroadcastProcessFunc<K, IN1, IN2> extends KeyedBroadcastProcessFunction<K, IN1, IN2, Void> {
-    protected final Map<TypeInformation<?>, SinkConnector<?>> connectorMap;
+    protected final Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap;
 
-    public GraphKeyedBroadcastProcessFunc(Map<TypeInformation<?>, SinkConnector<?>> connectorMap) {
+    public GraphKeyedBroadcastProcessFunc(Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) {
         this.connectorMap = CopyUtils.deepCopy(connectorMap);
     }
 
@@ -31,6 +31,6 @@ public abstract class GraphKeyedBroadcastProcessFunc<K, IN1, IN2> extends KeyedB
             IN1 input,
             KeyedBroadcastProcessFunction<K, IN1, IN2, Void>.ReadOnlyContext readOnlyCtx,
             Collector<Void> collector,
-            Map<TypeInformation<?>, SinkConnector<?>> connectorMap) throws Exception;
+            Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) throws Exception;
 
 }

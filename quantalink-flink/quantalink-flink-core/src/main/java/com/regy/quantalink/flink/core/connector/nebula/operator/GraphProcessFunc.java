@@ -13,9 +13,9 @@ import java.util.Map;
  * @author regy
  */
 public abstract class GraphProcessFunc<IN> extends ProcessFunction<IN, Void> {
-    protected final Map<TypeInformation<?>, SinkConnector<?>> connectorMap;
+    protected final Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap;
 
-    public GraphProcessFunc(Map<TypeInformation<?>, SinkConnector<?>> connectorMap) {
+    public GraphProcessFunc(Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) {
         this.connectorMap = CopyUtils.deepCopy(connectorMap);
     }
 
@@ -32,5 +32,5 @@ public abstract class GraphProcessFunc<IN> extends ProcessFunction<IN, Void> {
             IN in,
             ProcessFunction<IN, Void>.Context ctx,
             Collector<Void> collector,
-            Map<TypeInformation<?>, SinkConnector<?>> connectorMap) throws Exception;
+            Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) throws Exception;
 }

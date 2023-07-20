@@ -42,7 +42,7 @@ public class MySqlCdcConnector extends SourceConnector<String> {
 
     @Override
     public DataStreamSource<String> getSourceDataStream() throws FlinkException {
-        return env.fromSource(
+        return getEnv().fromSource(
                         MySqlSource.<String>builder()
                                 .hostname(hostname)
                                 .port(port)
@@ -55,7 +55,7 @@ public class MySqlCdcConnector extends SourceConnector<String> {
                                 .deserializer(new JsonDebeziumDeserializationSchema(includeSchema))
                                 .build(),
                         WatermarkStrategy.noWatermarks(),
-                        super.name)
-                .setParallelism(parallelism);
+                        getName())
+                .setParallelism(getParallelism());
     }
 }

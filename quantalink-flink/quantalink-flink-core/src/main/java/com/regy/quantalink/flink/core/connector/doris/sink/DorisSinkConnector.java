@@ -24,7 +24,7 @@ import java.util.Properties;
 /**
  * @author regy
  */
-public class DorisSinkConnector<T> extends SinkConnector<T> {
+public class DorisSinkConnector<T> extends SinkConnector<T, T> {
 
     private final List<String> fields;
     private final List<DataType> types;
@@ -36,24 +36,24 @@ public class DorisSinkConnector<T> extends SinkConnector<T> {
         Properties properties = new Properties();
         properties.setProperty("format", "json");
         properties.setProperty("read_json_by_line", "true");
-        String feNodes = config.getNotNull(DorisOptions.FE_NODES, String.format("Doris sink connector '%s' fe-nodes must not be null", super.name));
-        String table = config.getNotNull(DorisOptions.TABLE, String.format("Doris sink connector '%s' table must not be null", super.name));
-        String username = config.getNotNull(DorisOptions.USERNAME, String.format("Doris sink connector '%s' username must not be null", super.name));
-        String password = config.getNotNull(DorisOptions.PASSWORD, String.format("Doris sink connector '%s' password must not be null", super.name));
-        String label = config.getNotNull(DorisOptions.LABEL, String.format("Doris sink connector '%s' label must not be null", super.name));
-        this.fields = config.getNotNull(DorisOptions.FIELDS, String.format("Doris sink connector '%s' fields must not be null", super.name));
-        this.types = config.getNotNull(DorisOptions.TYPES, String.format("Doris sink connector '%s' types must not be null", super.name));
+        String feNodes = config.getNotNull(DorisOptions.FE_NODES, String.format("Doris sink connector '%s' fe-nodes must not be null", getName()));
+        String table = config.getNotNull(DorisOptions.TABLE, String.format("Doris sink connector '%s' table must not be null", getName()));
+        String username = config.getNotNull(DorisOptions.USERNAME, String.format("Doris sink connector '%s' username must not be null", getName()));
+        String password = config.getNotNull(DorisOptions.PASSWORD, String.format("Doris sink connector '%s' password must not be null", getName()));
+        String label = config.getNotNull(DorisOptions.LABEL, String.format("Doris sink connector '%s' label must not be null", getName()));
+        this.fields = config.getNotNull(DorisOptions.FIELDS, String.format("Doris sink connector '%s' fields must not be null", getName()));
+        this.types = config.getNotNull(DorisOptions.TYPES, String.format("Doris sink connector '%s' types must not be null", getName()));
         this.dorisOptions = org.apache.doris.flink.cfg.DorisOptions.builder().setFenodes(feNodes).setTableIdentifier(table).setUsername(username).setPassword(password).build();
         this.execOptions = DorisExecutionOptions.builder().setLabelPrefix(label).setStreamLoadProp(properties).build();
     }
 
     @Override
-    public DataStreamSink<T> getSinkDataStream(DataStream<T> stream) {
+    public DataStreamSink<T> createSinkDataStream(DataStream<T> stream) {
         DorisSink<T> dorisSink = applyDorisSink(stream.getType().getTypeClass());
         try {
-            return stream.sinkTo(dorisSink).name(super.name).setParallelism(super.parallelism).disableChaining();
+            return stream.sinkTo(dorisSink).name(getName()).setParallelism(getParallelism()).disableChaining();
         } catch (Exception e) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Could not get sink from stream '%s' to doris connector '%s': ", stream, super.name), e);
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Could not get sink from stream '%s' to doris connector '%s': ", stream, getName()), e);
         }
     }
 

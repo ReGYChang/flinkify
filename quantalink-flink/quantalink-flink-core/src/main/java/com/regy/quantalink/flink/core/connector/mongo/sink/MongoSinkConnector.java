@@ -19,7 +19,7 @@ import java.util.Optional;
 /**
  * @author regy
  */
-public class MongoSinkConnector<T> extends SinkConnector<T> {
+public class MongoSinkConnector<T> extends SinkConnector<T, T> {
 
     private final String uri;
     private final String database;
@@ -40,18 +40,18 @@ public class MongoSinkConnector<T> extends SinkConnector<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public DataStreamSink<T> getSinkDataStream(DataStream<T> stream) {
+    public DataStreamSink<T> createSinkDataStream(DataStream<T> stream) {
         try {
             MongoSerializationAdapter<T> serializationAdapter =
-                    Optional.ofNullable((MongoSerializationAdapter<T>) super.serializationAdapter).orElse(
-                            new MongoSerializationAdapter<>(
+                    Optional.ofNullable((MongoSerializationAdapter<T>) getSerializationAdapter())
+                            .orElse(new MongoSerializationAdapter<>(
                                     (input, cxt) -> {
                                         try {
                                             return new InsertOneModel<>(BsonDocumentParser.parse(input));
                                         } catch (IllegalAccessException e) {
-                                            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to parse data into BsonDocument: %s", input));
+                                            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to parse value '%s' to bson document for mongodb sink connector", input));
                                         }
-                                    }, super.typeInfo));
+                                    }, getOutputType()));
             MongoSink<T> sink = MongoSink.<T>builder()
                     .setUri(uri)
                     .setDatabase(database)
@@ -61,13 +61,13 @@ public class MongoSinkConnector<T> extends SinkConnector<T> {
                     .setMaxRetries(maxRetries)
                     .setSerializationSchema(serializationAdapter.getSerializationSchema())
                     .build();
-            return stream.sinkTo(sink).name(super.name).setParallelism(super.parallelism).disableChaining();
+            return stream.sinkTo(sink).name(getName()).setParallelism(getParallelism()).disableChaining();
         } catch (ClassCastException e) {
             throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED,
-                    String.format("MongoDB sink connector '%s' serialization adapter must be '%s', could not assign other serialization adapter", name, MongoSerializationAdapter.class), e);
+                    String.format("MongoDB sink connector '%s' serialization adapter must be '%s', could not assign other serialization adapter", getName(), MongoSerializationAdapter.class), e);
         } catch (Exception e) {
             throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED,
-                    String.format("Failed to initialize MongoDB sink connector '%s'", name), e);
+                    String.format("Failed to initialize MongoDB sink connector '%s'", getName()), e);
         }
     }
 }

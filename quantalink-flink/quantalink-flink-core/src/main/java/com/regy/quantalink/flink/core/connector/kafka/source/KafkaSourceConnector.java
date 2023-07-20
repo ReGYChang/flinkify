@@ -39,20 +39,20 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
         try {
             KafkaDeserializationAdapter<T> deserializer =
                     Optional.ofNullable((KafkaDeserializationAdapter<T>) getDeserializationAdapter())
-                            .orElse(KafkaDeserializationAdapter.valueOnlyDefault(super.typeInfo));
-            return env.fromSource(
+                            .orElse(KafkaDeserializationAdapter.valueOnlyDefault(getTypeInfo()));
+            return getEnv().fromSource(
                             KafkaSource.<T>builder()
                                     .setBootstrapServers(bootStrapServers)
                                     .setTopics(topics)
                                     .setGroupId(groupId)
                                     .setStartingOffsets(OffsetsInitializer.committedOffsets(offsetResetStrategy))
                                     .setDeserializer(deserializer.getDeserializationSchema())
-                                    .build(), getWatermarkStrategy(), name)
-                    .setParallelism(parallelism);
-        } catch (ClassCastException e1) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Kafka source connector '%s' deserialization adapter must be '%s', could not assign other deserialization adapter", super.name, KafkaDeserializationAdapter.class), e1);
-        } catch (Exception e2) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Could not get source from kafka source connector '%s': ", super.name), e2);
+                                    .build(), getWatermarkStrategy(), getName())
+                    .setParallelism(getParallelism());
+        } catch (ClassCastException e) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Kafka source connector '%s' deserialization adapter must be '%s', could not assign other deserialization adapter", getName(), KafkaDeserializationAdapter.class), e);
+        } catch (Exception e) {
+            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Could not get source from kafka source connector '%s': ", getName()), e);
         }
     }
 }
