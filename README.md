@@ -6,7 +6,7 @@ The Quantalink provides a comprehensive structure for building applications usin
 
 * **Flexible Initialization:** Provides interfaces for custom initialization steps that can be applied to various aspects of the Flink environment, including the execution environment, configuration, source connectors, and sink connectors.
 
-* **Auto-wiring Approach:** Provides an auto-wiring approach for source and sink connectors. This feature simplifies the process of integrating data sources and sinks into Flink jobs, eliminating the need for manual setup. Users can use Flink connectors through YAML configuration.
+* **Auto-wiring Approach:** Provides an auto-wiring approach for source and sink connectors. This feature simplifies the com.nexdata.flink.traceability.process of integrating data sources and sinks into Flink jobs, eliminating the need for manual setup. Users can use Flink connectors through YAML configuration.
 
 ## Usage
 
@@ -46,8 +46,7 @@ public class KafkaSource extends FlinkStreaming {
                         sourceConnector ->
                                 sourceConnector.withDeserializationSchemaAdapter(KafkaDeserializationAdapter.valueOnlyDefault(TypeInformation.get(DcsEvent.class)))
                                         .withWatermarkStrategy(WatermarkStrategy.noWatermarks()),
-                        TypeInformation.get(DcsEvent.class)
-                ).build();
+                        TypeInformation.get(DcsEvent.class)).build();
 
         (new KafkaSource()).run(args, initializer);
     }
