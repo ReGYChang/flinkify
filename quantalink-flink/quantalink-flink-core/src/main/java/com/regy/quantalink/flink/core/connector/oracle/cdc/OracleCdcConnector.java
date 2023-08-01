@@ -31,11 +31,11 @@ public class OracleCdcConnector extends SourceConnector<String> {
 
     public OracleCdcConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
-        this.username = config.getNotNull(OracleOptions.USERNAME, "Oracle CDC connector hostname must not be null");
-        this.password = config.getNotNull(OracleOptions.PASSWORD, "Oracle CDC connector hostname must not be null");
-        this.database = config.getNotNull(OracleOptions.DATABASE, "Oracle CDC connector hostname must not be null");
-        this.schemaList = config.getNotNull(OracleOptions.SCHEMA_LIST, "Oracle CDC connector hostname must not be null").toArray(new String[0]);
-        this.tableList = config.getNotNull(OracleOptions.TABLE_LIST, "Oracle CDC connector hostname must not be null").toArray(new String[0]);
+        this.username = config.getNotNull(OracleOptions.USERNAME, "Oracle CDC connector username must not be null");
+        this.password = config.getNotNull(OracleOptions.PASSWORD, "Oracle CDC connector password must not be null");
+        this.database = config.getNotNull(OracleOptions.DATABASE, "Oracle CDC connector database must not be null");
+        this.schemaList = config.getNotNull(OracleOptions.SCHEMA_LIST, "Oracle CDC connector schema-list must not be null").toArray(new String[0]);
+        this.tableList = config.getNotNull(OracleOptions.TABLE_LIST, "Oracle CDC connector table-list must not be null").toArray(new String[0]);
         this.debeziumProperties = config.get(OracleOptions.DEBEZIUM_PROPERTIES).toProperties();
         this.hostname = config.get(OracleOptions.HOSTNAME);
         this.port = config.get(OracleOptions.PORT);

@@ -6,7 +6,8 @@ flink:
         - data-type: org.apache.flink.table.data.RowData
           name: doris-source
           fe-nodes: 10.1.5.35:8030
-          table: test.test
+          database: test
+          table: test
           username: root
           password: ""
           fields:

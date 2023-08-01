@@ -48,7 +48,7 @@ public class RabbitmqSinkConnector<T> extends SinkConnector<T, T> {
                     Optional.ofNullable(queueName).isPresent() ?
                             new RMQSink<>(connectionConfig, queueName, serializationAdapter.getSerializationSchema()) :
                             new RMQSink<>(connectionConfig, serializationAdapter.getSerializationSchema(), sinkPublishOpts);
-            return stream.addSink(sink).name(getName()).setParallelism(getParallelism()).disableChaining();
+            return stream.addSink(sink);
         } catch (ClassCastException e) {
             throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Rabbitmq sink connector '%s' com.nexdata.flink.traceability.serialization adapter must be '%s', could not assign other com.nexdata.flink.traceability.serialization adapter", getName(), RabbitmqSerializationAdapter.class), e);
         } catch (Exception e) {

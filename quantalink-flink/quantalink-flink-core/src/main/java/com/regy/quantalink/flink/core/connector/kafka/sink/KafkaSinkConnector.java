@@ -43,7 +43,7 @@ public class KafkaSinkConnector<T> extends SinkConnector<T, T> {
                             KafkaRecordSerializationSchema.builder()
                                     .setTopic(topic)
                                     .setValueSerializationSchema(serializationAdapter.getSerializationSchema()).build()).build();
-            return stream.sinkTo(sink).name(getName()).setParallelism(getParallelism()).disableChaining();
+            return stream.sinkTo(sink);
         } catch (ClassCastException e) {
             throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Kafka sink connector '%s' com.nexdata.flink.traceability.serialization adapter must be '%s', could not assign other com.nexdata.flink.traceability.serialization adapter", getName(), KafkaSerializationAdapter.class), e);
         } catch (Exception e) {

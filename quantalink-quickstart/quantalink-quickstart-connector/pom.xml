@@ -27,6 +27,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <oracle.cdc.version>2.3.0</oracle.cdc.version>
     </properties>
 
 </project>

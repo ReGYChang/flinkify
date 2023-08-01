@@ -6,6 +6,7 @@ import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.common.type.TypeInformation;
 import com.regy.quantalink.flink.core.config.SinkConnectorOptions;
 import com.regy.quantalink.flink.core.connector.serialization.SerializationAdapter;
+import com.regy.quantalink.flink.core.utils.JsonFormat;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -26,12 +27,14 @@ public abstract class SinkConnector<IN, OUT> extends Connector implements Serial
     private FlatMapFunction<IN, OUT> transformFunc;
     private TypeInformation<IN> inputType;
     private TypeInformation<OUT> outputType;
+    private final JsonFormat jsonFormat;
 
     @SuppressWarnings("unchecked")
     public SinkConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
         this.inputType = (TypeInformation<IN>) config.get(SinkConnectorOptions.INPUT_DATA_TYPE);
         this.outputType = (TypeInformation<OUT>) config.get(SinkConnectorOptions.OUTPUT_DATA_TYPE);
+        this.jsonFormat = config.get(SinkConnectorOptions.JSON_FORMAT);
         if (inputType == null && outputType == null) {
             throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Input type information & output type information of sink connector '%s' must not be null at one time", getName()));
         } else if (inputType == null) {
@@ -49,7 +52,8 @@ public abstract class SinkConnector<IN, OUT> extends Connector implements Serial
             return createSinkDataStream(
                     inputType.equals(outputType)
                             ? (DataStream<OUT>) mapStream(stream)
-                            : mapStream(stream).flatMap(transformFunc).returns(TypeInformation.convertToFlinkType(getOutputType())));
+                            : mapStream(stream).flatMap(transformFunc).returns(TypeInformation.convertToFlinkType(getOutputType())))
+                    .setParallelism(getParallelism()).name(getName()).disableChaining();
         } catch (ClassCastException e) {
             throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED,
                     String.format("Invalid output type of data stream for sink connector `%s`. Please assign a transform function", getName()));
@@ -92,5 +96,9 @@ public abstract class SinkConnector<IN, OUT> extends Connector implements Serial
 
     public TypeInformation<OUT> getOutputType() {
         return outputType;
+    }
+
+    public JsonFormat getJsonFormat() {
+        return jsonFormat;
     }
 }

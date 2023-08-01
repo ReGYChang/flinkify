@@ -61,7 +61,7 @@ public class MongoSinkConnector<T> extends SinkConnector<T, T> {
                     .setMaxRetries(maxRetries)
                     .setSerializationSchema(serializationAdapter.getSerializationSchema())
                     .build();
-            return stream.sinkTo(sink).name(getName()).setParallelism(getParallelism()).disableChaining();
+            return stream.sinkTo(sink);
         } catch (ClassCastException e) {
             throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED,
                     String.format("MongoDB sink connector '%s' serialization adapter must be '%s', could not assign other serialization adapter", getName(), MongoSerializationAdapter.class), e);

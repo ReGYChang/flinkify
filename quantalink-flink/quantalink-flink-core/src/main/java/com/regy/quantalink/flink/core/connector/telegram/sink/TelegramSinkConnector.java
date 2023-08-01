@@ -53,6 +53,7 @@ public class TelegramSinkConnector<T> extends SinkConnector<T, TelegramPayload> 
 
     @Override
     public DataStreamSink<TelegramPayload> createSinkDataStream(DataStream<TelegramPayload> stream) {
+
         SingleOutputStreamOperator<TelegramPayload> payloadStream =
                 stream.map(new SetupPayloadFunc(parseMode, chatId)).returns(Types.POJO(TelegramPayload.class));
         TelegramSerializationAdapter serializationAdapter =

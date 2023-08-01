@@ -3,6 +3,7 @@ package com.regy.quantalink.flink.core.config;
 import com.regy.quantalink.common.config.ConfigOption;
 import com.regy.quantalink.common.config.ConfigOptions;
 import com.regy.quantalink.common.type.TypeInformation;
+import com.regy.quantalink.flink.core.utils.JsonFormat;
 
 import org.apache.flink.configuration.description.Description;
 import org.apache.flink.configuration.description.TextElement;
@@ -47,4 +48,9 @@ public interface SinkConnectorOptions {
                                                     + " 'org.apache.flink.api.java.tuple.Tuple2,java.lang.String,java.lang.Integer'")
                             )
                             .build());
+
+    ConfigOption<JsonFormat> JSON_FORMAT = ConfigOptions.key("json-format")
+            .enumType(JsonFormat.class)
+            .defaultValue(JsonFormat.JSON)
+            .withDescription("");
 }

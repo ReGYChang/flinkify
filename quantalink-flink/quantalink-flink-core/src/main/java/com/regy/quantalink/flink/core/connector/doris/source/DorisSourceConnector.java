@@ -69,10 +69,10 @@ public class DorisSourceConnector extends SourceConnector<RowData> {
 
     @Override
     public DataStreamSource<RowData> getSourceDataStream() throws FlinkException {
-        LogicalType[] logicalTypes = TypeConversions.fromDataToLogicalType(this.types.toArray(new DataType[0]));
+        LogicalType[] logicalTypes = TypeConversions.fromDataToLogicalType(types.toArray(new DataType[0]));
         List<RowType.RowField> rowFields =
                 IntStream.range(0, logicalTypes.length)
-                        .mapToObj(i -> new RowType.RowField(this.fields.get(i), logicalTypes[i]))
+                        .mapToObj(i -> new RowType.RowField(fields.get(i), logicalTypes[i]))
                         .collect(Collectors.toList());
 
         DorisSource<RowData> dorisSource = DorisSourceBuilder.<RowData>builder()

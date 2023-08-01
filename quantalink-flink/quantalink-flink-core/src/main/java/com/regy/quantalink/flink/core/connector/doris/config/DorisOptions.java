@@ -24,6 +24,11 @@ public interface DorisOptions {
             .noDefaultValue()
             .withDescription("");
 
+    ConfigOption<String> DATABASE = ConfigOptions.key("database")
+            .stringType()
+            .noDefaultValue()
+            .withDescription("");
+
     ConfigOption<String> TABLE = ConfigOptions.key("table")
             .stringType()
             .noDefaultValue()
@@ -37,9 +42,9 @@ public interface DorisOptions {
             .stringType()
             .noDefaultValue()
             .withDescription("");
-    ConfigOption<String> LABEL = ConfigOptions.key("label")
+    ConfigOption<String> LABEL_PREFIX = ConfigOptions.key("label-prefix")
             .stringType()
-            .noDefaultValue()
+            .defaultValue("")
             .withDescription("");
     ConfigOption<List<String>> FIELDS = ConfigOptions.key("fields")
             .stringType()

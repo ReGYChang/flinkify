@@ -85,7 +85,7 @@ public class NebulaSinkConnector<T> extends SinkConnector<T, Row> {
         NebulaMetaConnectionProvider metaConnProvider = new NebulaMetaConnectionProvider(clientOptions);
         NebulaSinkFunction<Row> sinkFunc = getSinkFunc(graphConnProvider, metaConnProvider);
         try {
-            return stream.addSink(sinkFunc).name(getName()).disableChaining();
+            return stream.addSink(sinkFunc);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Could not add sink from stream '%s' to nebula connector: ", stream.toString()), e);
         }
