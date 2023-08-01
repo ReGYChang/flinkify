@@ -64,6 +64,10 @@ public interface FlinkStreamingInitializer {
             return this;
         }
 
+        public <T> Builder withSinkConnectorSetup(SinkConnectorInitializer<T, T> initializer, TypeInformation<T> typeInfo) {
+            return withSinkConnectorSetup(initializer, typeInfo, typeInfo);
+        }
+
         public <I, O> Builder withSinkConnectorSetup(SinkConnectorInitializer<I, O> initializer, TypeInformation<I> inputTypeInfo, TypeInformation<O> outputTypeInfo) {
             initializers.add(
                     (ctx) -> {
