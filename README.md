@@ -1,24 +1,20 @@
-# Quantalink
+# QuantaStream
 
-The Quantalink provides a comprehensive structure for building applications using Apache Flink's streaming API. The framework encapsulates all necessary steps for running a Flink streaming job including initialization, configuration, execution, and termination. It facilitates defining specific behaviors for Flink streaming jobs, acting as a blueprint for streaming data processing tasks.
+The QuantaStream provides a comprehensive structure for building applications using Apache Flink's streaming API. The framework encapsulates all necessary steps for running a Flink streaming job including initialization, configuration, execution, and termination. It facilitates defining specific behaviors for Flink streaming jobs, acting as a blueprint for streaming data processing tasks.
 
 ## Features
 
 * **Flexible Initialization:** Provides interfaces for custom initialization steps that can be applied to various aspects of the Flink environment, including the execution environment, configuration, source connectors, and sink connectors.
 
-* **Auto-wiring Approach:** Provides an auto-wiring approach for source and sink connectors. This feature simplifies the com.nexdata.flink.traceability.process of integrating data sources and sinks into Flink jobs, eliminating the need for manual setup. Users can use Flink connectors through YAML configuration.
+* **Auto-wiring Approach:** Provides an auto-wiring approach for source and sink connectors. This feature simplifies the process of integrating data sources and sinks into Flink jobs, eliminating the need for manual setup. Users can use Flink connectors through YAML configuration.
 
 ## Usage
 
 To use this framework, follow the provided examples and use the API to define your streaming jobs, configure sources and sinks, and launch the job in the desired environment.
 
-## Contributing
-
-The Quantalink is an open-source project. We encourage contributions from developers who want to improve the system or add new features.
-
 ## Quickstart
 
-Check out Quantalink's [quickstart](./quantalink-quickstart/README.md) for more information, A simple quickstart of how you might use Quantalink is as follows:
+Check out QuantaStream's [quickstart](./quantalink-quickstart/README.md) for more information, A simple quickstart of how you might use Quantastream is as follows:
 
 For the auto-wiring of connectors, you can simply provide a YAML configuration:
 
@@ -61,20 +57,18 @@ public class KafkaSource extends FlinkStreaming {
 
 Then you just need to run the `KafkaSource` class. To run your `KafkaSource` class, you need to pass the `--conf` argument followed by the path to your configuration file.
 
-If you're using a terminal or command prompt, navigate to the directory containing your compiled Java files. Then, use the java command to run your program. Replace `path_to_your_config` with the path to the YAML file you created in step 1.
-
-```bash
-java KafkaSource --conf path_to_your_config
-```
-
 This will start your Flink job with the specified configuration. Be sure to monitor the logs for any potential issues during the execution.
 
 ## Building from Source
 
-Refer to the instructions in the main [Apache Flink](https://github.com/apache/flink) repository for building the Quantalink from source.
+Refer to the instructions in the main [Apache Flink](https://github.com/apache/flink) repository for building the QuantaStream from source.
+
+## Contributing
+
+The QuantaStream is an open-source project. We encourage contributions from developers who want to improve the system or add new features.
 
 ## Support
 
 Don’t hesitate to ask for help!
 
-Open an issue if you find a bug in the Quantalink.
+Open an issue if you find a bug in the QuantaStream.
