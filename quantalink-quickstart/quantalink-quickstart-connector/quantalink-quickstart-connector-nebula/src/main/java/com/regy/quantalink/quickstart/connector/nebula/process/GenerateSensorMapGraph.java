@@ -24,18 +24,18 @@ import java.util.Map;
  */
 public class GenerateSensorMapGraph extends GraphProcessFunc<SensorMap> {
 
-    public GenerateSensorMapGraph(Map<TypeInformation<?>, SinkConnector<?>> connectorMap) {
+    public GenerateSensorMapGraph(Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) {
         super(connectorMap);
     }
 
     @Override
-    protected void processGraph(SensorMap sensorMap, ProcessFunction<SensorMap, Void>.Context ctx, Collector<Void> collector, Map<TypeInformation<?>, SinkConnector<?>> connectorMap) throws Exception {
+    protected void processGraph(SensorMap sensorMap, ProcessFunction<SensorMap, Void>.Context ctx, Collector<Void> collector, Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) throws Exception {
         for (SensorMap.ProductionLine line : sensorMap.productionLines) {
             extractProductionLineInfo(line, ctx, connectorMap);
         }
     }
 
-    private void extractProductionLineInfo(SensorMap.ProductionLine line, ProcessFunction<SensorMap, Void>.Context ctx, Map<TypeInformation<?>, SinkConnector<?>> connectorMap) throws NoSuchAlgorithmException {
+    private void extractProductionLineInfo(SensorMap.ProductionLine line, ProcessFunction<SensorMap, Void>.Context ctx, Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) throws NoSuchAlgorithmException {
         NebulaSinkConnector lineSinkConnector =
                 (NebulaSinkConnector) connectorMap.get(TypeInformation.get(NebulaTag.ProductionLine.class));
 
@@ -63,7 +63,7 @@ public class GenerateSensorMapGraph extends GraphProcessFunc<SensorMap> {
             SensorMap.Workstation station,
             Map<String, Tuple2<Integer, SensorMap.SequenceInfo>> sequenceMap,
             ProcessFunction<SensorMap, Void>.Context ctx,
-            Map<TypeInformation<?>, SinkConnector<?>> connectorMap) throws NoSuchAlgorithmException {
+            Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) throws NoSuchAlgorithmException {
 
         Tuple2<Integer, SensorMap.SequenceInfo> sequenceTuple = sequenceMap.get(station.oid);
         NebulaSinkConnector stationSinkConnector =

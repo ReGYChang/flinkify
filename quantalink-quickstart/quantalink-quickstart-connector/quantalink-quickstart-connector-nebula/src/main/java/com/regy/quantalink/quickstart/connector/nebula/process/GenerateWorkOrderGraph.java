@@ -35,7 +35,7 @@ public class GenerateWorkOrderGraph extends GraphKeyedBroadcastProcessFunc<Strin
     private static final String WORK_ORDER_BUFFER = "WORK_ORDER_BUFFER";
     private volatile boolean isReady = false;
 
-    public GenerateWorkOrderGraph(Map<TypeInformation<?>, SinkConnector<?>> connectorMap, MapStateDescriptor<String, Map<String, List<String>>> stateDesc) {
+    public GenerateWorkOrderGraph(Map<TypeInformation<?>, SinkConnector<?,?>> connectorMap, MapStateDescriptor<String, Map<String, List<String>>> stateDesc) {
         super(connectorMap);
         this.stateDesc = stateDesc;
     }
@@ -50,7 +50,7 @@ public class GenerateWorkOrderGraph extends GraphKeyedBroadcastProcessFunc<Strin
             DcsEvent record,
             KeyedBroadcastProcessFunction<String, DcsEvent, SensorMap, Void>.ReadOnlyContext readOnlyCtx,
             Collector<Void> collector,
-            Map<TypeInformation<?>, SinkConnector<?>> connectorMap) throws Exception {
+            Map<TypeInformation<?>, SinkConnector<?,?>> connectorMap) throws Exception {
 
         NebulaSinkConnector orderSinkConnector =
                 (NebulaSinkConnector) connectorMap.get(TypeInformation.get(NebulaTag.WorkOrder.class));

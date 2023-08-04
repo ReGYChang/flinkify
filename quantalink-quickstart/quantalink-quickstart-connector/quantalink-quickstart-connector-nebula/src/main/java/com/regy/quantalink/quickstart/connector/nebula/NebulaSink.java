@@ -53,10 +53,11 @@ public class NebulaSink extends FlinkStreaming {
         DataStreamSource<SensorMap> mapSourceStream = ctx.getSourceDataStream(TypeInformation.get(SensorMap.class));
         SingleOutputStreamOperator<Void> mapGraphStream = mapSourceStream.process(new GenerateSensorMapGraph(ctx.getSinkConnectors()));
 
+        // TODO: refactor does not test
         FlinkDataStream.ofDataStream(mapGraphStream, ctx)
-                .sideSink(TypeInformation.get(NebulaTag.ProductionLine.class))
-                .sideSink(TypeInformation.get(NebulaTag.Workstation.class))
-                .sideSink(TypeInformation.get(NebulaTag.BelongsTo.class));
+                .sink(TypeInformation.get(NebulaTag.ProductionLine.class))
+                .sink(TypeInformation.get(NebulaTag.Workstation.class))
+                .sink(TypeInformation.get(NebulaTag.BelongsTo.class));
 
 
         // create product graph
@@ -66,8 +67,8 @@ public class NebulaSink extends FlinkStreaming {
                 .process(new GenerateWorkOrderGraph(ctx.getSinkConnectors(), SENSOR_MAP_DESC));
 
         FlinkDataStream.ofDataStream(dcsGraphStream, ctx)
-                .sideSink(TypeInformation.get(NebulaTag.WorkOrder.class))
-                .sideSink(TypeInformation.get(NebulaTag.ProducedOn.class));
+                .sink(TypeInformation.get(NebulaTag.WorkOrder.class))
+                .sink(TypeInformation.get(NebulaTag.ProducedOn.class));
     }
 }
 
