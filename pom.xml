@@ -33,8 +33,10 @@
         <flink.version>1.16.1</flink.version>
         <flink-cdc.version>2.3.0</flink-cdc.version>
         <scala.binary.version>2.12</scala.binary.version>
-        <nebula-graph-connector.version>3.5.0</nebula-graph-connector.version>
-        <doris-connector.version>1.3.0</doris-connector.version>
+        <flink.nebula-graph-connector.version>3.5.0</flink.nebula-graph-connector.version>
+        <flink.doris-connector.version>1.3.0</flink.doris-connector.version>
+        <flink.mongo-connector.version>1.0.1</flink.mongo-connector.version>
+        <flink.http-connector.version>0.10.0</flink.http-connector.version>
 
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>

@@ -15,7 +15,7 @@ development environment, run an example Flink job, and understand how to configu
 Before we get started, ensure that you have the following installed:
 
 - JDK 11
-- Apache Maven 3.8.6
+- Apache Maven 3.8.6+
 
 Clone the Quantastream repository from GitHub.
 
@@ -27,11 +27,16 @@ mvn clean install -DskipTests
 ## Running the Quickstart
 
 In order to run the Flink job, navigate to the directory containing your compiled Java files, and use the java command
-to run your program. Replace `your-jar-file.jar` with the path to the JAR file you built.
+to run your program. Replace `your-jar-path` with the path to the JAR file you built.
+
+> ❗️ Note that you should set up your configuration for the job with `application.yml`. For example, you should assign your `chat-id` and other required configurations for the Telegram bot
 
 ```bash
 mvn clean package -DskipTests
-java -cp your-jar-file.jar com.regy.quantalink.quickstart.connector.telegram.TelegramSink
+
+java \
+-cp /your-jar-path/target/quantalink-quickstart-connector-telegram-1.0-SNAPSHOT-jar-with-dependencies.jar \
+com.regy.quantalink.quickstart.connector.telegram.TelegramSink
 ```
 
 ## Connectors Quickstart

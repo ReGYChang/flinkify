@@ -69,12 +69,14 @@ public class DorisSinkConnector<T> extends SinkConnector<T, T> {
                     .setDorisOptions(dorisOptions);
 
             if (getJsonFormat().equals(JsonFormat.DEBEZIUM_JSON)) {
-                DorisRecordSerializer<?> serializer = clazz.equals(RowData.class)
-                        ? RowDataSerializer.builder()
-                        .setType("json")
-                        .setFieldNames(fields.toArray(new String[0]))
-                        .setFieldType(types.toArray(new DataType[0])).build()
-                        : new SimpleStringSerializer();
+                DorisRecordSerializer<?> serializer =
+                        clazz.equals(RowData.class)
+                                ?
+                                RowDataSerializer.builder()
+                                        .setType("json")
+                                        .setFieldNames(fields.toArray(new String[0]))
+                                        .setFieldType(types.toArray(new DataType[0])).build()
+                                : new SimpleStringSerializer();
 
                 builder.setSerializer((DorisRecordSerializer<T>) serializer);
             } else {
