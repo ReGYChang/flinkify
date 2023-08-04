@@ -1,0 +1,13 @@
+flink:
+  job-name: RabbitMQ Source Connector Quickstart
+  sources:
+    - rabbitmq:
+        - data-type: com.regy.quantalink.quickstart.connector.rabbitmq.entity.DcsEvent,com.regy.quantalink.quickstart.connector.rabbitmq.entity.DcsEvent$FromRabbitmq
+          name: rabbitmq-lazy-consumed-dcs-source
+          host: rabbitmq-amqp.nexdata.stg
+          port: 5672
+          virtual-host: /
+          username: username
+          password: password
+          queue-name: queue-name
+          uses-correlation-id: true

@@ -1,4 +1,4 @@
-package com.regy.quantalink.quickstart.connector.kafka.entity;
+package com.regy.quantalink.quickstart.connector.rabbitmq.entity;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
@@ -30,5 +30,7 @@ public class DcsEvent {
     public String wsId;
     @JSONField(name = "sensor_map_id")
     public String sensorMapObjectId;
-}
 
+    public static class FromRabbitmq {
+    }
+}
