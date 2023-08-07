@@ -1,0 +1,7 @@
+flink:
+  job-name: CSV Source Connector Quickstart
+  sources:
+    - csv:
+        - data-type: com.regy.quantalink.quickstart.connector.csv.entity.SaleCase
+          name: csv-quickstart-source
+          file-path: /Users/regy/Github/QuantaLink/quantalink-quickstart/quantalink-quickstart-connector/quantalink-quickstart-connector-csv/src/main/resources/real_estate_actual_price_registration_sale_cases_111.csv

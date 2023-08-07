@@ -7,6 +7,8 @@ import com.regy.quantalink.common.type.TypeInformation;
 import com.regy.quantalink.flink.core.config.FlinkOptions;
 import com.regy.quantalink.flink.core.config.SinkConnectorOptions;
 import com.regy.quantalink.flink.core.config.SourceConnectorOptions;
+import com.regy.quantalink.flink.core.connector.csv.source.CsvSourceConnector;
+import com.regy.quantalink.flink.core.connector.csv.config.CsvOptions;
 import com.regy.quantalink.flink.core.connector.doris.config.DorisOptions;
 import com.regy.quantalink.flink.core.connector.doris.sink.DorisSinkConnector;
 import com.regy.quantalink.flink.core.connector.doris.source.DorisSourceConnector;
@@ -66,6 +68,11 @@ public class ConnectorUtils {
                         dorisConfigs.forEach(
                                 dorisConfig ->
                                         connectors.put(dorisConfig.getNotNull(SourceConnectorOptions.DATA_TYPE, "Could not find data type of doris source connector"), new DorisSourceConnector(environment, dorisConfig)));
+                    } else if (connectorConfig.contains(CsvOptions.CONNECTORS)) {
+                        List<Configuration> csvConfigs = connectorConfig.getNotNull(CsvOptions.CONNECTORS, "Could not find configuration of csv source connector");
+                        csvConfigs.forEach(
+                                csvConfig ->
+                                        connectors.put(csvConfig.getNotNull(SourceConnectorOptions.DATA_TYPE, "Could not find data type of csv source connector"), new CsvSourceConnector<>(environment, csvConfig)));
                     } else if (connectorConfig.contains(MySqlOptions.CDC)) {
                         Configuration mysqlCdcConfig = connectorConfig.getNotNull(MySqlOptions.CDC, "Could not find configuration of mysql cdc connector");
                         mysqlCdcConfig.set(SourceConnectorOptions.DATA_TYPE, TypeInformation.get(String.class));

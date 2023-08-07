@@ -21,6 +21,7 @@
         <module>quantalink-quickstart-connector-doris</module>
         <module>quantalink-quickstart-connector-oracle</module>
         <module>quantalink-quickstart-connector-telegram</module>
+        <module>quantalink-quickstart-connector-csv</module>
     </modules>
 
     <properties>

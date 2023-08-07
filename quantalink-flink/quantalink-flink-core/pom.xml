@@ -108,6 +108,18 @@
             <systemPath>${project.basedir}/src/main/resources/lib/flink-http-connector-0.10.0.jar</systemPath>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-csv</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-files</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
         <!--flink cdc connector dependencies-->
         <dependency>
             <groupId>com.ververica</groupId>

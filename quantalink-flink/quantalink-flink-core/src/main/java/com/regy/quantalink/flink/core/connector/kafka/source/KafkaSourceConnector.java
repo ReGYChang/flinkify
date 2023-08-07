@@ -30,7 +30,7 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
         this.groupId = config.get(KafkaOptions.GROUP_ID);
         this.offsetResetStrategy = config.get(KafkaOptions.OFFSET_RESET_STRATEGY);
         this.bootStrapServers = config.getNotNull(KafkaOptions.BOOTSTRAP_SERVERS, "Kafka source connector bootstrap servers must not be null, please check your configuration");
-        this.topics = config.getNotNull(KafkaOptions.TOPIC, "Kafka source topics must not be null, please check your configuration");
+        this.topics = config.getNotNull(KafkaOptions.TOPIC, "Kafka source connector topics must not be null, please check your configuration");
     }
 
     @SuppressWarnings("unchecked")
