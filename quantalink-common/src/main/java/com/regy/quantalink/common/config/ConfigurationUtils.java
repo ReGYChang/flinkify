@@ -39,6 +39,8 @@ public final class ConfigurationUtils {
             return (T) convertToFloat(rawValue);
         } else if (Double.class.equals(clazz)) {
             return (T) convertToDouble(rawValue);
+        } else if (Character.class.equals(clazz)) {
+            return (T) convertToCharacter(rawValue);
         } else if (String.class.equals(clazz)) {
             return (T) convertToString(rawValue);
         } else if (clazz.isEnum()) {
@@ -202,6 +204,18 @@ public final class ConfigurationUtils {
         return TimeUtils.parseDuration(o.toString());
     }
 
+    public static Character convertToCharacter(Object o) {
+        if (o instanceof Character) {
+            return (Character) o;
+        } else if (o instanceof String && ((String) o).length() == 1) {
+            return ((String) o).charAt(0);
+        } else {
+            throw new ConfigurationException(
+                    ErrCode.PARSING_CONFIG_FAILED,
+                    String.format("Invalid character value input '%s' in the configuration", o));
+        }
+    }
+
     public static String convertToString(Object o) {
         return o.toString();
     }
@@ -217,7 +231,7 @@ public final class ConfigurationUtils {
                 throw new ConfigurationException(
                         ErrCode.PARSING_CONFIG_FAILED,
                         String.format(
-                                "Configuration value %s overflows/underflows the integer type.",
+                                "Configuration value '%s' overflows/underflows the integer type.",
                                 value));
             }
         }

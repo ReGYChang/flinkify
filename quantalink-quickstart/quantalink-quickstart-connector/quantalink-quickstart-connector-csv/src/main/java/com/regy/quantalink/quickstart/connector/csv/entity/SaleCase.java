@@ -18,7 +18,7 @@ public class SaleCase {
     public String district;
     public String rps01;
     public String rps02;
-    public Double rps03;
+    public String rps03;
     public String rps04;
     public String rps05;
     public String rps06;

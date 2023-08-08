@@ -96,6 +96,10 @@ public class ConfigOptions {
             return new TypedConfigOptionBuilder<>(this.key, String.class);
         }
 
+        public TypedConfigOptionBuilder<Character> characterType() {
+            return new TypedConfigOptionBuilder<>(this.key, Character.class);
+        }
+
         public TypedConfigOptionBuilder<Duration> durationType() {
             return new TypedConfigOptionBuilder<>(this.key, Duration.class);
         }
