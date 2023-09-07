@@ -3,6 +3,7 @@ package com.regy.quantalink.common.type;
 import com.regy.quantalink.common.utils.CopyUtils;
 
 import com.google.common.base.Preconditions;
+import lombok.Getter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.flink.api.common.typeinfo.Types;
@@ -15,6 +16,7 @@ import java.lang.reflect.Type;
 /**
  * @author regy
  */
+@Getter
 public class TypeInformation<T> implements Serializable {
     private final Class<T> rawType;
     private final Type[] actualTypeArguments;
@@ -29,16 +31,8 @@ public class TypeInformation<T> implements Serializable {
         }
     }
 
-    public Class<T> getRawType() {
-        return rawType;
-    }
-
     public Type[] getActualTypeArguments() {
         return CopyUtils.deepCopy(actualTypeArguments);
-    }
-
-    public Type getType() {
-        return type;
     }
 
     public boolean isParameterizedType() {

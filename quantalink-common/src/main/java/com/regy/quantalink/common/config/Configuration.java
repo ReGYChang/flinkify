@@ -39,8 +39,22 @@ public class Configuration implements Serializable {
         return getValueFromOption(configOption).orElse(overrideDefault);
     }
 
+    public <T> T getNotNull(ConfigOption<T> configOption) {
+        return Optional.ofNullable(this.get(configOption))
+                .orElseThrow(
+                        () ->
+                                new ConfigurationException(
+                                        ErrCode.MISSING_CONFIG_FIELD,
+                                        String.format("Required configuration key '%s' is missing or has a null value." +
+                                                "Please ensure that it is properly set in your configuration.", configOption.key())));
+    }
+
+
     public <T> T getNotNull(ConfigOption<T> configOption, String message) {
-        return Optional.ofNullable(this.get(configOption)).orElseThrow(() -> new ConfigurationException(ErrCode.MISSING_CONFIG_FIELD, message));
+        return Optional.ofNullable(this.get(configOption))
+                .orElseThrow(
+                        () ->
+                                new ConfigurationException(ErrCode.MISSING_CONFIG_FIELD, message));
     }
 
     // TODO: Test

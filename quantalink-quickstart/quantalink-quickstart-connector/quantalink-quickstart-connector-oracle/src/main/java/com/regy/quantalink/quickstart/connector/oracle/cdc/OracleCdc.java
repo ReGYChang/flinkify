@@ -4,6 +4,7 @@ import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.common.type.TypeInformation;
 import com.regy.quantalink.flink.core.streaming.FlinkStreaming;
 import com.regy.quantalink.flink.core.streaming.FlinkStreamingContext;
+import com.regy.quantalink.flink.core.streaming.FlinkStreamingInitializer;
 
 /**
  * @author regy
@@ -11,7 +12,14 @@ import com.regy.quantalink.flink.core.streaming.FlinkStreamingContext;
 public class OracleCdc extends FlinkStreaming {
 
     public static void main(String[] args) throws Exception {
-        (new OracleCdc()).run(args);
+        FlinkStreamingInitializer initializer = new FlinkStreamingInitializer.Builder()
+                .withExecutionEnvironmentSetup(
+                        env -> {
+                            env.enableCheckpointing(3000);
+                            env.setParallelism(1);
+                        }).build();
+
+        (new OracleCdc()).run(args, initializer);
     }
 
     @Override

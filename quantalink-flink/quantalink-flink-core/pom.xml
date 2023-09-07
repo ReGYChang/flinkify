@@ -15,10 +15,13 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <flink.big-query-connector.version>1.5.0</flink.big-query-connector.version>
+        <flink.http-connector.version>0.10.0</flink.http-connector.version>
     </properties>
 
     <dependencies>
 
+        <!--quantalink dependencies-->
         <dependency>
             <groupId>com.regy</groupId>
             <artifactId>quantalink-common</artifactId>
@@ -101,11 +104,19 @@
         </dependency>
 
         <dependency>
+            <groupId>com.github.vinted</groupId>
+            <artifactId>flink-big-query-connector</artifactId>
+            <version>${flink.big-query-connector.version}</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/flink-big-query-connector-${flink.big-query-connector.version}.jar</systemPath>
+        </dependency>
+
+        <dependency>
             <groupId>com.getindata</groupId>
             <artifactId>flink-http-connector</artifactId>
-            <version>0.10.0</version>
+            <version>${flink.http-connector.version}</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/lib/flink-http-connector-0.10.0.jar</systemPath>
+            <systemPath>${project.basedir}/src/main/resources/lib/flink-http-connector-${flink.http-connector.version}.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -130,6 +141,12 @@
         <dependency>
             <groupId>com.ververica</groupId>
             <artifactId>flink-connector-oracle-cdc</artifactId>
+            <version>${flink-cdc.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ververica</groupId>
+            <artifactId>flink-connector-sqlserver-cdc</artifactId>
             <version>${flink-cdc.version}</version>
         </dependency>
 
