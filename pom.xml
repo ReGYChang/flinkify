@@ -24,6 +24,7 @@
         <commons-lang3.version>3.8.1</commons-lang3.version>
         <guava.version>30.0-jre</guava.version>
         <slf4j.version>1.7.32</slf4j.version>
+        <lombok.version>1.18.28</lombok.version>
         <jupiter.version>5.9.1</jupiter.version>
         <mockito.version>3.4.6</mockito.version>
         <assertj.version>3.23.1</assertj.version>
@@ -62,6 +63,13 @@
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <type>jar</type>
         </dependency>
 
         <!--apache.commons -->
