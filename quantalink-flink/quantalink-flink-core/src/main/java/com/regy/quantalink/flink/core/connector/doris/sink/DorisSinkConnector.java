@@ -20,7 +20,9 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.types.DataType;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -35,57 +37,87 @@ public class DorisSinkConnector<T> extends SinkConnector<T, T> {
 
     public DorisSinkConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
+        dorisOptions = createDorisOptions(config);
+        execOptions = createExecOptions(config);
+
+        if (!getJsonFormat().equals(JsonFormat.DEBEZIUM_JSON)) {
+            fields = config.getNotNull(DorisOptions.FIELDS);
+            types = config.getNotNull(DorisOptions.TYPES);
+        } else {
+            fields = Collections.emptyList();
+            types = Collections.emptyList();
+        }
+    }
+
+    private Properties createProperties() {
         Properties properties = new Properties();
         properties.setProperty("format", "json");
         properties.setProperty("read_json_by_line", "true");
-        String feNodes = config.getNotNull(DorisOptions.FE_NODES, String.format("Doris sink connector '%s' fe-nodes must not be null", getName()));
-        String database = config.getNotNull(DorisOptions.DATABASE, String.format("Doris sink connector '%s' database must not be null", getName()));
-        String table = config.getNotNull(DorisOptions.TABLE, String.format("Doris sink connector '%s' table must not be null", getName()));
-        String username = config.getNotNull(DorisOptions.USERNAME, String.format("Doris sink connector '%s' username must not be null", getName()));
-        String password = config.getNotNull(DorisOptions.PASSWORD, String.format("Doris sink connector '%s' password must not be null", getName()));
-        String labelPrefix = config.getNotNull(DorisOptions.LABEL_PREFIX, String.format("Doris sink connector '%s' label-prefix must not be null", getName()));
-        this.fields = config.getNotNull(DorisOptions.FIELDS, String.format("Doris sink connector '%s' fields must not be null", getName()));
-        this.types = config.getNotNull(DorisOptions.TYPES, String.format("Doris sink connector '%s' types must not be null", getName()));
-        this.dorisOptions = org.apache.doris.flink.cfg.DorisOptions.builder().setFenodes(feNodes).setTableIdentifier(String.join(".", database, table)).setUsername(username).setPassword(password).build();
-        this.execOptions = DorisExecutionOptions.builder().setLabelPrefix(String.join("-", labelPrefix, database, table)).setStreamLoadProp(properties).build();
+        return properties;
+    }
+
+    private org.apache.doris.flink.cfg.DorisOptions createDorisOptions(Configuration config) {
+        return org.apache.doris.flink.cfg.DorisOptions.builder()
+                .setFenodes(config.getNotNull(DorisOptions.FE_NODES))
+                .setTableIdentifier(String.join(".", config.getNotNull(DorisOptions.DATABASE), config.getNotNull(DorisOptions.TABLE)))
+                .setUsername(config.getNotNull(DorisOptions.USERNAME))
+                .setPassword(config.getNotNull(DorisOptions.PASSWORD))
+                .build();
+    }
+
+    private DorisExecutionOptions createExecOptions(Configuration config) {
+        return DorisExecutionOptions.builder()
+                .setLabelPrefix(
+                        String.join("-",
+                                config.get(DorisOptions.LABEL_PREFIX),
+                                config.getNotNull(DorisOptions.DATABASE),
+                                config.getNotNull(DorisOptions.TABLE)))
+                .setStreamLoadProp(createProperties())
+                .build();
     }
 
     @Override
     public DataStreamSink<T> createSinkDataStream(DataStream<T> stream) {
-        DorisSink<T> dorisSink = applyDorisSink(stream.getType().getTypeClass());
-        try {
-            return stream.sinkTo(dorisSink);
-        } catch (Exception e) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Could not get sink from stream '%s' to doris connector '%s': ", stream, getName()), e);
-        }
+        return Optional.of(applyDorisSink(stream.getType().getTypeClass()))
+                .map(stream::sinkTo)
+                .orElseThrow(
+                        () ->
+                                new FlinkException(
+                                        ErrCode.STREAMING_CONNECTOR_FAILED,
+                                        String.format("Could not get sink from stream '%s' to doris connector '%s': ", stream, getName())));
     }
 
     @SuppressWarnings("unchecked")
     private DorisSink<T> applyDorisSink(Class<T> clazz) {
-        try {
-            DorisSink.Builder<T> builder = DorisSink.<T>builder()
-                    .setDorisReadOptions(DorisReadOptions.builder().build())
-                    .setDorisExecutionOptions(execOptions)
-                    .setDorisOptions(dorisOptions);
+        DorisSink.Builder<T> builder = initializeBuilder();
+        return Optional.of(clazz)
+                .map(this::selectSerializerForClass)
+                .map(
+                        serializer ->
+                                builder.setSerializer((DorisRecordSerializer<T>) serializer).build())
+                .orElseThrow(
+                        () ->
+                                new FlinkException(
+                                        ErrCode.STREAMING_CONNECTOR_FAILED,
+                                        "Could not initialize doris sink, doris sink stream type must be `String` or `RowData`"));
+    }
 
-            if (getJsonFormat().equals(JsonFormat.DEBEZIUM_JSON)) {
-                DorisRecordSerializer<?> serializer =
-                        clazz.equals(RowData.class)
-                                ?
-                                RowDataSerializer.builder()
-                                        .setType("json")
-                                        .setFieldNames(fields.toArray(new String[0]))
-                                        .setFieldType(types.toArray(new DataType[0])).build()
-                                : new SimpleStringSerializer();
+    private DorisSink.Builder<T> initializeBuilder() {
+        return DorisSink.<T>builder()
+                .setDorisReadOptions(DorisReadOptions.builder().build())
+                .setDorisExecutionOptions(execOptions)
+                .setDorisOptions(dorisOptions);
+    }
 
-                builder.setSerializer((DorisRecordSerializer<T>) serializer);
-            } else {
-                builder.setSerializer((DorisRecordSerializer<T>) JsonDebeziumSchemaSerializer.builder()
-                        .setDorisOptions(dorisOptions).build());
-            }
-            return builder.build();
-        } catch (Exception e) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, "Could not initialize doris sink, doris sink stream type must be `String` or `RowData`", e);
+    private DorisRecordSerializer<?> selectSerializerForClass(Class<T> clazz) {
+        if (getJsonFormat().equals(JsonFormat.DEBEZIUM_JSON)) {
+            return JsonDebeziumSchemaSerializer.builder().setDorisOptions(dorisOptions).build();
         }
+        return clazz.equals(RowData.class) ?
+                RowDataSerializer.builder()
+                        .setType("json")
+                        .setFieldNames(fields.toArray(new String[0]))
+                        .setFieldType(types.toArray(new DataType[0])).build() :
+                new SimpleStringSerializer();
     }
 }
