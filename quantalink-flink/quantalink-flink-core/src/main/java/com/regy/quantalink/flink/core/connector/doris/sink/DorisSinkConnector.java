@@ -5,6 +5,7 @@ import com.regy.quantalink.common.exception.ErrCode;
 import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.flink.core.connector.SinkConnector;
 import com.regy.quantalink.flink.core.connector.doris.config.DorisOptions;
+import com.regy.quantalink.flink.core.connector.doris.func.ObjectStringTransformFunc;
 import com.regy.quantalink.flink.core.utils.JsonFormat;
 
 import org.apache.doris.flink.cfg.DorisExecutionOptions;
@@ -14,10 +15,10 @@ import org.apache.doris.flink.sink.writer.DorisRecordSerializer;
 import org.apache.doris.flink.sink.writer.JsonDebeziumSchemaSerializer;
 import org.apache.doris.flink.sink.writer.RowDataSerializer;
 import org.apache.doris.flink.sink.writer.SimpleStringSerializer;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.types.DataType;
 
 import java.util.Collections;
@@ -28,38 +29,66 @@ import java.util.Properties;
 /**
  * @author regy
  */
-public class DorisSinkConnector<T> extends SinkConnector<T, T> {
+public class DorisSinkConnector<IN, OUT> extends SinkConnector<IN, OUT> {
 
     private final List<String> fields;
     private final List<DataType> types;
     private final org.apache.doris.flink.cfg.DorisOptions dorisOptions;
     private final DorisExecutionOptions execOptions;
+    private final DorisSinkType dorisSinkType;
 
     public DorisSinkConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
-        dorisOptions = createDorisOptions(config);
-        execOptions = createExecOptions(config);
 
-        if (!getJsonFormat().equals(JsonFormat.DEBEZIUM_JSON)) {
-            fields = config.getNotNull(DorisOptions.FIELDS);
-            types = config.getNotNull(DorisOptions.TYPES);
+        this.dorisSinkType = determineSinkType();
+        this.dorisOptions = createDorisOptions(config);
+        this.execOptions = createExecOptions(config);
+        this.fields = (dorisSinkType == DorisSinkType.ROW) ? config.getNotNull(DorisOptions.FIELDS) : Collections.emptyList();
+        this.types = (dorisSinkType == DorisSinkType.ROW) ? config.getNotNull(DorisOptions.TYPES) : Collections.emptyList();
+    }
+
+    @Override
+    public DataStreamSink<OUT> createSinkDataStream(DataStream<OUT> stream) {
+        return Optional.of(applyDorisSink(stream.getType().getTypeClass()))
+                .map(stream::sinkTo)
+                .orElseThrow(
+                        () ->
+                                new FlinkException(
+                                        ErrCode.STREAMING_CONNECTOR_FAILED,
+                                        String.format("Could not get sink from stream '%s' to doris connector '%s': ", stream, getName())));
+    }
+
+    @SuppressWarnings("unchecked")
+    private DorisSinkType determineSinkType() {
+        if (getJsonFormat().equals(JsonFormat.DEBEZIUM_JSON)) {
+            return DorisSinkType.DEBEZIUM_STRING;
+        } else if (super.getOutputType().getRawType().equals(String.class)) {
+            super.setTransformFunc((FlatMapFunction<IN, OUT>) new ObjectStringTransformFunc<IN>());
+            return DorisSinkType.STRING;
         } else {
-            fields = Collections.emptyList();
-            types = Collections.emptyList();
+            return DorisSinkType.ROW;
         }
     }
 
     private Properties createProperties() {
-        Properties properties = new Properties();
-        properties.setProperty("format", "json");
-        properties.setProperty("read_json_by_line", "true");
-        return properties;
+        return Optional.of(new Properties())
+                .filter(props -> dorisSinkType == DorisSinkType.DEBEZIUM_STRING)
+                .map(
+                        props -> {
+                            props.setProperty("format", "json");
+                            props.setProperty("read_json_by_line", "true");
+                            return props;
+                        })
+                .orElse(new Properties());
     }
 
     private org.apache.doris.flink.cfg.DorisOptions createDorisOptions(Configuration config) {
         return org.apache.doris.flink.cfg.DorisOptions.builder()
                 .setFenodes(config.getNotNull(DorisOptions.FE_NODES))
-                .setTableIdentifier(String.join(".", config.getNotNull(DorisOptions.DATABASE), config.getNotNull(DorisOptions.TABLE)))
+                .setTableIdentifier(
+                        String.join(".",
+                                config.getNotNull(DorisOptions.DATABASE),
+                                config.getNotNull(DorisOptions.TABLE)))
                 .setUsername(config.getNotNull(DorisOptions.USERNAME))
                 .setPassword(config.getNotNull(DorisOptions.PASSWORD))
                 .build();
@@ -76,25 +105,14 @@ public class DorisSinkConnector<T> extends SinkConnector<T, T> {
                 .build();
     }
 
-    @Override
-    public DataStreamSink<T> createSinkDataStream(DataStream<T> stream) {
-        return Optional.of(applyDorisSink(stream.getType().getTypeClass()))
-                .map(stream::sinkTo)
-                .orElseThrow(
-                        () ->
-                                new FlinkException(
-                                        ErrCode.STREAMING_CONNECTOR_FAILED,
-                                        String.format("Could not get sink from stream '%s' to doris connector '%s': ", stream, getName())));
-    }
-
     @SuppressWarnings("unchecked")
-    private DorisSink<T> applyDorisSink(Class<T> clazz) {
-        DorisSink.Builder<T> builder = initializeBuilder();
+    private DorisSink<OUT> applyDorisSink(Class<OUT> clazz) {
+        DorisSink.Builder<OUT> builder = initializeBuilder();
         return Optional.of(clazz)
                 .map(this::selectSerializerForClass)
                 .map(
                         serializer ->
-                                builder.setSerializer((DorisRecordSerializer<T>) serializer).build())
+                                builder.setSerializer((DorisRecordSerializer<OUT>) serializer).build())
                 .orElseThrow(
                         () ->
                                 new FlinkException(
@@ -102,22 +120,28 @@ public class DorisSinkConnector<T> extends SinkConnector<T, T> {
                                         "Could not initialize doris sink, doris sink stream type must be `String` or `RowData`"));
     }
 
-    private DorisSink.Builder<T> initializeBuilder() {
-        return DorisSink.<T>builder()
+    private DorisSink.Builder<OUT> initializeBuilder() {
+        return DorisSink.<OUT>builder()
                 .setDorisReadOptions(DorisReadOptions.builder().build())
                 .setDorisExecutionOptions(execOptions)
                 .setDorisOptions(dorisOptions);
     }
 
-    private DorisRecordSerializer<?> selectSerializerForClass(Class<T> clazz) {
-        if (getJsonFormat().equals(JsonFormat.DEBEZIUM_JSON)) {
+    private DorisRecordSerializer<?> selectSerializerForClass(Class<OUT> clazz) {
+        if (dorisSinkType == DorisSinkType.DEBEZIUM_STRING) {
             return JsonDebeziumSchemaSerializer.builder().setDorisOptions(dorisOptions).build();
         }
-        return clazz.equals(RowData.class) ?
-                RowDataSerializer.builder()
-                        .setType("json")
-                        .setFieldNames(fields.toArray(new String[0]))
-                        .setFieldType(types.toArray(new DataType[0])).build() :
-                new SimpleStringSerializer();
+        if (dorisSinkType == DorisSinkType.STRING) {
+            return new SimpleStringSerializer();
+        }
+        return RowDataSerializer.builder()
+                .setType("json")
+                .setFieldNames(fields.toArray(new String[0]))
+                .setFieldType(types.toArray(new DataType[0]))
+                .build();
+    }
+
+    private enum DorisSinkType {
+        DEBEZIUM_STRING, STRING, ROW
     }
 }
