@@ -8,6 +8,8 @@ import org.apache.flink.shaded.jackson2.org.yaml.snakeyaml.Yaml;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.util.TimeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -26,6 +29,8 @@ import java.util.stream.Collectors;
  * @author regy
  */
 public final class ConfigurationUtils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigurationUtils.class);
 
     @SuppressWarnings("unchecked")
     public static <T> T convertValue(Object rawValue, Class<?> clazz) {
@@ -302,7 +307,17 @@ public final class ConfigurationUtils {
         try (FileInputStream stream = new FileInputStream(path)) {
             return loadYamlConfigFromStream(stream);
         } catch (IOException e) {
-            throw new ConfigurationException(ErrCode.PARSING_CONFIG_FAILED, "Error reading YAML configuration file.", e);
+            LOG.warn("Error reading YAML configuration file from path.", e);
+            return null;
+        }
+    }
+
+    public static Configuration loadYamlConfigFromClasspath(ClassLoader classLoader, String name) {
+        try (InputStream stream = Objects.requireNonNull(classLoader.getResourceAsStream(name))) {
+            return ConfigurationUtils.loadYamlConfigFromStream(stream);
+        } catch (IOException | NullPointerException e) {
+            LOG.warn("Configuration files not found, initial flink job with empty configuration", e);
+            return new Configuration();
         }
     }
 

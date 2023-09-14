@@ -33,10 +33,10 @@ public class DorisSourceConnector extends SourceConnector<RowData> {
 
     public DorisSourceConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
-        String feNodes = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.FE_NODES, String.format("Doris source connector '%s' fe-nodes must not be null", getName()));
-        String table = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.TABLE, String.format("Doris source connector '%s' table must not be null", getName()));
-        String username = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.USERNAME, String.format("Doris source connector '%s' username must not be null", getName()));
-        String password = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.PASSWORD, String.format("Doris source connector '%s' password must not be null", getName()));
+        String feNodes = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.FE_NODES);
+        String table = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.TABLE);
+        String username = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.USERNAME);
+        String password = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.PASSWORD);
         String readFields = config.get(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.READ_FIELDS);
         String filterQuery = config.get(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.FILTER_QUERY);
         Integer requestTabletSize = config.get(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.REQUEST_TABLET_SIZE);
@@ -49,8 +49,8 @@ public class DorisSourceConnector extends SourceConnector<RowData> {
         Integer deserializeQueueSize = config.get(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.DESERIALIZE_QUEUE_SIZE);
         Boolean deserializeArrowAsync = config.get(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.DESERIALIZE_ARROW_ASYNC);
         Boolean useOldApi = config.get(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.USE_OLD_API);
-        this.fields = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.FIELDS, String.format("Doris source connector '%s' fields must not be null", getName()));
-        this.types = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.TYPES, String.format("Doris source connector '%s' types must not be null", getName()));
+        this.fields = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.FIELDS);
+        this.types = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.TYPES);
         this.dorisOptions = org.apache.doris.flink.cfg.DorisOptions.builder().setFenodes(feNodes).setTableIdentifier(table).setUsername(username).setPassword(password).build();
         this.dorisReadOptions = DorisReadOptions.builder()
                 .setReadFields(readFields)
@@ -72,14 +72,17 @@ public class DorisSourceConnector extends SourceConnector<RowData> {
         LogicalType[] logicalTypes = TypeConversions.fromDataToLogicalType(types.toArray(new DataType[0]));
         List<RowType.RowField> rowFields =
                 IntStream.range(0, logicalTypes.length)
-                        .mapToObj(i -> new RowType.RowField(fields.get(i), logicalTypes[i]))
+                        .mapToObj(
+                                i ->
+                                        new RowType.RowField(fields.get(i), logicalTypes[i]))
                         .collect(Collectors.toList());
 
-        DorisSource<RowData> dorisSource = DorisSourceBuilder.<RowData>builder()
-                .setDorisOptions(dorisOptions)
-                .setDorisReadOptions(dorisReadOptions)
-                .setDeserializer(new RowDataDeserializationSchema(new RowType(rowFields)))
-                .build();
+        DorisSource<RowData> dorisSource =
+                DorisSourceBuilder.<RowData>builder()
+                        .setDorisOptions(dorisOptions)
+                        .setDorisReadOptions(dorisReadOptions)
+                        .setDeserializer(new RowDataDeserializationSchema(new RowType(rowFields)))
+                        .build();
         return getEnv().fromSource(dorisSource, getWatermarkStrategy(), getName());
     }
 }

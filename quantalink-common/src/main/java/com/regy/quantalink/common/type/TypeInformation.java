@@ -3,9 +3,9 @@ package com.regy.quantalink.common.type;
 import com.regy.quantalink.common.utils.CopyUtils;
 
 import com.google.common.base.Preconditions;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import lombok.ToString;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 
@@ -16,6 +16,8 @@ import java.lang.reflect.Type;
 /**
  * @author regy
  */
+@ToString
+@EqualsAndHashCode
 @Getter
 public class TypeInformation<T> implements Serializable {
     private final Class<T> rawType;
@@ -37,31 +39,6 @@ public class TypeInformation<T> implements Serializable {
 
     public boolean isParameterizedType() {
         return type != null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        TypeInformation<?> that = (TypeInformation<?>) o;
-
-        return new EqualsBuilder().append(rawType, that.rawType).append(actualTypeArguments, that.actualTypeArguments).isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(rawType).append(actualTypeArguments).toHashCode();
-    }
-
-    @Override
-    public String toString() {
-        return rawType.getSimpleName();
     }
 
     public static <T> TypeInformation<T> get(Class<T> rawType, Type... actualTypeArguments) {
@@ -99,8 +76,11 @@ public class TypeInformation<T> implements Serializable {
 
         if (typeInformation.isParameterizedType()) {
             if (rawType.equals(Tuple2.class) && actualTypeArguments.length == 2) {
-                org.apache.flink.api.common.typeinfo.TypeInformation<?> typeInfo1 = convertToFlinkType(TypeInformation.get((Class<?>) actualTypeArguments[0]));
-                org.apache.flink.api.common.typeinfo.TypeInformation<?> typeInfo2 = convertToFlinkType(TypeInformation.get((Class<?>) actualTypeArguments[1]));
+                org.apache.flink.api.common.typeinfo.TypeInformation<?> typeInfo1 =
+                        convertToFlinkType(TypeInformation.get((Class<?>) actualTypeArguments[0]));
+                org.apache.flink.api.common.typeinfo.TypeInformation<?> typeInfo2 =
+                        convertToFlinkType(TypeInformation.get((Class<?>) actualTypeArguments[1]));
+
                 return (org.apache.flink.api.common.typeinfo.TypeInformation<T>) Types.TUPLE(typeInfo1, typeInfo2);
             }
             // Add more cases for other parameterized types if needed

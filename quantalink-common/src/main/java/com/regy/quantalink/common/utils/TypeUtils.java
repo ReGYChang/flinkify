@@ -32,7 +32,7 @@ public class TypeUtils extends com.alibaba.fastjson2.util.TypeUtils {
         }
     }
 
-    public static Double toDouble(Object value) {
+    public static Double toDouble(Object value) throws JSONException {
         if (value != null && !(value instanceof Double)) {
             if (value instanceof Number) {
                 return ((Number) value).doubleValue();

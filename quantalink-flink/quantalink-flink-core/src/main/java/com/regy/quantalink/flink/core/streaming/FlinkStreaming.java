@@ -76,16 +76,11 @@ public abstract class FlinkStreaming {
     private Configuration loadConfig(String[] args) {
         Optional<String> confPathOpt = Optional.ofNullable(ParameterTool.fromArgs(args).get("conf"));
         return confPathOpt.map(ConfigurationUtils::loadYamlConfigFromPath)
-                .orElseGet(this::loadDefaultConfig);
-    }
-
-    private Configuration loadDefaultConfig() {
-        try (InputStream stream = Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("application.yml"))) {
-            return ConfigurationUtils.loadYamlConfigFromStream(stream);
-        } catch (IOException | NullPointerException e) {
-            LOG.warn("Configuration files not found, initial flink job with empty configuration", e);
-            return new Configuration();
-        }
+                .orElseGet(
+                        () ->
+                                ConfigurationUtils.loadYamlConfigFromClasspath(
+                                        this.getClass().getClassLoader(),
+                                        confPathOpt.orElse("application.yml")));
     }
 }
 
