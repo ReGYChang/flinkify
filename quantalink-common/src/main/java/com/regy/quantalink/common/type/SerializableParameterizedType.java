@@ -2,6 +2,8 @@ package com.regy.quantalink.common.type;
 
 import com.regy.quantalink.common.utils.CopyUtils;
 
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -9,6 +11,7 @@ import java.lang.reflect.Type;
 /**
  * @author regy
  */
+@EqualsAndHashCode
 public class SerializableParameterizedType implements ParameterizedType, Serializable {
     private final Type[] actualTypeArguments;
     private final Type rawType;

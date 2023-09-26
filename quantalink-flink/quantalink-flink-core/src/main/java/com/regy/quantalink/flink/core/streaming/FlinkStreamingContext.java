@@ -8,6 +8,7 @@ import com.regy.quantalink.common.type.TypeInformation;
 import com.regy.quantalink.flink.core.connector.SinkConnector;
 import com.regy.quantalink.flink.core.connector.SourceConnector;
 
+import lombok.Getter;
 import org.apache.flink.api.common.JobID;
 import org.apache.flink.metrics.MetricGroup;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -23,6 +24,7 @@ import java.util.Optional;
 /**
  * @author regy
  */
+@Getter
 public class FlinkStreamingContext {
     private final StreamExecutionEnvironment env;
     private final StreamTableEnvironment tEnv;
@@ -73,40 +75,8 @@ public class FlinkStreamingContext {
                 .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Sink connector could not be found with input type '%s' & output type '%s' ", inputTypeInfo, outputTypeInfo)));
     }
 
-    public StreamExecutionEnvironment getEnv() {
-        return env;
-    }
-
-    public StreamTableEnvironment getTEnv() {
-        return tEnv;
-    }
-
-    public Configuration getConfig() {
-        return config;
-    }
-
     public <T> T getConfigOption(ConfigOption<T> option) {
         return config.get(option);
-    }
-
-    public JobID getJobId() {
-        return jobId;
-    }
-
-    public MetricGroup getMetricGroup() {
-        return metricGroup;
-    }
-
-    public Map<String, AutoCloseable> getResources() {
-        return resources;
-    }
-
-    public Map<TypeInformation<?>, SourceConnector<?>> getSourceConnectors() {
-        return sourceConnectors;
-    }
-
-    public Map<TypeInformation<?>, SinkConnector<?, ?>> getSinkConnectors() {
-        return sinkConnectors;
     }
 
     public static class Builder {

@@ -24,6 +24,10 @@ public class FlinkDataStream<T> {
         return this.dataStream;
     }
 
+    public static <T> FlinkDataStream<T> ofDataStream(DataStream<T> stream, FlinkStreamingContext context) throws FlinkException {
+        return new FlinkDataStream<>(stream, context);
+    }
+
     public static <T> FlinkDataStream<T> ofDataStream(DataStreamSource<T> stream, FlinkStreamingContext context) throws FlinkException {
         return new FlinkDataStream<>(stream, context);
     }
