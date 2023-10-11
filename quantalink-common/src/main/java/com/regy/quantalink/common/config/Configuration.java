@@ -68,9 +68,10 @@ public class Configuration implements Serializable {
         }
 
         Optional<Object> parentOpt = getValueFromPrefix(Arrays.copyOfRange(keyHierarchy, 0, keyHierarchy.length), this.confData, null);
-        Object parentObject = parentOpt.orElseThrow(() ->
-                new ConfigurationException(ErrCode.MISSING_CONFIG_FIELD,
-                        String.format("Could not set value '%s' for key '%s'", value, option.key())));
+        Object parentObject = parentOpt.orElseThrow(
+                () ->
+                        new ConfigurationException(ErrCode.MISSING_CONFIG_FIELD,
+                                String.format("Could not set value '%s' for key '%s'", value, option.key())));
 
         if (parentObject instanceof Map) {
             ((Map<String, Object>) parentObject).put(keyHierarchy[keyHierarchy.length - 1], value);

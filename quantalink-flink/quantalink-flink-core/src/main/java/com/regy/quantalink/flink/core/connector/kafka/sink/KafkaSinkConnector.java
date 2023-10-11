@@ -42,12 +42,19 @@ public class KafkaSinkConnector<T> extends SinkConnector<T, T> {
                     .setRecordSerializer(
                             KafkaRecordSerializationSchema.builder()
                                     .setTopic(topic)
-                                    .setValueSerializationSchema(serializationAdapter.getSerializationSchema()).build()).build();
+                                    .setValueSerializationSchema(
+                                            serializationAdapter.getSerializationSchema()).build()).build();
             return stream.sinkTo(sink);
         } catch (ClassCastException e) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Kafka sink connector '%s' com.nexdata.flink.traceability.serialization adapter must be '%s', could not assign other com.nexdata.flink.traceability.serialization adapter", getName(), KafkaSerializationAdapter.class), e);
+            throw new FlinkException(
+                    ErrCode.STREAMING_CONNECTOR_FAILED,
+                    String.format("Kafka serialization adapter of sink connector '%s' must be '%s', " +
+                                    "could not assign other adapter",
+                            getName(), KafkaSerializationAdapter.class), e);
         } catch (Exception e) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Failed to initialize Kafka sink connector '%s'", getName()), e);
+            throw new FlinkException(
+                    ErrCode.STREAMING_CONNECTOR_FAILED,
+                    String.format("Failed to initialize Kafka sink connector '%s'", getName()), e);
         }
     }
 }

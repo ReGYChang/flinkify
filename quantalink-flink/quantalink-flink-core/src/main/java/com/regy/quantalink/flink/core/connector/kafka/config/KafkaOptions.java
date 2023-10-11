@@ -23,18 +23,33 @@ public interface KafkaOptions {
             .stringType()
             .noDefaultValue()
             .withDescription("The comma-separated list of Kafka broker addresses.");
+
     ConfigOption<String> GROUP_ID = ConfigOptions.key("group-id")
             .stringType()
             .defaultValue("flink-default-consumer")
             .withDescription("The consumer group ID used for the Kafka consumer.");
+
     ConfigOption<String> TOPIC = ConfigOptions.key("topic")
             .stringType()
             .noDefaultValue()
             .withDescription("The Kafka topic to consume from.");
+
     ConfigOption<OffsetResetStrategy> OFFSET_RESET_STRATEGY = ConfigOptions.key("offset-reset-strategy")
             .enumType(OffsetResetStrategy.class)
-            .defaultValue(OffsetResetStrategy.EARLIEST)
+            .defaultValue(null)
             .withDescription(
                     "The strategy to use if the Kafka consumer does not find a valid offset for the topic."
                             + "Valid options are 'EARLIEST' and 'LATEST'.");
+
+    ConfigOption<OffsetInitializationType> OFFSET_INITIALIZATION_TYPE = ConfigOptions.key("offset-initialization-type")
+            .enumType(OffsetInitializationType.class)
+            .defaultValue(OffsetInitializationType.EARLIEST)
+            .withDescription("The type of offset initialization " +
+                    "(COMMITTED, COMMITTED_WITH_RESET, TIMESTAMP, EARLIEST, LATEST).");
+
+    ConfigOption<Long> OFFSET_INITIALIZATION_TIMESTAMP = ConfigOptions.key("offset-initialization-timestamp")
+            .longType()
+            .defaultValue(-1L)
+            .withDescription("The timestamp for offset initialization when using the TIMESTAMP strategy." +
+                    "Default to -1 which indicates using current timestamp.");
 }

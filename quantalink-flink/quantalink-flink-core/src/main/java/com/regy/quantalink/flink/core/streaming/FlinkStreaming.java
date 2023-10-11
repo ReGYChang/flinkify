@@ -6,6 +6,7 @@ import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.flink.core.config.FlinkOptions;
 import com.regy.quantalink.flink.core.connector.ConnectorUtils;
 
+import lombok.Getter;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.RestOptions;
@@ -19,6 +20,7 @@ import java.util.Optional;
 /**
  * @author regy
  */
+@Getter
 public abstract class FlinkStreaming {
     private static final Logger LOG = LoggerFactory.getLogger(FlinkStreaming.class);
 
