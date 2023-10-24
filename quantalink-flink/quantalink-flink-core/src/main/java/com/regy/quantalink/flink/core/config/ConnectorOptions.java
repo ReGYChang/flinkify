@@ -8,13 +8,18 @@ import com.regy.quantalink.common.config.ConfigOptions;
  */
 public interface ConnectorOptions {
 
+    ConfigOption<String> ID = ConfigOptions.key("id")
+            .stringType()
+            .defaultValue("Undefined")
+            .withDescription("The name of the connector.");
+
     ConfigOption<String> NAME = ConfigOptions.key("name")
             .stringType()
-            .defaultValue("NoName")
-            .withDescription("The name of the source connector.");
+            .defaultValue("Undefined")
+            .withDescription("The name of the connector.");
 
     ConfigOption<Integer> PARALLELISM = ConfigOptions.key("parallelism")
             .intType()
             .defaultValue(1)
-            .withDescription("The level of parallelism for the source operator.");
+            .withDescription("The level of parallelism for the connector operator.");
 }

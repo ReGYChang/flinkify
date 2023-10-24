@@ -1,7 +1,7 @@
 package com.regy.quantalink.flink.core.connector.nebula.operator;
 
-import com.regy.quantalink.common.type.TypeInformation;
 import com.regy.quantalink.common.utils.CopyUtils;
+import com.regy.quantalink.flink.core.connector.ConnectorKey;
 import com.regy.quantalink.flink.core.connector.SinkConnector;
 
 import org.apache.flink.streaming.api.functions.ProcessFunction;
@@ -13,9 +13,9 @@ import java.util.Map;
  * @author regy
  */
 public abstract class GraphProcessFunc<IN> extends ProcessFunction<IN, Void> {
-    protected final Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap;
+    protected final Map<ConnectorKey<?>, SinkConnector<?, ?>> connectorMap;
 
-    public GraphProcessFunc(Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) {
+    public GraphProcessFunc(Map<ConnectorKey<?>, SinkConnector<?, ?>> connectorMap) {
         this.connectorMap = CopyUtils.deepCopy(connectorMap);
     }
 
@@ -32,5 +32,5 @@ public abstract class GraphProcessFunc<IN> extends ProcessFunction<IN, Void> {
             IN in,
             ProcessFunction<IN, Void>.Context ctx,
             Collector<Void> collector,
-            Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) throws Exception;
+            Map<ConnectorKey<?>, SinkConnector<?, ?>> connectorMap) throws Exception;
 }

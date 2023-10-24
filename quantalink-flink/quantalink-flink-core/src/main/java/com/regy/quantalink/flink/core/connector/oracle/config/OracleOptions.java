@@ -13,8 +13,9 @@ import java.util.List;
  */
 public interface OracleOptions {
 
-    ConfigOption<Configuration> CDC = ConfigOptions.key("oracle-cdc")
+    ConfigOption<List<Configuration>> CDC = ConfigOptions.key("oracle-cdc")
             .configType()
+            .asList()
             .noDefaultValue()
             .withDescription("");
 

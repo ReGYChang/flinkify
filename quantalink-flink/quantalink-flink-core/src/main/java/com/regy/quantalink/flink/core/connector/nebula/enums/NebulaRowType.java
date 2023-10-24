@@ -5,6 +5,7 @@ package com.regy.quantalink.flink.core.connector.nebula.enums;
  */
 
 public enum NebulaRowType {
+
     /**
      * tag of nebula graph
      */

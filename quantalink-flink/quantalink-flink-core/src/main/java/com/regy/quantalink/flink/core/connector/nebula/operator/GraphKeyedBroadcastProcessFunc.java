@@ -1,7 +1,7 @@
 package com.regy.quantalink.flink.core.connector.nebula.operator;
 
-import com.regy.quantalink.common.type.TypeInformation;
 import com.regy.quantalink.common.utils.CopyUtils;
+import com.regy.quantalink.flink.core.connector.ConnectorKey;
 import com.regy.quantalink.flink.core.connector.SinkConnector;
 
 import org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction;
@@ -13,9 +13,9 @@ import java.util.Map;
  * @author regy
  */
 public abstract class GraphKeyedBroadcastProcessFunc<K, IN1, IN2> extends KeyedBroadcastProcessFunction<K, IN1, IN2, Void> {
-    protected final Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap;
+    protected final Map<ConnectorKey<?>, SinkConnector<?, ?>> connectorMap;
 
-    public GraphKeyedBroadcastProcessFunc(Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) {
+    public GraphKeyedBroadcastProcessFunc(Map<ConnectorKey<?>, SinkConnector<?, ?>> connectorMap) {
         this.connectorMap = CopyUtils.deepCopy(connectorMap);
     }
 
@@ -31,6 +31,5 @@ public abstract class GraphKeyedBroadcastProcessFunc<K, IN1, IN2> extends KeyedB
             IN1 input,
             KeyedBroadcastProcessFunction<K, IN1, IN2, Void>.ReadOnlyContext readOnlyCtx,
             Collector<Void> collector,
-            Map<TypeInformation<?>, SinkConnector<?, ?>> connectorMap) throws Exception;
-
+            Map<ConnectorKey<?>, SinkConnector<?, ?>> connectorMap) throws Exception;
 }

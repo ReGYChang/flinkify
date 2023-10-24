@@ -4,13 +4,16 @@ import com.regy.quantalink.common.config.ConfigOption;
 import com.regy.quantalink.common.config.ConfigOptions;
 import com.regy.quantalink.common.config.Configuration;
 
+import java.util.List;
+
 /**
  * @author regy
  */
 public interface MySqlOptions {
 
-    ConfigOption<Configuration> CDC = ConfigOptions.key("mysql-cdc")
+    ConfigOption<List<Configuration>> CDC = ConfigOptions.key("mysql-cdc")
             .configType()
+            .asList()
             .noDefaultValue()
             .withDescription("");
 

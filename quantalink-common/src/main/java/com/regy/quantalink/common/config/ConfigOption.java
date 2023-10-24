@@ -1,5 +1,6 @@
 package com.regy.quantalink.common.config;
 
+import lombok.Getter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.flink.configuration.description.Description;
@@ -10,15 +11,13 @@ import org.apache.flink.util.Preconditions;
  */
 public class ConfigOption<T> {
     public static final Description EMPTY_DESCRIPTION = Description.builder().text("").build();
+    @Getter
+    private final Class<?> clazz;
+    @Getter
     private final String key;
     private final T defaultValue;
     private final Description description;
-    private final Class<?> clazz;
     private final boolean isList;
-
-    public Class<?> getClazz() {
-        return this.clazz;
-    }
 
     public boolean isList() {
         return this.isList;
@@ -81,4 +80,3 @@ public class ConfigOption<T> {
         return String.format("Key: '%s' , default: %s", this.key, this.defaultValue);
     }
 }
-

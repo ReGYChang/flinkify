@@ -31,6 +31,8 @@
         <assertj.version>3.23.1</assertj.version>
         <fastjson2.version>2.0.33</fastjson2.version>
         <mongo-driver.version>4.8.1</mongo-driver.version>
+        <beanutils.version>1.9.4</beanutils.version>
+        <vavr.version>0.10.4</vavr.version>
 
         <flink.version>1.17.1</flink.version>
         <flink-cdc.version>2.3.0</flink-cdc.version>

@@ -41,20 +41,35 @@ public class FlinkDataStream<T> {
     }
 
     public FlinkDataStream<T> sink() {
-        com.regy.quantalink.common.type.TypeInformation<T> typeInfo = com.regy.quantalink.common.type.TypeInformation.get(this.typeInformation.getTypeClass());
+        com.regy.quantalink.common.type.TypeInformation<T> typeInfo =
+                com.regy.quantalink.common.type.TypeInformation.get(this.typeInformation.getTypeClass());
         context.getSinkDataStream(typeInfo, typeInfo, dataStream);
         return this;
     }
 
     public FlinkDataStream<T> sink(com.regy.quantalink.common.type.TypeInformation<?> outputTypeInfo) {
         context.getSinkDataStream(
-                com.regy.quantalink.common.type.TypeInformation.get(typeInformation.getTypeClass()),
-                outputTypeInfo, dataStream);
+                com.regy.quantalink.common.type.TypeInformation.get(typeInformation.getTypeClass()), outputTypeInfo, dataStream);
+        return this;
+    }
+
+    public FlinkDataStream<T> sink(String sinkConnectorId) {
+        this.sink(sinkConnectorId, com.regy.quantalink.common.type.TypeInformation.get(typeInformation.getTypeClass()));
+        return this;
+    }
+
+    public FlinkDataStream<T> sink(String sinkConnectorId, com.regy.quantalink.common.type.TypeInformation<?> outputTypeInfo) {
+        context.getSinkDataStream(sinkConnectorId, com.regy.quantalink.common.type.TypeInformation.get(typeInformation.getTypeClass()), outputTypeInfo, dataStream);
         return this;
     }
 
     private FlinkDataStream(DataStream<T> dataStream, FlinkStreamingContext context) {
-        this.dataStream = Optional.ofNullable(dataStream).orElseThrow(() -> new FlinkException(ErrCode.STREAMING_EXECUTION_FAILED, "Initialize Flink data stream failed, data stream must not be null"));
+        this.dataStream =
+                Optional.ofNullable(dataStream)
+                        .orElseThrow(() ->
+                                new FlinkException(
+                                        ErrCode.STREAMING_EXECUTION_FAILED,
+                                        "Initialize Flink data stream failed, data stream must not be null"));
         this.context = context;
         this.typeInformation = dataStream.getType();
     }

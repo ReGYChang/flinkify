@@ -5,6 +5,7 @@ import com.regy.quantalink.common.config.Configuration;
 import com.regy.quantalink.common.exception.ErrCode;
 import com.regy.quantalink.common.exception.FlinkException;
 import com.regy.quantalink.common.type.TypeInformation;
+import com.regy.quantalink.flink.core.connector.ConnectorKey;
 import com.regy.quantalink.flink.core.connector.SinkConnector;
 import com.regy.quantalink.flink.core.connector.SourceConnector;
 
@@ -33,8 +34,9 @@ public class FlinkStreamingContext {
     private final JobID jobId;
     private final MetricGroup metricGroup;
     private final Map<String, AutoCloseable> resources;
-    private final Map<TypeInformation<?>, SourceConnector<?>> sourceConnectors;
-    private final Map<TypeInformation<?>, SinkConnector<?, ?>> sinkConnectors;
+    private final Map<ConnectorKey<?>, SourceConnector<?>> sourceConnectors;
+    private final Map<ConnectorKey<?>, SinkConnector<?, ?>> sinkConnectors;
+    private static final String DEFAULT_ID = "Undefined";
 
     private FlinkStreamingContext(Builder builder) {
         this.env = builder.env;
@@ -48,31 +50,58 @@ public class FlinkStreamingContext {
         this.tEnv = builder.tEnv;
     }
 
-    @SuppressWarnings("unchecked")
     public <T> SourceConnector<T> getSourceConnector(TypeInformation<T> typeInformation) {
-        return Optional.ofNullable((SourceConnector<T>) sourceConnectors.get(typeInformation))
-                .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Source connector could not be found with type: [%s]", typeInformation)));
+        return getSourceConnector(DEFAULT_ID, typeInformation);
     }
 
     @SuppressWarnings("unchecked")
+    public <T> SourceConnector<T> getSourceConnector(String connectorId, TypeInformation<T> typeInformation) {
+        return Optional.ofNullable((SourceConnector<T>) sourceConnectors.get(new ConnectorKey<>(connectorId, typeInformation)))
+                .orElseThrow(() ->
+                        new FlinkException(
+                                ErrCode.STREAMING_CONNECTOR_FAILED,
+                                String.format("Source connector could not be found with type: [%s]", typeInformation)));
+    }
+
     public <I, O> SinkConnector<I, O> getSinkConnector(TypeInformation<I> inputTypeInfo, TypeInformation<O> outputTypeInfo) {
-        return Optional.ofNullable((SinkConnector<I, O>) sinkConnectors.get(inputTypeInfo))
-                .or(
-                        () ->
-                                Optional.ofNullable((SinkConnector<I, O>) sinkConnectors.get(outputTypeInfo)))
-                .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Sink connector could not be found with input type '%s' & output type '%s' ", inputTypeInfo, outputTypeInfo)));
+        return getSinkConnector(DEFAULT_ID, inputTypeInfo, outputTypeInfo);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <I, O> SinkConnector<I, O> getSinkConnector(String connectorId, TypeInformation<I> inputTypeInfo, TypeInformation<O> outputTypeInfo) {
+        return Optional.ofNullable((SinkConnector<I, O>) sinkConnectors.get(new ConnectorKey<>(connectorId, inputTypeInfo)))
+                .orElseThrow(() ->
+                        new FlinkException(
+                                ErrCode.STREAMING_CONNECTOR_FAILED,
+                                String.format("Sink connector could not be found with input type '%s' & output type '%s'", inputTypeInfo, outputTypeInfo)));
     }
 
     public <T> DataStreamSource<T> getSourceDataStream(TypeInformation<T> typeInformation) throws FlinkException {
         return Optional.ofNullable(this.getSourceConnector(typeInformation).getSourceDataStream())
-                .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Source data stream could not be found with type: [%s]", typeInformation)));
+                .orElseThrow(() ->
+                        new FlinkException(
+                                ErrCode.STREAMING_CONNECTOR_FAILED,
+                                String.format("Source data stream could not be found with type: [%s]", typeInformation)));
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public <I, O> DataStreamSink<O> getSinkDataStream(String connectorId, TypeInformation<I> inputTypeInfo, TypeInformation<O> outputTypeInfo, DataStream<I> stream) {
+        SinkConnector<I, O> sinkConnector = this.getSinkConnector(connectorId, inputTypeInfo, outputTypeInfo);
+        return Optional.ofNullable(sinkConnector.getSinkDataStream(stream))
+                .orElseThrow(() ->
+                        new FlinkException(
+                                ErrCode.STREAMING_CONNECTOR_FAILED,
+                                String.format("Sink connector could not be found with input type '%s' & output type '%s' ", inputTypeInfo, outputTypeInfo)));
     }
 
     @SuppressWarnings("UnusedReturnValue")
     public <I, O> DataStreamSink<O> getSinkDataStream(TypeInformation<I> inputTypeInfo, TypeInformation<O> outputTypeInfo, DataStream<I> stream) {
-        SinkConnector<I, O> sinkConnector = this.getSinkConnector(inputTypeInfo, outputTypeInfo);
+        SinkConnector<I, O> sinkConnector = this.getSinkConnector(DEFAULT_ID, inputTypeInfo, outputTypeInfo);
         return Optional.ofNullable(sinkConnector.getSinkDataStream(stream))
-                .orElseThrow(() -> new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED, String.format("Sink connector could not be found with input type '%s' & output type '%s' ", inputTypeInfo, outputTypeInfo)));
+                .orElseThrow(() ->
+                        new FlinkException(
+                                ErrCode.STREAMING_CONNECTOR_FAILED,
+                                String.format("Sink connector could not be found with input type '%s' & output type '%s' ", inputTypeInfo, outputTypeInfo)));
     }
 
     public <T> T getConfigOption(ConfigOption<T> option) {
@@ -87,8 +116,8 @@ public class FlinkStreamingContext {
         private JobID jobId;
         private MetricGroup metricGroup;
         private final Map<String, AutoCloseable> resources = new HashMap<>();
-        private Map<TypeInformation<?>, SourceConnector<?>> sourceConnectors;
-        private Map<TypeInformation<?>, SinkConnector<?, ?>> sinkConnectors;
+        private Map<ConnectorKey<?>, SourceConnector<?>> sourceConnectors;
+        private Map<ConnectorKey<?>, SinkConnector<?, ?>> sinkConnectors;
 
         public Builder withEnv(StreamExecutionEnvironment env) {
             this.env = env;
@@ -125,12 +154,12 @@ public class FlinkStreamingContext {
             return this;
         }
 
-        public Builder withSourceConnectors(Map<TypeInformation<?>, SourceConnector<?>> sourceConnectors) {
+        public Builder withSourceConnectors(Map<ConnectorKey<?>, SourceConnector<?>> sourceConnectors) {
             this.sourceConnectors = sourceConnectors;
             return this;
         }
 
-        public Builder withSinkConnectors(Map<TypeInformation<?>, SinkConnector<?, ?>> sinkConnectors) {
+        public Builder withSinkConnectors(Map<ConnectorKey<?>, SinkConnector<?, ?>> sinkConnectors) {
             this.sinkConnectors = sinkConnectors;
             return this;
         }
