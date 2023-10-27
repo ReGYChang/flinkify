@@ -8,12 +8,15 @@ import com.regy.quantalink.flink.core.connector.kafka.config.KafkaOptions;
 import com.regy.quantalink.flink.core.connector.kafka.config.OffsetInitializationType;
 import com.regy.quantalink.flink.core.connector.kafka.serialization.KafkaDeserializationAdapter;
 
+import io.vavr.control.Try;
 import org.apache.flink.connector.kafka.source.KafkaSource;
+import org.apache.flink.connector.kafka.source.KafkaSourceBuilder;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * @author regy
@@ -22,6 +25,7 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
 
     private final String bootStrapServers;
     private final String topics;
+    private final String topicPattern;
     private final String groupId;
     private final OffsetResetStrategy offsetResetStrategy;
     private final Long offsetInitializationTimestamp;
@@ -34,18 +38,17 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
         this.offsetInitializationTimestamp = config.get(KafkaOptions.OFFSET_INITIALIZATION_TIMESTAMP);
         this.offsetInitializationType = config.get(KafkaOptions.OFFSET_INITIALIZATION_TYPE);
         this.bootStrapServers = config.getNotNull(KafkaOptions.BOOTSTRAP_SERVERS);
-        this.topics = config.getNotNull(KafkaOptions.TOPIC);
+        this.topics = config.get(KafkaOptions.TOPICS);
+        this.topicPattern = config.get(KafkaOptions.TOPIC_PATTERN);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public DataStreamSource<T> getSourceDataStream() throws FlinkException {
-        try {
+        return Try.of(() -> {
             KafkaDeserializationAdapter<T> deserializer =
                     Optional.ofNullable((KafkaDeserializationAdapter<T>) getDeserializationAdapter())
-                            .orElseGet(
-                                    () ->
-                                            KafkaDeserializationAdapter.valueOnlyDefault(getTypeInfo()));
+                            .orElseGet(() -> KafkaDeserializationAdapter.valueOnlyDefault(getTypeInfo()));
 
             return getEnv()
                     .fromSource(
@@ -53,31 +56,35 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
                             getWatermarkStrategy(),
                             getName())
                     .setParallelism(getParallelism());
-        } catch (ClassCastException e) {
-            throw new FlinkException(
-                    ErrCode.STREAMING_CONNECTOR_FAILED,
-                    String.format("Kafka source connector '%s' deserialization adapter must be '%s'," +
-                                    " could not assign other deserialization adapter",
-                            getName(), KafkaDeserializationAdapter.class), e);
-        } catch (Exception e) {
-            throw new FlinkException(
-                    ErrCode.STREAMING_CONNECTOR_FAILED,
-                    String.format("Could not get source from kafka source connector '%s': ",
-                            getName()), e);
-        }
+
+        }).getOrElseThrow(e -> {
+            if (e instanceof ClassCastException) {
+                return new FlinkException(
+                        ErrCode.STREAMING_CONNECTOR_FAILED,
+                        String.format("Kafka source connector '%s' deserialization adapter must be '%s'," +
+                                " could not assign other deserialization adapter", getName(), KafkaDeserializationAdapter.class), e);
+            } else {
+                return new FlinkException(
+                        ErrCode.STREAMING_CONNECTOR_FAILED,
+                        String.format("Could not get source from kafka source connector '%s': ", getName()), e);
+            }
+        });
     }
 
     private KafkaSource<T> createKafkaSource(KafkaDeserializationAdapter<T> deserializer) {
-        return KafkaSource.<T>builder()
-                .setBootstrapServers(bootStrapServers)
-                .setTopics(topics)
-                .setGroupId(groupId)
-                .setStartingOffsets(
-                        offsetInitializationType
-                                .withResetStrategy(offsetResetStrategy)
-                                .withTimestamp(offsetInitializationTimestamp)
-                                .toOffsetsInitializer())
-                .setDeserializer(deserializer.getDeserializationSchema())
-                .build();
+        KafkaSourceBuilder<T> builder =
+                KafkaSource.<T>builder()
+                        .setBootstrapServers(bootStrapServers)
+                        .setGroupId(groupId)
+                        .setStartingOffsets(
+                                offsetInitializationType
+                                        .withResetStrategy(offsetResetStrategy)
+                                        .withTimestamp(offsetInitializationTimestamp)
+                                        .toOffsetsInitializer())
+                        .setDeserializer(deserializer.getDeserializationSchema());
+
+        return topics == null ?
+                builder.setTopicPattern(Pattern.compile(topicPattern)).build() :
+                builder.setTopics(topics).build();
     }
 }

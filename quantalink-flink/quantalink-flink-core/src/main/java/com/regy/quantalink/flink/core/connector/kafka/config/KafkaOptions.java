@@ -29,10 +29,15 @@ public interface KafkaOptions {
             .defaultValue("flink-default-consumer")
             .withDescription("The consumer group ID used for the Kafka consumer.");
 
-    ConfigOption<String> TOPIC = ConfigOptions.key("topic")
+    ConfigOption<String> TOPICS = ConfigOptions.key("topics")
             .stringType()
             .noDefaultValue()
-            .withDescription("The Kafka topic to consume from.");
+            .withDescription("The Kafka topics to consume from.");
+
+    ConfigOption<String> TOPIC_PATTERN = ConfigOptions.key("topic-pattern")
+            .stringType()
+            .noDefaultValue()
+            .withDescription("The Kafka topics whose name matches the provided regular expression to consume from.");
 
     ConfigOption<OffsetResetStrategy> OFFSET_RESET_STRATEGY = ConfigOptions.key("offset-reset-strategy")
             .enumType(OffsetResetStrategy.class)
@@ -45,7 +50,7 @@ public interface KafkaOptions {
             .enumType(OffsetInitializationType.class)
             .defaultValue(OffsetInitializationType.EARLIEST)
             .withDescription("The type of offset initialization " +
-                    "(COMMITTED, COMMITTED_WITH_RESET, TIMESTAMP, EARLIEST, LATEST).");
+                    "(COMMITTED_WITH_RESET_STRATEGY, TIMESTAMP, EARLIEST, LATEST).");
 
     ConfigOption<Long> OFFSET_INITIALIZATION_TIMESTAMP = ConfigOptions.key("offset-initialization-timestamp")
             .longType()
