@@ -84,6 +84,14 @@ public class FlinkStreamingContext {
                                 String.format("Source data stream could not be found with type: [%s]", typeInformation)));
     }
 
+    public <T> DataStreamSource<T> getSourceDataStream(String connectorId, TypeInformation<T> typeInformation) throws FlinkException {
+        return Optional.ofNullable(this.getSourceConnector(connectorId, typeInformation).getSourceDataStream())
+                .orElseThrow(() ->
+                        new FlinkException(
+                                ErrCode.STREAMING_CONNECTOR_FAILED,
+                                String.format("Source data stream could not be found with type: [%s]", typeInformation)));
+    }
+
     @SuppressWarnings("UnusedReturnValue")
     public <I, O> DataStreamSink<O> getSinkDataStream(String connectorId, TypeInformation<I> inputTypeInfo, TypeInformation<O> outputTypeInfo, DataStream<I> stream) {
         SinkConnector<I, O> sinkConnector = this.getSinkConnector(connectorId, inputTypeInfo, outputTypeInfo);

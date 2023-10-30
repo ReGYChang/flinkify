@@ -89,31 +89,32 @@ public class ConnectorUtils {
         List<Configuration> connectorConfigs = appConfig.get(connectorConfigOption);
 
         return connectorConfigs.stream()
-                .flatMap(connectorConfig -> {
-                    Optional<ConnectorType<T>> matchingConnectorType =
-                            connectorTypes.stream()
-                                    .filter(type -> connectorConfig.contains(type.configOption))
-                                    .findFirst();
+                .flatMap(
+                        connectorConfig -> {
+                            Optional<ConnectorType<T>> matchingConnectorType =
+                                    connectorTypes.stream()
+                                            .filter(type -> connectorConfig.contains(type.configOption))
+                                            .findFirst();
 
-                    if (matchingConnectorType.isEmpty()) {
-                        throw new ConfigurationException(
-                                ErrCode.PARSING_CONFIG_FAILED,
-                                String.format("Unknown connector type '%s', please check your configuration of connector",
-                                        connectorConfig.toMap().keySet()));
-                    }
+                            if (matchingConnectorType.isEmpty()) {
+                                throw new ConfigurationException(
+                                        ErrCode.PARSING_CONFIG_FAILED,
+                                        String.format("Unknown connector type '%s', please check your configuration of connector",
+                                                connectorConfig.toMap().keySet()));
+                            }
 
-                    List<Configuration> configs = connectorConfig.getNotNull(matchingConnectorType.get().configOption, "Could not find configuration");
-                    return configs.stream()
-                            .map(config -> {
-                                TypeInformation<?> typeInformation =
-                                        connectorConfigOption.getKey().equals("flink.sources") ?
-                                                config.getNotNull(SourceConnectorOptions.DATA_TYPE, "Could not find data type of source connector") :
-                                                config.getNotNull(SinkConnectorOptions.INPUT_DATA_TYPE, "Could not find data type of sink connector");
-                                ConnectorKey<?> key = new ConnectorKey<>(connectorConfig.get(ConnectorOptions.ID), typeInformation);
-                                T value = matchingConnectorType.get().connectorFactory.apply(env, config);
-                                return new AbstractMap.SimpleEntry<>(key, value);
-                            });
-                })
+                            List<Configuration> configs = connectorConfig.getNotNull(matchingConnectorType.get().configOption, "Could not find configuration");
+                            return configs.stream()
+                                    .map(config -> {
+                                        TypeInformation<?> typeInformation =
+                                                connectorConfigOption.getKey().equals("flink.sources") ?
+                                                        config.getNotNull(SourceConnectorOptions.DATA_TYPE, "Could not find data type of source connector") :
+                                                        config.getNotNull(SinkConnectorOptions.INPUT_DATA_TYPE, "Could not find data type of sink connector");
+                                        ConnectorKey<?> key = new ConnectorKey<>(config.get(ConnectorOptions.ID), typeInformation);
+                                        T value = matchingConnectorType.get().connectorFactory.apply(env, config);
+                                        return new AbstractMap.SimpleEntry<>(key, value);
+                                    });
+                        })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
