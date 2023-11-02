@@ -3,6 +3,7 @@ package com.regy.quantalink.quickstart.connector.nebula.process;
 import com.regy.quantalink.common.type.TypeInformation;
 import com.regy.quantalink.common.utils.HashUtils;
 import com.regy.quantalink.common.utils.TimeUtils;
+import com.regy.quantalink.flink.core.connector.ConnectorKey;
 import com.regy.quantalink.flink.core.connector.SinkConnector;
 import com.regy.quantalink.flink.core.connector.nebula.operator.GraphKeyedBroadcastProcessFunc;
 import com.regy.quantalink.flink.core.connector.nebula.sink.NebulaSinkConnector;
@@ -33,9 +34,10 @@ public class GenerateWorkOrderGraph extends GraphKeyedBroadcastProcessFunc<Strin
     private final MapStateDescriptor<String, Map<String, List<String>>> stateDesc;
     private transient MapState<String, Map<String, WorkOrderRecord>> workOrderBuffer;
     private static final String WORK_ORDER_BUFFER = "WORK_ORDER_BUFFER";
+    private static final String DEFAULT_ID = "Undefined";
     private volatile boolean isReady = false;
 
-    public GenerateWorkOrderGraph(Map<TypeInformation<?>, SinkConnector<?,?>> connectorMap, MapStateDescriptor<String, Map<String, List<String>>> stateDesc) {
+    public GenerateWorkOrderGraph(Map<ConnectorKey<?>, SinkConnector<?, ?>> connectorMap, MapStateDescriptor<String, Map<String, List<String>>> stateDesc) {
         super(connectorMap);
         this.stateDesc = stateDesc;
     }
@@ -50,10 +52,10 @@ public class GenerateWorkOrderGraph extends GraphKeyedBroadcastProcessFunc<Strin
             DcsEvent record,
             KeyedBroadcastProcessFunction<String, DcsEvent, SensorMap, Void>.ReadOnlyContext readOnlyCtx,
             Collector<Void> collector,
-            Map<TypeInformation<?>, SinkConnector<?,?>> connectorMap) throws Exception {
+            Map<ConnectorKey<?>, SinkConnector<?, ?>> connectorMap) throws Exception {
 
         NebulaSinkConnector orderSinkConnector =
-                (NebulaSinkConnector) connectorMap.get(TypeInformation.get(NebulaTag.WorkOrder.class));
+                (NebulaSinkConnector) connectorMap.get(new ConnectorKey<>(DEFAULT_ID, TypeInformation.get(NebulaTag.WorkOrder.class)));
 
         readOnlyCtx.output(
                 orderSinkConnector.getOutputTag(),
@@ -63,7 +65,7 @@ public class GenerateWorkOrderGraph extends GraphKeyedBroadcastProcessFunc<Strin
 
             ReadOnlyBroadcastState<String, Map<String, List<String>>> state = readOnlyCtx.getBroadcastState(stateDesc);
             NebulaSinkConnector producedOnSinkConnector =
-                    (NebulaSinkConnector) connectorMap.get(TypeInformation.get(NebulaTag.ProducedOn.class));
+                    (NebulaSinkConnector) connectorMap.get(new ConnectorKey<>(DEFAULT_ID, TypeInformation.get(NebulaTag.ProducedOn.class)));
 
             for (Map.Entry<String, Map<String, List<String>>> entry : state.immutableEntries()) {
                 List<String> stationIds = entry.getValue().get(record.dcsId);
