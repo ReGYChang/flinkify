@@ -3,16 +3,25 @@ package com.regy.quantalink.quickstart.connector.telegram.function;
 import com.regy.quantalink.common.utils.TimeUtils;
 import com.regy.quantalink.quickstart.connector.telegram.entity.Transaction;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -22,6 +31,7 @@ import java.util.List;
 /**
  * @author regy
  */
+@Slf4j
 public class ApiBatchFunction extends RichSourceFunction<Transaction> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApiBatchFunction.class);
@@ -33,7 +43,8 @@ public class ApiBatchFunction extends RichSourceFunction<Transaction> {
     public void run(SourceContext<Transaction> sourceCtx) throws Exception {
         while (isRunning) {
             LOG.debug("---------------->");
-            String response = fetchData();
+//            String response = fetchData("https://barn.traderjoexyz.com/v1/events/swap/avalanche/0x9b2cc8e6a2bbb56d6be4682891a91b0e48633c72?pageNum=1&pageSize=10", "GET");
+            String response = fetchData("https://mis.twse.com.tw/stock/api/getStockInfo.jsp?json=1&delay=0&ex_ch=tse_00878.tw", "GET");
 
             List<Transaction> transactions = JSON.parseArray(response, Transaction.class);
             transactions.sort(Comparator.comparing(in -> in.timestamp));
@@ -51,14 +62,25 @@ public class ApiBatchFunction extends RichSourceFunction<Transaction> {
         }
     }
 
-    private String fetchData() throws IOException {
-        String urlStr = "https://barn.traderjoexyz.com/v1/events/swap/avalanche/0x9b2cc8e6a2bbb56d6be4682891a91b0e48633c72?pageNum=1&pageSize=10";
+    public static String fetchData(String urlStr, String method) throws IOException {
+        return fetchData(urlStr, method, null);
+    }
+
+    public static String fetchData(String urlStr, String method, String requestBody) throws IOException {
+        disableSslVerification();
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-        // Set properties before opening the input stream
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Accept", "application/json");
+        conn.setRequestMethod(method);
+        conn.setDoOutput(true);
+
+        // Send request body if it's not null
+        if (requestBody != null) {
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+        }
 
         StringBuilder response = new StringBuilder();
         try {
@@ -73,6 +95,8 @@ public class ApiBatchFunction extends RichSourceFunction<Transaction> {
                     response.append(output);
                 }
             }
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
         } finally {
             conn.disconnect();
         }
@@ -83,5 +107,34 @@ public class ApiBatchFunction extends RichSourceFunction<Transaction> {
     @Override
     public void cancel() {
         isRunning = false;
+    }
+
+    private static void disableSslVerification() {
+        try {
+            // Create a trust manager that does not validate certificate chains
+            TrustManager[] trustAllCertificates = new TrustManager[]{
+                    new X509TrustManager() {
+                        public X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+
+                        public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                        }
+
+                        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                        }
+                    }
+            };
+
+            // Install the all-trusting trust manager
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCertificates, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            // Install the all-trusting host verifier
+            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 }

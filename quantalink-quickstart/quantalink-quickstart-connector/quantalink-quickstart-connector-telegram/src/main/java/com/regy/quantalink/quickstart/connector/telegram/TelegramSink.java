@@ -29,16 +29,15 @@ public class TelegramSink extends FlinkStreaming {
                         })
 
                 .withSinkConnectorSetup(
-                        (sinkConnector, config) ->
-                                sinkConnector
-                                        .withSerializationAdapter(
-                                                new TelegramSerializationAdapter(JSON::toJSONBytes))
-                                        .withTransformFunc(
-                                                (input, collector) -> {
-                                                    if (input.amountIn > 10000) {
-                                                        collector.collect(new TelegramPayload(input.toMarkdownString()));
-                                                    }
-                                                }),
+                        (sinkConnector, config) -> {
+                            sinkConnector.setSerializationAdapter(new TelegramSerializationAdapter(JSON::toJSONBytes));
+                            sinkConnector.setTransformFunc(
+                                    (input, collector) -> {
+                                        if (input.amountIn > 0) {
+                                            collector.collect(new TelegramPayload(input.toMarkdownString()));
+                                        }
+                                    });
+                        },
                         TypeInformation.get(Transaction.class), TypeInformation.get(TelegramPayload.class)).build();
 
         (new TelegramSink()).run(args, initializer);

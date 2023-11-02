@@ -63,7 +63,7 @@ public class MongoSink extends FlinkStreaming {
 
                 .withSinkConnectorSetup(
                         (sinkConnector, config) ->
-                                sinkConnector.withSerializationAdapter(
+                                sinkConnector.setSerializationAdapter(
                                         new MongoSerializationAdapter<>(
                                                 (input, ctx) ->
                                                         new UpdateManyModel<>(
