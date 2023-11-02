@@ -104,14 +104,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.vinted</groupId>
-            <artifactId>flink-big-query-connector</artifactId>
-            <version>${flink.big-query-connector.version}</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/lib/flink-big-query-connector-${flink.big-query-connector.version}.jar</systemPath>
-        </dependency>
-
-        <dependency>
             <groupId>com.getindata</groupId>
             <artifactId>flink-http-connector</artifactId>
             <version>${flink.http-connector.version}</version>
