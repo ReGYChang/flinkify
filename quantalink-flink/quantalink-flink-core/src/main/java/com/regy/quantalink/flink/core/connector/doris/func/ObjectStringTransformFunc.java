@@ -4,6 +4,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 
 import java.lang.reflect.Field;
+import java.util.Optional;
 
 public class ObjectStringTransformFunc<T> implements FlatMapFunction<T, String> {
 
@@ -14,7 +15,12 @@ public class ObjectStringTransformFunc<T> implements FlatMapFunction<T, String> 
 
         for (Field field : fields) {
             field.setAccessible(true);
-            sb.append(field.get(object)).append("\t");
+            String stringValue =
+                    Optional.ofNullable(field.get(object))
+                            .map(value -> value.toString().trim())
+                            .orElse(null);
+
+            sb.append(stringValue).append("\t");
         }
 
         String result = sb.toString().trim();
