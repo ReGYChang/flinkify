@@ -1,0 +1,18 @@
+flink:
+  sources:
+    - postgres-cdc:
+        - data-type: java.lang.String
+          hostname: 10.1.5.35
+          port: 5432
+          username: quantacore
+          password: quantacore
+          database: postgres
+          schema-list:
+            - test
+          table-list:
+            - test.cdc_test
+          slot-name: flink
+          decoding-plugin-name: pgoutput
+          include-schema-changes: true
+          split-size: 2
+          startup-mode: latest_offset

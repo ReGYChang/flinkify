@@ -13,6 +13,7 @@ import io.vavr.control.Try;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchemaBuilder;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
+import org.apache.flink.connector.kafka.sink.TopicSelector;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -33,8 +34,8 @@ public class KafkaSinkConnector<T> extends SinkConnector<T, T> {
         this.topic = config.get(KafkaOptions.TOPICS);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public DataStreamSink<T> createSinkDataStream(DataStream<T> stream) {
         return Try.of(() -> {
 
@@ -47,10 +48,18 @@ public class KafkaSinkConnector<T> extends SinkConnector<T, T> {
 
             KafkaRecordSerializationSchema<T> serializer =
                     Optional.ofNullable(topic)
-                            .map(t -> serializerBuilder.setTopic(t).build())
-                            .orElseGet(() ->
-                                    serializerBuilder.setTopicSelector(Optional.ofNullable(serializationAdapter.getTopicSelector())
-                                            .orElseThrow(() -> new ConfigurationException(ErrCode.STREAMING_CONNECTOR_FAILED, ""))).build());
+                            .map(serializerBuilder::setTopic)
+                            .orElseGet(() -> {
+                                TopicSelector<T> topicSelector =
+                                        Optional.ofNullable(serializationAdapter.getTopicSelector())
+                                                .orElseThrow(() -> new ConfigurationException(
+                                                        ErrCode.STREAMING_CONNECTOR_FAILED,
+                                                        "Configuration requires either a topic name or " +
+                                                                "a topic selector, but neither was provided."));
+
+                                return serializerBuilder.setTopicSelector(topicSelector);
+                            })
+                            .build();
 
             KafkaSink<T> sink =
                     KafkaSink.<T>builder()

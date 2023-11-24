@@ -26,6 +26,8 @@ import com.regy.quantalink.flink.core.connector.nebula.sink.NebulaSinkConnector;
 import com.regy.quantalink.flink.core.connector.nebula.source.NebulaSourceConnector;
 import com.regy.quantalink.flink.core.connector.oracle.cdc.OracleCdcConnector;
 import com.regy.quantalink.flink.core.connector.oracle.config.OracleOptions;
+import com.regy.quantalink.flink.core.connector.postgres.cdc.PostgresCdcConnector;
+import com.regy.quantalink.flink.core.connector.postgres.config.PostgresOptions;
 import com.regy.quantalink.flink.core.connector.rabbitmq.config.RabbitmqOptions;
 import com.regy.quantalink.flink.core.connector.rabbitmq.sink.RabbitmqSinkConnector;
 import com.regy.quantalink.flink.core.connector.rabbitmq.source.RabbitmqSourceConnector;
@@ -59,7 +61,8 @@ public class ConnectorUtils {
                         new ConnectorType<>(DorisOptions.CONNECTORS, DorisSourceConnector::new),
                         new ConnectorType<>(CsvOptions.CONNECTORS, CsvSourceConnector::new),
                         new ConnectorType<>(MySqlOptions.CDC, MySqlCdcConnector::new),
-                        new ConnectorType<>(OracleOptions.CDC, OracleCdcConnector::new));
+                        new ConnectorType<>(OracleOptions.CDC, OracleCdcConnector::new),
+                        new ConnectorType<>(PostgresOptions.CDC, PostgresCdcConnector::new));
 
         return initConnectors(env, appConfig, sourceConnectorTypes, FlinkOptions.SOURCE_CONNECTORS);
     }

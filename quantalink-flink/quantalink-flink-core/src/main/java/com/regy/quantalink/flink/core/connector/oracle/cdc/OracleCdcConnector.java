@@ -26,8 +26,8 @@ public class OracleCdcConnector extends SourceConnector<String> {
     private final String hostname;
     private final Integer port;
     private final String url;
-    private StartupOptions startupOptions;
     private final Properties debeziumProperties;
+    private StartupOptions startupOptions;
 
     public OracleCdcConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
@@ -61,7 +61,6 @@ public class OracleCdcConnector extends SourceConnector<String> {
                         StartupOptions.timestamp(config.getNotNull(OracleOptions.STARTUP_TIMESTAMP_MS, "Oracle CDC connector startup-timestamp-ms must not be null when startup mode is [TIMESTAMP]"));
                 break;
         }
-
     }
 
     @Override

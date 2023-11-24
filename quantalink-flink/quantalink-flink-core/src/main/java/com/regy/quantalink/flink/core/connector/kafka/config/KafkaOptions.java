@@ -41,7 +41,7 @@ public interface KafkaOptions {
 
     ConfigOption<OffsetResetStrategy> OFFSET_RESET_STRATEGY = ConfigOptions.key("offset-reset-strategy")
             .enumType(OffsetResetStrategy.class)
-            .defaultValue(null)
+            .defaultValue(OffsetResetStrategy.EARLIEST)
             .withDescription(
                     "The strategy to use if the Kafka consumer does not find a valid offset for the topic."
                             + "Valid options are 'EARLIEST' and 'LATEST'.");
@@ -49,8 +49,9 @@ public interface KafkaOptions {
     ConfigOption<OffsetInitializationType> OFFSET_INITIALIZATION_TYPE = ConfigOptions.key("offset-initialization-type")
             .enumType(OffsetInitializationType.class)
             .defaultValue(OffsetInitializationType.EARLIEST)
-            .withDescription("The type of offset initialization " +
-                    "(COMMITTED_WITH_RESET_STRATEGY, TIMESTAMP, EARLIEST, LATEST).");
+            .withDescription(
+                    "The type of offset initialization " +
+                            "(COMMITTED_WITH_RESET_STRATEGY, TIMESTAMP, EARLIEST, LATEST).");
 
     ConfigOption<Long> OFFSET_INITIALIZATION_TIMESTAMP = ConfigOptions.key("offset-initialization-timestamp")
             .longType()
