@@ -5,9 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.regy</groupId>
-        <artifactId>quantalink</artifactId>
+        <artifactId>quantalink-quickstart-connector</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <groupId>com.quantalink</groupId>

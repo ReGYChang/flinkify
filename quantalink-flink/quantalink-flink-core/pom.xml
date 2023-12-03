@@ -108,7 +108,9 @@
             <artifactId>flink-http-connector</artifactId>
             <version>${flink.http-connector.version}</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/lib/flink-http-connector-${flink.http-connector.version}.jar</systemPath>
+            <systemPath>
+                ${project.basedir}/src/main/resources/lib/flink-http-connector-${flink.http-connector.version}.jar
+            </systemPath>
         </dependency>
 
         <dependency>
@@ -133,7 +135,13 @@
         <dependency>
             <groupId>com.ververica</groupId>
             <artifactId>flink-connector-oracle-cdc</artifactId>
-            <version>${flink-cdc.version}</version>
+            <version>${flink-oracle-cdc.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ververica</groupId>
+            <artifactId>flink-connector-postgres-cdc</artifactId>
+            <version>${flink-postgres-cdc.version}</version>
         </dependency>
 
         <dependency>

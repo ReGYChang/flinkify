@@ -22,6 +22,8 @@
         <module>quantalink-quickstart-connector-oracle</module>
         <module>quantalink-quickstart-connector-telegram</module>
         <module>quantalink-quickstart-connector-csv</module>
+        <module>quantalink-quickstart-connector-postgres</module>
+<!--        <module>quantalink-quickstart-connector-bigquery</module>-->
     </modules>
 
     <properties>
