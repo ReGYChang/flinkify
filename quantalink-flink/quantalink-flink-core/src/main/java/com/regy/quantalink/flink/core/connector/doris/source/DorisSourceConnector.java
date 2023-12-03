@@ -34,6 +34,7 @@ public class DorisSourceConnector extends SourceConnector<RowData> {
     public DorisSourceConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
         String feNodes = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.FE_NODES);
+        String database = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.DATABASE);
         String table = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.TABLE);
         String username = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.USERNAME);
         String password = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.PASSWORD);
@@ -51,7 +52,7 @@ public class DorisSourceConnector extends SourceConnector<RowData> {
         Boolean useOldApi = config.get(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.USE_OLD_API);
         this.fields = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.FIELDS);
         this.types = config.getNotNull(com.regy.quantalink.flink.core.connector.doris.config.DorisOptions.TYPES);
-        this.dorisOptions = org.apache.doris.flink.cfg.DorisOptions.builder().setFenodes(feNodes).setTableIdentifier(table).setUsername(username).setPassword(password).build();
+        this.dorisOptions = org.apache.doris.flink.cfg.DorisOptions.builder().setFenodes(feNodes).setTableIdentifier(String.join(".", database, table)).setUsername(username).setPassword(password).build();
         this.dorisReadOptions = DorisReadOptions.builder()
                 .setReadFields(readFields)
                 .setFilterQuery(filterQuery)
@@ -72,9 +73,7 @@ public class DorisSourceConnector extends SourceConnector<RowData> {
         LogicalType[] logicalTypes = TypeConversions.fromDataToLogicalType(types.toArray(new DataType[0]));
         List<RowType.RowField> rowFields =
                 IntStream.range(0, logicalTypes.length)
-                        .mapToObj(
-                                i ->
-                                        new RowType.RowField(fields.get(i), logicalTypes[i]))
+                        .mapToObj(i -> new RowType.RowField(fields.get(i), logicalTypes[i]))
                         .collect(Collectors.toList());
 
         DorisSource<RowData> dorisSource =
@@ -83,6 +82,7 @@ public class DorisSourceConnector extends SourceConnector<RowData> {
                         .setDorisReadOptions(dorisReadOptions)
                         .setDeserializer(new RowDataDeserializationSchema(new RowType(rowFields)))
                         .build();
+
         return getEnv().fromSource(dorisSource, getWatermarkStrategy(), getName());
     }
 }

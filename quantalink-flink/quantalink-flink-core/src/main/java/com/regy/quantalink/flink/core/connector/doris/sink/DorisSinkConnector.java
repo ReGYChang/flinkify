@@ -72,7 +72,7 @@ public class DorisSinkConnector<IN, OUT> extends SinkConnector<IN, OUT> {
 
     private Properties createProperties() {
         return Optional.of(new Properties())
-                .filter(props -> dorisSinkType == DorisSinkType.DEBEZIUM_STRING)
+                .filter(props -> dorisSinkType != DorisSinkType.STRING)
                 .map(
                         props -> {
                             props.setProperty("format", "json");
