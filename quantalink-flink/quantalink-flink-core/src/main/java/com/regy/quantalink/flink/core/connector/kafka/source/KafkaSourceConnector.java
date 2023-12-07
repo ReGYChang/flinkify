@@ -16,6 +16,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 
 import java.util.Optional;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 /**
@@ -30,6 +31,7 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
     private final OffsetResetStrategy offsetResetStrategy;
     private final Long offsetInitializationTimestamp;
     private final OffsetInitializationType offsetInitializationType;
+    private final Properties properties;
 
     public KafkaSourceConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
@@ -40,6 +42,7 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
         this.bootStrapServers = config.getNotNull(KafkaOptions.BOOTSTRAP_SERVERS);
         this.topics = config.get(KafkaOptions.TOPICS);
         this.topicPattern = config.get(KafkaOptions.TOPIC_PATTERN);
+        this.properties = config.get(KafkaOptions.PROPERTIES).toProperties();
     }
 
     @SuppressWarnings("unchecked")
@@ -81,7 +84,8 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
                                         .withResetStrategy(offsetResetStrategy)
                                         .withTimestamp(offsetInitializationTimestamp)
                                         .toOffsetsInitializer())
-                        .setDeserializer(deserializer.getDeserializationSchema());
+                        .setDeserializer(deserializer.getDeserializationSchema())
+                        .setProperties(properties);
 
         return topics == null ?
                 builder.setTopicPattern(Pattern.compile(topicPattern)).build() :

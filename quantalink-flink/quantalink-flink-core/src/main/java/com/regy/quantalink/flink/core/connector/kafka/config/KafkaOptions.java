@@ -39,6 +39,11 @@ public interface KafkaOptions {
             .noDefaultValue()
             .withDescription("The Kafka topics whose name matches the provided regular expression to consume from.");
 
+    ConfigOption<Configuration> PROPERTIES = ConfigOptions.key("properties")
+            .configType()
+            .defaultValue(new Configuration())
+            .withDescription("");
+
     ConfigOption<OffsetResetStrategy> OFFSET_RESET_STRATEGY = ConfigOptions.key("offset-reset-strategy")
             .enumType(OffsetResetStrategy.class)
             .defaultValue(OffsetResetStrategy.EARLIEST)
