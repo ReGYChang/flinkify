@@ -35,6 +35,8 @@
 
         <flink.version>1.17.1</flink.version>
         <flink-cdc.version>2.3.0</flink-cdc.version>
+        <flink-oracle-cdc.version>2.4.2</flink-oracle-cdc.version>
+        <flink-postgres-cdc.version>2.4.2</flink-postgres-cdc.version>
         <scala.binary.version>2.12</scala.binary.version>
         <flink.nebula-graph-connector.version>3.5.0</flink.nebula-graph-connector.version>
         <flink.rabbitmq-connector.version>3.0.1-1.17</flink.rabbitmq-connector.version>
