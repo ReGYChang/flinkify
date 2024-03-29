@@ -2,9 +2,9 @@ flink:
   job-name: Kafka Source Connector Quickstart
   sources:
     - kafka:
-        - data-type: com.regy.quantalink.quickstart.connector.kafka.entity.DcsEvent
+        - data-type: java.lang.String
           name: kafka-quickstart-source
-          bootstrap-servers: kafka.nexdata.stg:9094
-          group-id: kafka-quickstart
-          topic: test.traceability_v1.data_collection_station
+          bootstrap-servers: kafka.sdsp-stg.com:9094
+          group-id: flink-kafka-quickstart
+          topics: new-otdata-telemetry
           offset-reset-strategy: EARLIEST

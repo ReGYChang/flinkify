@@ -1,0 +1,9 @@
+flink:
+  job-name: Kafka Sink Connector Quickstart
+  sinks:
+    - kafka:
+        - input-data-type: java.lang.String
+          name: kafka-quickstart-sink
+          bootstrap-servers: 10.1.5.35:9092
+          group-id: kafka-quickstart
+          topic: spring-boot-test
