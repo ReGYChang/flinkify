@@ -12,8 +12,8 @@
     <artifactId>quantalink-flink-core</artifactId>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <flink.big-query-connector.version>1.5.0</flink.big-query-connector.version>
         <flink.http-connector.version>0.10.0</flink.http-connector.version>
@@ -74,7 +74,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-kafka</artifactId>
-            <version>${flink.version}</version>
+            <version>${flink-connector-kafka.version}</version>
         </dependency>
 
         <dependency>
@@ -103,15 +103,15 @@
             <systemPath>${project.basedir}/src/main/resources/lib/flink-connector-mongodb-1.0.1.jar</systemPath>
         </dependency>
 
-        <dependency>
-            <groupId>com.getindata</groupId>
-            <artifactId>flink-http-connector</artifactId>
-            <version>${flink.http-connector.version}</version>
-            <scope>system</scope>
-            <systemPath>
-                ${project.basedir}/src/main/resources/lib/flink-http-connector-${flink.http-connector.version}.jar
-            </systemPath>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.getindata</groupId>-->
+<!--            <artifactId>flink-http-connector</artifactId>-->
+<!--            <version>${flink.http-connector.version}</version>-->
+<!--            <scope>system</scope>-->
+<!--            <systemPath>-->
+<!--                ${project.basedir}/src/main/resources/lib/flink-http-connector-${flink.http-connector.version}.jar-->
+<!--            </systemPath>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -135,13 +135,13 @@
         <dependency>
             <groupId>com.ververica</groupId>
             <artifactId>flink-connector-oracle-cdc</artifactId>
-            <version>${flink-oracle-cdc.version}</version>
+            <version>${flink-cdc.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.ververica</groupId>
             <artifactId>flink-connector-postgres-cdc</artifactId>
-            <version>${flink-postgres-cdc.version}</version>
+            <version>${flink-cdc.version}</version>
         </dependency>
 
         <dependency>

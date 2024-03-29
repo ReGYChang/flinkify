@@ -66,13 +66,13 @@
         <dependency>
             <groupId>com.ververica</groupId>
             <artifactId>flink-connector-postgres-cdc</artifactId>
-            <version>${flink-postgres-cdc.version}</version>
+            <version>${flink-cdc.version}</version>
         </dependency>
     </dependencies>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
