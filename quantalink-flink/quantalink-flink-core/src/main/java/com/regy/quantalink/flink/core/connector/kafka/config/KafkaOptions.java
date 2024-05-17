@@ -32,7 +32,12 @@ public interface KafkaOptions {
     ConfigOption<String> TOPICS = ConfigOptions.key("topics")
             .stringType()
             .noDefaultValue()
-            .withDescription("The Kafka topics to consume from.");
+            .withDescription("The Kafka topic to consume from.");
+
+    ConfigOption<String> TOPIC = ConfigOptions.key("topic")
+            .stringType()
+            .noDefaultValue()
+            .withDescription("The Kafka topic to sink to.");
 
     ConfigOption<String> TOPIC_PATTERN = ConfigOptions.key("topic-pattern")
             .stringType()
