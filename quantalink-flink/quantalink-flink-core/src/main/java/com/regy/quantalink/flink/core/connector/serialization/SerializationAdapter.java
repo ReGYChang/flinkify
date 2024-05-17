@@ -2,10 +2,11 @@ package com.regy.quantalink.flink.core.connector.serialization;
 
 import com.regy.quantalink.common.type.TypeInformation;
 
-/**
- * @author regy
- */
+import lombok.Getter;
+
+@Getter
 public abstract class SerializationAdapter<T, S> {
+
     private final TypeInformation<T> typeInfo;
 
     protected SerializationAdapter(TypeInformation<T> typeInfo) {
@@ -13,8 +14,4 @@ public abstract class SerializationAdapter<T, S> {
     }
 
     public abstract S getSerializationSchema();
-
-    public TypeInformation<T> getTypeInfo() {
-        return typeInfo;
-    }
 }
