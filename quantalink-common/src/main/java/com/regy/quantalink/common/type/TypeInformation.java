@@ -41,6 +41,10 @@ public class TypeInformation<T> implements Serializable {
         return type != null;
     }
 
+    public org.apache.flink.api.common.typeinfo.TypeInformation<T> toFlinkType() {
+        return TypeInformation.convertToFlinkType(this);
+    }
+
     public static <T> TypeInformation<T> get(Class<T> rawType, Type... actualTypeArguments) {
         return new TypeInformation<>(rawType, actualTypeArguments);
     }
