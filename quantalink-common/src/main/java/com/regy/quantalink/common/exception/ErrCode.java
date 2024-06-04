@@ -1,9 +1,5 @@
 package com.regy.quantalink.common.exception;
 
-/**
- * @author regy
- */
-
 public interface ErrCode {
 
     String MISSING_CONFIG_FILE = "E_CONF_001";

@@ -11,6 +11,8 @@ import com.regy.quantalink.flink.core.config.SinkConnectorOptions;
 import com.regy.quantalink.flink.core.config.SourceConnectorOptions;
 import com.regy.quantalink.flink.core.connector.csv.config.CsvOptions;
 import com.regy.quantalink.flink.core.connector.csv.source.CsvSourceConnector;
+import com.regy.quantalink.flink.core.connector.datagen.config.DataGenOptions;
+import com.regy.quantalink.flink.core.connector.datagen.source.DataGenSourceConnector;
 import com.regy.quantalink.flink.core.connector.doris.config.DorisOptions;
 import com.regy.quantalink.flink.core.connector.doris.sink.DorisSinkConnector;
 import com.regy.quantalink.flink.core.connector.doris.source.DorisSourceConnector;
@@ -31,8 +33,6 @@ import com.regy.quantalink.flink.core.connector.postgres.config.PostgresOptions;
 import com.regy.quantalink.flink.core.connector.rabbitmq.config.RabbitmqOptions;
 import com.regy.quantalink.flink.core.connector.rabbitmq.sink.RabbitmqSinkConnector;
 import com.regy.quantalink.flink.core.connector.rabbitmq.source.RabbitmqSourceConnector;
-import com.regy.quantalink.flink.core.connector.telegram.config.TelegramOptions;
-import com.regy.quantalink.flink.core.connector.telegram.sink.TelegramSinkConnector;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -44,9 +44,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-/**
- * @author regy
- */
 public class ConnectorUtils {
 
     public static Map<ConnectorKey<?>, SourceConnector<?>> initSourceConnectors(
@@ -62,7 +59,8 @@ public class ConnectorUtils {
                         new ConnectorType<>(CsvOptions.CONNECTORS, CsvSourceConnector::new),
                         new ConnectorType<>(MySqlOptions.CDC, MySqlCdcConnector::new),
                         new ConnectorType<>(OracleOptions.CDC, OracleCdcConnector::new),
-                        new ConnectorType<>(PostgresOptions.CDC, PostgresCdcConnector::new));
+                        new ConnectorType<>(PostgresOptions.CDC, PostgresCdcConnector::new),
+                        new ConnectorType<>(DataGenOptions.CONNECTORS, DataGenSourceConnector::new));
 
         return initConnectors(env, appConfig, sourceConnectorTypes, FlinkOptions.SOURCE_CONNECTORS);
     }
@@ -77,8 +75,8 @@ public class ConnectorUtils {
                         new ConnectorType<>(RabbitmqOptions.CONNECTORS, RabbitmqSinkConnector::new),
                         new ConnectorType<>(NebulaOptions.CONNECTORS, NebulaSinkConnector::new),
                         new ConnectorType<>(MongoOptions.CONNECTORS, MongoSinkConnector::new),
-                        new ConnectorType<>(DorisOptions.CONNECTORS, DorisSinkConnector::new),
-                        new ConnectorType<>(TelegramOptions.CONNECTORS, TelegramSinkConnector::new));
+                        new ConnectorType<>(DorisOptions.CONNECTORS, DorisSinkConnector::new));
+//                        new ConnectorType<>(TelegramOptions.CONNECTORS, TelegramSinkConnector::new));
 
         return initConnectors(env, config, sinkConnectorTypes, FlinkOptions.SINK_CONNECTORS);
     }

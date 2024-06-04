@@ -13,21 +13,23 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.util.Optional;
 
-/**
- * @author regy
- */
 public abstract class SourceConnector<T> extends Connector {
 
     @Getter
     private DeserializationAdapter<T, ?> deserializationAdapter;
+
     @Getter
     private final TypeInformation<T> typeInfo;
+
     private WatermarkStrategy<T> watermarkStrategy;
 
     @SuppressWarnings("unchecked")
     public SourceConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
-        this.typeInfo = (TypeInformation<T>) config.getNotNull(SourceConnectorOptions.DATA_TYPE, String.format("Source connector '%s' data type must not be null", getName()));
+        this.typeInfo =
+                (TypeInformation<T>) config.getNotNull(
+                        SourceConnectorOptions.DATA_TYPE,
+                        String.format("Source connector '%s' data type must not be null", getName()));
     }
 
     /**

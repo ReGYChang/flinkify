@@ -45,7 +45,7 @@ public class Configuration implements Serializable {
                         () ->
                                 new ConfigurationException(
                                         ErrCode.MISSING_CONFIG_FIELD,
-                                        String.format("Required configuration key '%s' is missing or has a null value." +
+                                        String.format("Required configuration key '%s' is missing or has a null value. " +
                                                 "Please ensure that it is properly set in your configuration.", configOption.key())));
     }
 

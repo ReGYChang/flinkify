@@ -23,7 +23,8 @@
         <module>quantalink-quickstart-connector-telegram</module>
         <module>quantalink-quickstart-connector-csv</module>
         <module>quantalink-quickstart-connector-postgres</module>
-<!--        <module>quantalink-quickstart-connector-bigquery</module>-->
+        <module>quantalink-quickstart-connector-datagen</module>
+        <!--        <module>quantalink-quickstart-connector-bigquery</module>-->
     </modules>
 
     <properties>

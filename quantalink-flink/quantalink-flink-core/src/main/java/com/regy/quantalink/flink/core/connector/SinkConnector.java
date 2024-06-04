@@ -20,9 +20,6 @@ import org.apache.flink.util.OutputTag;
 import java.io.Serializable;
 import java.util.Optional;
 
-/**
- * @author regy
- */
 @Getter
 @Setter
 public abstract class SinkConnector<IN, OUT> extends Connector implements Serializable {
@@ -43,8 +40,11 @@ public abstract class SinkConnector<IN, OUT> extends Connector implements Serial
         TypeInformation<OUT> initialOutputType = (TypeInformation<OUT>) config.get(SinkConnectorOptions.OUTPUT_DATA_TYPE);
 
         if (initialInputType == null && initialOutputType == null) {
-            throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED,
-                    String.format("Input type information & output type information of sink connector '%s' must not be null at one time", getName()));
+            throw new FlinkException(
+                    ErrCode.STREAMING_CONNECTOR_FAILED,
+                    String.format(
+                            "Input type information & output type information of sink connector" +
+                                    " '%s' must not be null at one time", getName()));
         }
 
         this.inputType = Optional.ofNullable(initialInputType).orElse((TypeInformation<IN>) initialOutputType);
@@ -59,8 +59,12 @@ public abstract class SinkConnector<IN, OUT> extends Connector implements Serial
             return createSinkDataStream(
                     inputType.equals(outputType) ?
                             (DataStream<OUT>) mapStream(stream) :
-                            mapStream(stream).flatMap(transformFunc).returns(TypeInformation.convertToFlinkType(getOutputType())))
-                    .setParallelism(getParallelism()).name(getName()).disableChaining();
+                            mapStream(stream)
+                                    .flatMap(transformFunc)
+                                    .returns(TypeInformation.convertToFlinkType(getOutputType())))
+                    .setParallelism(getParallelism())
+                    .name(getName())
+                    .disableChaining();
         } catch (ClassCastException e) {
             throw new FlinkException(ErrCode.STREAMING_CONNECTOR_FAILED,
                     String.format("Invalid output type of data stream for sink connector `%s`." +
@@ -73,7 +77,9 @@ public abstract class SinkConnector<IN, OUT> extends Connector implements Serial
     }
 
     private DataStream<IN> mapStream(DataStream<IN> stream) {
-        return (outputTag != null && stream instanceof SingleOutputStreamOperator) ?
+        return (
+                outputTag != null &&
+                        stream instanceof SingleOutputStreamOperator) ?
                 ((SingleOutputStreamOperator<IN>) stream).getSideOutput(outputTag) : stream;
     }
 }

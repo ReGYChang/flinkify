@@ -3,13 +3,12 @@ package com.regy.quantalink.flink.core.connector;
 import com.regy.quantalink.common.config.Configuration;
 import com.regy.quantalink.flink.core.config.ConnectorOptions;
 
+import lombok.Getter;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.io.Serializable;
 
-/**
- * @author regy
- */
+@Getter
 public abstract class Connector implements Serializable {
 
     private final int parallelism;
@@ -22,21 +21,5 @@ public abstract class Connector implements Serializable {
         this.config = config;
         this.parallelism = config.get(ConnectorOptions.PARALLELISM);
         this.name = config.get(ConnectorOptions.NAME);
-    }
-
-    protected int getParallelism() {
-        return parallelism;
-    }
-
-    protected String getName() {
-        return name;
-    }
-
-    protected StreamExecutionEnvironment getEnv() {
-        return env;
-    }
-
-    protected Configuration getConfig() {
-        return config;
     }
 }
