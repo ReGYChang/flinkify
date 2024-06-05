@@ -67,7 +67,7 @@
         <kryo.version>0.45</kryo.version>
         <kafka.version>3.7.0</kafka.version>
         <paimon.version>0.7.0-incubating</paimon.version>
-        <aircompressor.version>0.21</aircompressor.version>
+        <aircompressor.version>0.27</aircompressor.version>
         <hadoop.version>3.3.6</hadoop.version>
 
         <flink.version>1.18.1</flink.version>
