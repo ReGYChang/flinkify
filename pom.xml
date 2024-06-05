@@ -34,16 +34,23 @@
         <beanutils.version>1.9.4</beanutils.version>
         <vavr.version>0.10.4</vavr.version>
         <java-faker.version>0.1.3</java-faker.version>
+        <orai18n.version>12.1.0.2.0</orai18n.version>
+        <kryo.version>0.45</kryo.version>
+        <kafka.version>3.7.0</kafka.version>
+        <paimon.version>0.7.0-incubating</paimon.version>
+        <aircompressor.version>0.21</aircompressor.version>
+        <hadoop.version>3.3.6</hadoop.version>
 
         <flink.version>1.18.1</flink.version>
         <flink-cdc.version>3.0.1</flink-cdc.version>
         <scala.binary.version>2.12</scala.binary.version>
-        <flink.nebula-graph-connector.version>3.5.0</flink.nebula-graph-connector.version>
-        <flink.rabbitmq-connector.version>3.0.1-1.17</flink.rabbitmq-connector.version>
-        <flink.doris-connector.version>1.3.0</flink.doris-connector.version>
-        <flink.mongo-connector.version>1.0.1</flink.mongo-connector.version>
-        <flink.http-connector.version>0.10.0</flink.http-connector.version>
+        <flink-nebula-graph-connector.version>3.5.0</flink-nebula-graph-connector.version>
+        <flink-rabbitmq-connector.version>3.0.1-1.17</flink-rabbitmq-connector.version>
+        <flink-doris-connector.version>1.3.0</flink-doris-connector.version>
+        <flink-mongo-connector.version>1.0.1</flink-mongo-connector.version>
+        <flink-http-connector.version>0.10.0</flink-http-connector.version>
         <flink-connector-kafka.version>3.0.2-1.18</flink-connector-kafka.version>
+        <flink-connector-jdbc.version>3.1.2-1.18</flink-connector-jdbc.version>
 
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
@@ -57,7 +64,6 @@
     </properties>
 
     <dependencies>
-
         <!--lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -126,30 +132,244 @@
             <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
-    <distributionManagement>
-        <repository>
-            <id>nexus</id>
-            <url>http://172.20.37.42:30081/repository/maven-snapshots/</url>
-        </repository>
-    </distributionManagement>
+    <dependencyManagement>
+        <dependencies>
+            <!--quantalink core dependencies-->
+            <dependency>
+                <groupId>com.regy</groupId>
+                <artifactId>quantalink-flink-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
-    <!--    <build>-->
-    <!--        <plugins>-->
-    <!--            <plugin>-->
-    <!--                <groupId>org.apache.maven.plugins</groupId>-->
-    <!--                <artifactId>maven-assembly-plugin</artifactId>-->
-    <!--                <version>3.7.1</version>-->
-    <!--                <configuration>-->
-    <!--                    <descriptorRefs>-->
-    <!--                        <descriptorRef>jar-with-dependencies</descriptorRef>-->
-    <!--                    </descriptorRefs>-->
-    <!--                </configuration>-->
-    <!--            </plugin>-->
-    <!--        </plugins>-->
-    <!--    </build>-->
+            <dependency>
+                <groupId>com.regy</groupId>
+                <artifactId>quantalink-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!--flink core dependencies-->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-core</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-streaming-java</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-table-api-java-bridge</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-table-runtime</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-clients</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-runtime-web</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-json</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <!--flink connector dependencies-->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-kafka</artifactId>
+                <version>${flink-connector-kafka.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.doris</groupId>
+                <artifactId>flink-doris-connector-1.16</artifactId>
+                <version>${flink-doris-connector.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.vesoft</groupId>
+                <artifactId>nebula-flink-connector</artifactId>
+                <version>${flink-nebula-graph-connector.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-rabbitmq</artifactId>
+                <version>${flink-rabbitmq-connector.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-mongodb</artifactId>
+                <version>1.1.0-1.18</version>
+            </dependency>
+
+            <!--        <dependency>-->
+            <!--            <groupId>com.getindata</groupId>-->
+            <!--            <artifactId>flink-http-connector</artifactId>-->
+            <!--            <version>${flink.http-connector.version}</version>-->
+            <!--            <scope>system</scope>-->
+            <!--            <systemPath>-->
+            <!--                ${project.basedir}/src/main/resources/lib/flink-http-connector-${flink.http-connector.version}.jar-->
+            <!--            </systemPath>-->
+            <!--        </dependency>-->
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-csv</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-files</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-jdbc</artifactId>
+                <version>${flink-connector-jdbc.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-datagen</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <!--flink cdc connector dependencies-->
+            <dependency>
+                <groupId>com.ververica</groupId>
+                <artifactId>flink-connector-mysql-cdc</artifactId>
+                <version>${flink-cdc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ververica</groupId>
+                <artifactId>flink-connector-oracle-cdc</artifactId>
+                <version>${flink-cdc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ververica</groupId>
+                <artifactId>flink-connector-postgres-cdc</artifactId>
+                <version>${flink-cdc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ververica</groupId>
+                <artifactId>flink-connector-sqlserver-cdc</artifactId>
+                <version>${flink-cdc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-sync</artifactId>
+                <version>${mongo-driver.version}</version>
+            </dependency>
+
+            <!-- paimon dependencies-->
+            <dependency>
+                <groupId>org.apache.paimon</groupId>
+                <artifactId>paimon-flink-1.18</artifactId>
+                <version>${paimon.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.paimon</groupId>
+                <artifactId>paimon-s3</artifactId>
+                <version>${paimon.version}</version>
+            </dependency>
+
+            <!-- utils dependencies-->
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.vavr</groupId>
+                <artifactId>vavr</artifactId>
+                <version>${vavr.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${beanutils.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.regychang</groupId>
+                <artifactId>java-faker</artifactId>
+                <version>${java-faker.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.easyproject</groupId>
+                <artifactId>orai18n</artifactId>
+                <version>${orai18n.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.javakaffee</groupId>
+                <artifactId>kryo-serializers</artifactId>
+                <version>${kryo.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>aircompressor</artifactId>
+                <version>${aircompressor.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-mapreduce-client-core</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <finalName>original-${artifactId}-${version}</finalName>

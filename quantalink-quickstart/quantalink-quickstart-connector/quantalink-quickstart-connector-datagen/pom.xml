@@ -21,35 +21,30 @@
         <dependency>
             <groupId>com.regy</groupId>
             <artifactId>quantalink-flink-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!--flink core dependencies-->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-core</artifactId>
-            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java</artifactId>
-            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients</artifactId>
-            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -11,62 +11,46 @@
 
     <artifactId>quantalink-flink-core</artifactId>
 
-    <properties>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink.big-query-connector.version>1.5.0</flink.big-query-connector.version>
-        <flink.http-connector.version>0.10.0</flink.http-connector.version>
-    </properties>
-
     <dependencies>
-
         <!--quantalink dependencies-->
         <dependency>
             <groupId>com.regy</groupId>
             <artifactId>quantalink-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
-            <version>${fastjson2.version}</version>
         </dependency>
 
         <!--flink core dependencies-->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-core</artifactId>
-            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java</artifactId>
-            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients</artifactId>
-            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-runtime-web</artifactId>
-            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -74,98 +58,82 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-kafka</artifactId>
-            <version>${flink-connector-kafka.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.doris</groupId>
             <artifactId>flink-doris-connector-1.16</artifactId>
-            <version>${flink.doris-connector.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.vesoft</groupId>
             <artifactId>nebula-flink-connector</artifactId>
-            <version>${flink.nebula-graph-connector.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-rabbitmq</artifactId>
-            <version>${flink.rabbitmq-connector.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-mongodb</artifactId>
-            <version>1.0.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/lib/flink-connector-mongodb-1.0.1.jar</systemPath>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.getindata</groupId>-->
-<!--            <artifactId>flink-http-connector</artifactId>-->
-<!--            <version>${flink.http-connector.version}</version>-->
-<!--            <scope>system</scope>-->
-<!--            <systemPath>-->
-<!--                ${project.basedir}/src/main/resources/lib/flink-http-connector-${flink.http-connector.version}.jar-->
-<!--            </systemPath>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.getindata</groupId>-->
+        <!--            <artifactId>flink-http-connector</artifactId>-->
+        <!--            <version>${flink.http-connector.version}</version>-->
+        <!--            <scope>system</scope>-->
+        <!--            <systemPath>-->
+        <!--                ${project.basedir}/src/main/resources/lib/flink-http-connector-${flink.http-connector.version}.jar-->
+        <!--            </systemPath>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-csv</artifactId>
-            <version>${flink.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-files</artifactId>
-            <version>${flink.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-datagen</artifactId>
-            <version>${flink.version}</version>
         </dependency>
 
         <!--flink cdc connector dependencies-->
         <dependency>
             <groupId>com.ververica</groupId>
             <artifactId>flink-connector-mysql-cdc</artifactId>
-            <version>${flink-cdc.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.ververica</groupId>
             <artifactId>flink-connector-oracle-cdc</artifactId>
-            <version>${flink-cdc.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.ververica</groupId>
             <artifactId>flink-connector-postgres-cdc</artifactId>
-            <version>${flink-cdc.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.ververica</groupId>
             <artifactId>flink-connector-sqlserver-cdc</artifactId>
-            <version>${flink-cdc.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>${mongo-driver.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.regychang</groupId>
             <artifactId>java-faker</artifactId>
-            <version>${java-faker.version}</version>
         </dependency>
     </dependencies>
 
