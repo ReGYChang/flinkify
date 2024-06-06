@@ -1,0 +1,18 @@
+flink:
+  job-name: Telegram Sink Connector Quickstart
+
+  sinks:
+    - telegram:
+        - input-data-type: io.github.regychang.flinkify.quickstart.connector.telegram.entity.Transaction
+          output-data-type: io.github.regychang.flinkify.flink.core.connector.telegram.sink.TelegramPayload
+          name: telegram-trader-joe-transaction-sink
+          chat-id: 1395774346
+          token: 6363110102:AAHrso2zV_6fnRyOTXvSh-atUzmZB-kyz2c
+          telegram-method: send_message
+          http-method: post
+          parse-mode: markdown_v2
+          allow-self-signed: true
+          sink-request-mode: single
+          header:
+            X-Content-Type-Options: nosniff
+            Content-Type: application/json

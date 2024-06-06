@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.regychang</groupId>
+        <artifactId>flinkify-quickstart</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>flinkify-quickstart-connector</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>flinkify-quickstart-connector-kafka</module>
+        <module>flinkify-quickstart-connector-mysql</module>
+        <module>flinkify-quickstart-connector-nebula</module>
+        <module>flinkify-quickstart-connector-mongo</module>
+        <module>flinkify-quickstart-connector-rabbitmq</module>
+        <module>flinkify-quickstart-connector-doris</module>
+        <module>flinkify-quickstart-connector-oracle</module>
+        <module>flinkify-quickstart-connector-telegram</module>
+        <module>flinkify-quickstart-connector-csv</module>
+        <module>flinkify-quickstart-connector-postgres</module>
+        <module>flinkify-quickstart-connector-datagen</module>
+        <!--        <module>flinkify-quickstart-connector-bigquery</module>-->
+    </modules>
+
+    <properties>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <oracle.cdc.version>2.3.0</oracle.cdc.version>
+    </properties>
+
+</project>

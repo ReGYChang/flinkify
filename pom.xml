@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.regy</groupId>
-    <artifactId>quantalink</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>io.github.regychang</groupId>
+    <artifactId>flinkify</artifactId>
+    <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>flinkify</name>
@@ -39,9 +39,9 @@
     </scm>
 
     <modules>
-        <module>quantalink-flink</module>
-        <module>quantalink-common</module>
-        <module>quantalink-quickstart</module>
+        <module>flinkify-flink</module>
+        <module>flinkify-common</module>
+        <module>flinkify-quickstart</module>
     </modules>
 
     <properties>
@@ -167,16 +167,16 @@
 
     <dependencyManagement>
         <dependencies>
-            <!--quantalink core dependencies-->
+            <!--flinkify core dependencies-->
             <dependency>
-                <groupId>com.regy</groupId>
-                <artifactId>quantalink-flink-core</artifactId>
+                <groupId>io.github.regychang</groupId>
+                <artifactId>flinkify-flink-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.regy</groupId>
-                <artifactId>quantalink-common</artifactId>
+                <groupId>io.github.regychang</groupId>
+                <artifactId>flinkify-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -449,6 +449,17 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <sourcepath>src/main/java</sourcepath>
+                    <additionalDependencies>
+                        <additionalDependency>
+                            <groupId>org.apache.flink</groupId>
+                            <artifactId>flink-core</artifactId>
+                            <version>${flink.version}</version>
+                            <scope>compile</scope>
+                        </additionalDependency>
+                    </additionalDependencies>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -491,4 +502,46 @@
             </plugin>
         </plugins>
     </build>
+
+<!--    <profiles>-->
+<!--        <profile>-->
+<!--            <id>javadoc</id>-->
+<!--            <dependencies>-->
+<!--                <dependency>-->
+<!--                    <groupId>org.apache.flink</groupId>-->
+<!--                    <artifactId>flink-core</artifactId>-->
+<!--                    <version>${flink.version}</version>-->
+<!--                    <scope>compile</scope>-->
+<!--                </dependency>-->
+
+<!--                <dependency>-->
+<!--                    <groupId>org.apache.flink</groupId>-->
+<!--                    <artifactId>flink-runtime</artifactId>-->
+<!--                    <version>${flink.version}</version>-->
+<!--                    <scope>compile</scope>-->
+<!--                </dependency>-->
+
+<!--                <dependency>-->
+<!--                    <groupId>org.apache.flink</groupId>-->
+<!--                    <artifactId>flink-table-api-java</artifactId>-->
+<!--                    <version>${flink.version}</version>-->
+<!--                    <scope>compile</scope>-->
+<!--                </dependency>-->
+
+<!--                <dependency>-->
+<!--                    <groupId>org.apache.flink</groupId>-->
+<!--                    <artifactId>flink-table-common</artifactId>-->
+<!--                    <version>${flink.version}</version>-->
+<!--                    <scope>compile</scope>-->
+<!--                </dependency>-->
+
+<!--                <dependency>-->
+<!--                    <groupId>org.apache.flink</groupId>-->
+<!--                    <artifactId>flink-shaded-jackson</artifactId>-->
+<!--                    <version>2.14.2-17.0</version>-->
+<!--                    <scope>compile</scope>-->
+<!--                </dependency>-->
+<!--            </dependencies>-->
+<!--        </profile>-->
+<!--    </profiles>-->
 </project>

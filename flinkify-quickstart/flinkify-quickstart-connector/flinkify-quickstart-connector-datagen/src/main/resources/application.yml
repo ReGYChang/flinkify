@@ -1,0 +1,8 @@
+flink:
+  job-name: DataGen Source Connector Quickstart
+  sources:
+    - datagen:
+        - data-type: io.github.regychang.flinkify.quickstart.connector.datagen.source.SimplePojo
+          name: datagen-quickstart-source
+          number-of-rows: 1000
+          rows-per-second: 1000

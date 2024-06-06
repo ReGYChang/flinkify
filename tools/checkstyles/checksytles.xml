@@ -156,7 +156,7 @@ This file is based on the checkstyle file of Apache Beam.
             <!-- Checks for out of order import statements. -->
             <property name="severity" value="error"/>
             <property name="groups"
-                      value="com.regy.quantalink,javax,java,scala"/>
+                      value="io.github.regychang.flinkify,javax,java,scala"/>
             <property name="separated" value="true"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
             <property name="option" value="bottom"/>
