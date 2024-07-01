@@ -35,7 +35,7 @@ Replace `your-jar-path` with the path to your JAR file.
 mvn clean package -DskipTests
 
 java \
--cp /your-jar-path/target/flinkify-quickstart-connector-telegram-0.1-SNAPSHOT-jar-with-dependencies.jar \
+-cp /your-jar-path/target/flinkify-quickstart-connector-telegram-0.1.2-SNAPSHOT-jar-with-dependencies.jar \
 com.regy.flinkify.quickstart.connector.telegram.TelegramSink
 ```
 
