@@ -55,7 +55,10 @@ public class DorisSinkConnector<IN, OUT> extends SinkConnector<IN, OUT> {
                         () ->
                                 new FlinkException(
                                         ErrCode.STREAMING_CONNECTOR_FAILED,
-                                        String.format("Could not get sink from stream '%s' to doris connector '%s': ", stream, getName())));
+                                        String.format(
+                                                "Could not get sink from stream '%s' to doris connector '%s': ",
+                                                stream,
+                                                getName())));
     }
 
     @SuppressWarnings("unchecked")
@@ -117,7 +120,8 @@ public class DorisSinkConnector<IN, OUT> extends SinkConnector<IN, OUT> {
                         () ->
                                 new FlinkException(
                                         ErrCode.STREAMING_CONNECTOR_FAILED,
-                                        "Could not initialize doris sink, doris sink stream type must be `String` or `RowData`"));
+                                        "Could not initialize doris sink," +
+                                                " doris sink stream type must be `String` or `RowData`"));
     }
 
     private DorisSink.Builder<OUT> initializeBuilder() {

@@ -1,0 +1,12 @@
+flink:
+  sinks:
+    - postgres:
+        - input-data-type: io.github.regychang.flinkify.quickstart.connector.postgres.sink.Inventory
+          name: postgres-quickstart-sink
+          hostname: localhost
+          port: 5432
+          username: regy
+          password: regy
+          database: test
+          schema: test
+          table: inventory

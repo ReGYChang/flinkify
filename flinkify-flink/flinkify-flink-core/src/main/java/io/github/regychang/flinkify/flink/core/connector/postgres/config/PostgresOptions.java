@@ -10,6 +10,12 @@ import java.util.List;
 
 public interface PostgresOptions {
 
+    ConfigOption<List<Configuration>> CONNECTORS = ConfigOptions.key("postgres")
+            .configType()
+            .asList()
+            .noDefaultValue()
+            .withDescription("The connector list of Postgres.");
+
     ConfigOption<List<Configuration>> CDC = ConfigOptions.key("postgres-cdc")
             .configType()
             .asList()
@@ -37,6 +43,16 @@ public interface PostgresOptions {
             .withDescription("");
 
     ConfigOption<String> DATABASE = ConfigOptions.key("database")
+            .stringType()
+            .noDefaultValue()
+            .withDescription("");
+
+    ConfigOption<String> SCHEMA = ConfigOptions.key("schema")
+            .stringType()
+            .defaultValue("public")
+            .withDescription("");
+
+    ConfigOption<String> TABLE = ConfigOptions.key("table")
             .stringType()
             .noDefaultValue()
             .withDescription("");
@@ -81,5 +97,20 @@ public interface PostgresOptions {
     ConfigOption<Configuration> DEBEZIUM_PROPERTIES = ConfigOptions.key("debezium-properties")
             .configType()
             .defaultValue(new Configuration())
+            .withDescription("");
+
+    ConfigOption<Integer> BATCH_SIZE = ConfigOptions.key("batch-size")
+            .intType()
+            .defaultValue(5000)
+            .withDescription("");
+
+    ConfigOption<Long> BATCH_INTERVAL_MS = ConfigOptions.key("batch-interval-ms")
+            .longType()
+            .defaultValue(0L)
+            .withDescription("");
+
+    ConfigOption<Integer> MAX_RETRIES = ConfigOptions.key("max-retries")
+            .intType()
+            .defaultValue(3)
             .withDescription("");
 }

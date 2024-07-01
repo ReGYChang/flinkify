@@ -30,6 +30,7 @@ import io.github.regychang.flinkify.flink.core.connector.oracle.cdc.OracleCdcCon
 import io.github.regychang.flinkify.flink.core.connector.oracle.config.OracleOptions;
 import io.github.regychang.flinkify.flink.core.connector.postgres.cdc.PostgresCdcConnector;
 import io.github.regychang.flinkify.flink.core.connector.postgres.config.PostgresOptions;
+import io.github.regychang.flinkify.flink.core.connector.postgres.sink.PostgresSinkConnector;
 import io.github.regychang.flinkify.flink.core.connector.rabbitmq.config.RabbitmqOptions;
 import io.github.regychang.flinkify.flink.core.connector.rabbitmq.sink.RabbitmqSinkConnector;
 import io.github.regychang.flinkify.flink.core.connector.rabbitmq.source.RabbitmqSourceConnector;
@@ -75,7 +76,8 @@ public class ConnectorUtils {
                         new ConnectorType<>(RabbitmqOptions.CONNECTORS, RabbitmqSinkConnector::new),
                         new ConnectorType<>(NebulaOptions.CONNECTORS, NebulaSinkConnector::new),
                         new ConnectorType<>(MongoOptions.CONNECTORS, MongoSinkConnector::new),
-                        new ConnectorType<>(DorisOptions.CONNECTORS, DorisSinkConnector::new));
+                        new ConnectorType<>(DorisOptions.CONNECTORS, DorisSinkConnector::new),
+                        new ConnectorType<>(PostgresOptions.CONNECTORS, PostgresSinkConnector::new));
 //                        new ConnectorType<>(TelegramOptions.CONNECTORS, TelegramSinkConnector::new));
 
         return initConnectors(env, config, sinkConnectorTypes, FlinkOptions.SINK_CONNECTORS);

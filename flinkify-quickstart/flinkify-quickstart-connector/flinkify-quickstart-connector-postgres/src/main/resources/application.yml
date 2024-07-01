@@ -1,18 +1,25 @@
 flink:
   sources:
     - postgres-cdc:
-        - data-type: java.lang.String
-          hostname: 10.1.5.35
+        - data-type: org.apache.kafka.connect.source.SourceRecord,org.apache.kafka.connect.source.SourceRecord
+          hostname: localhost
           port: 5432
-          username: quantacore
-          password: quantacore
-          database: postgres
+          username: regy
+          password: regy
+          database: test
           schema-list:
             - test
           table-list:
-            - test.cdc_test
+            - test.authors
           slot-name: flink
           decoding-plugin-name: pgoutput
           include-schema-changes: true
           split-size: 2
-          startup-mode: latest_offset
+          startup-mode: initial
+  sinks:
+    - kafka:
+        - input-data-type: org.apache.kafka.connect.source.SourceRecord,org.apache.kafka.connect.source.SourceRecord
+          name: kafka-quickstart-sink
+          bootstrap-servers: localhost:9092
+          group-id: kafka-quickstart
+          topic: test.cdc.authors

@@ -35,19 +35,23 @@ public interface DorisOptions {
             .stringType()
             .noDefaultValue()
             .withDescription("");
+
     ConfigOption<String> PASSWORD = ConfigOptions.key("password")
             .stringType()
             .noDefaultValue()
             .withDescription("");
+
     ConfigOption<String> LABEL_PREFIX = ConfigOptions.key("label-prefix")
             .stringType()
             .defaultValue("")
             .withDescription("");
+
     ConfigOption<List<String>> FIELDS = ConfigOptions.key("fields")
             .stringType()
             .asList()
             .noDefaultValue()
             .withDescription("");
+
     ConfigOption<List<DataType>> TYPES = ConfigOptions.key("types")
             .dataType()
             .asList()
