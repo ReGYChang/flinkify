@@ -15,13 +15,17 @@ import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.util.Optional;
+import java.util.Properties;
 
 public class KafkaSinkConnector<T> extends SinkConnector<T, T> {
 
     private final String bootStrapServers;
 
+    private final Properties properties;
+
     public KafkaSinkConnector(StreamExecutionEnvironment env, Configuration config) {
         super(env, config);
+        this.properties = config.get(KafkaOptions.PROPERTIES).toProperties();
         this.bootStrapServers =
                 config.getNotNull(
                         KafkaOptions.BOOTSTRAP_SERVERS,
@@ -43,6 +47,7 @@ public class KafkaSinkConnector<T> extends SinkConnector<T, T> {
                     KafkaSink.<T>builder()
                             .setBootstrapServers(bootStrapServers)
                             .setRecordSerializer(serializationAdapter.getSerializationSchema())
+                            .setKafkaProducerConfig(properties)
                             .build();
 
             return stream.sinkTo(sink);

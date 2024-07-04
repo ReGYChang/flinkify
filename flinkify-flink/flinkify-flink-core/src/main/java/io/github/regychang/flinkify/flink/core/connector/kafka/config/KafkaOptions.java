@@ -39,7 +39,8 @@ public interface KafkaOptions {
     ConfigOption<String> TOPIC_PATTERN = ConfigOptions.key("topic-pattern")
             .stringType()
             .noDefaultValue()
-            .withDescription("The Kafka topics whose name matches the provided regular expression to consume from.");
+            .withDescription(
+                    "The Kafka topics whose name matches the provided regular expression to consume from.");
 
     ConfigOption<Configuration> PROPERTIES = ConfigOptions.key("properties")
             .configType()
@@ -63,6 +64,7 @@ public interface KafkaOptions {
     ConfigOption<Long> OFFSET_INITIALIZATION_TIMESTAMP = ConfigOptions.key("offset-initialization-timestamp")
             .longType()
             .defaultValue(-1L)
-            .withDescription("The timestamp for offset initialization when using the TIMESTAMP strategy." +
-                    "Default to -1 which indicates using current timestamp.");
+            .withDescription(
+                    "The timestamp for offset initialization when using the TIMESTAMP strategy." +
+                            "Default to -1 which indicates using current timestamp.");
 }
