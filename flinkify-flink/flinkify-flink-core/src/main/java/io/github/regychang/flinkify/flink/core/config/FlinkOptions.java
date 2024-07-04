@@ -15,6 +15,11 @@ public interface FlinkOptions {
             .defaultValue(String.format("Flink Job - %s", LocalDateTime.now()))
             .withDescription("");
 
+    ConfigOption<Configuration> CONFIG = ConfigOptions.key("flink.config")
+            .configType()
+            .defaultValue(new Configuration())
+            .withDescription("");
+
     ConfigOption<List<Configuration>> SOURCE_CONNECTORS = ConfigOptions.key("flink.sources")
             .configType()
             .asList()

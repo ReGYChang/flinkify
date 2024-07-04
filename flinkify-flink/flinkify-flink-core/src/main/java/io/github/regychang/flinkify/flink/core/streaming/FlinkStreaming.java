@@ -25,20 +25,18 @@ public abstract class FlinkStreaming {
     protected FlinkStreamingContext context;
 
     protected void init(String[] args) {
-        org.apache.flink.configuration.Configuration flinkConf =
-                new org.apache.flink.configuration.Configuration();
-        // TODO: dynamic allocation
-        flinkConf.setInteger(RestOptions.PORT, 8089);
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(flinkConf);
         Configuration config = loadConfig(args);
+        org.apache.flink.configuration.Configuration flinkConf = config.get(FlinkOptions.CONFIG).toFlinkConfig();
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(flinkConf);
 
-        this.context = new FlinkStreamingContext.Builder()
-                .withEnv(env)
-                .withTEnv(StreamTableEnvironment.create(env))
-                .withConfig(config)
-                .withSourceConnectors(ConnectorUtils.initSourceConnectors(env, config))
-                .withSinkConnectors(ConnectorUtils.initSinkConnectors(env, config))
-                .build();
+        this.context =
+                new FlinkStreamingContext.Builder()
+                        .withEnv(env)
+                        .withTEnv(StreamTableEnvironment.create(env))
+                        .withConfig(config)
+                        .withSourceConnectors(ConnectorUtils.initSourceConnectors(env, config))
+                        .withSinkConnectors(ConnectorUtils.initSinkConnectors(env, config))
+                        .build();
     }
 
     protected void config(FlinkStreamingInitializer initializer) throws FlinkException {
@@ -63,7 +61,9 @@ public abstract class FlinkStreaming {
         execute(context);
 
         LOG.info("[QuantaLink]: Running the Flink job");
-        JobExecutionResult executionRes = context.getEnv().execute(context.getConfigOption(FlinkOptions.JOB_NAME));
+        JobExecutionResult executionRes =
+                context.getEnv().execute(
+                        context.getConfigOption(FlinkOptions.JOB_NAME));
 
         LOG.info("[QuantaLink]: Terminating the Flink job");
         terminate();
