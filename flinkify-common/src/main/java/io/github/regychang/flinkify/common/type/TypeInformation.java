@@ -12,6 +12,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 
 @ToString
 @EqualsAndHashCode
@@ -27,7 +28,7 @@ public class TypeInformation<T> implements Serializable {
     private TypeInformation(Class<T> rawType, Type... actualTypeArguments) {
         Preconditions.checkNotNull(rawType, "TypeInformation rawType must not be null");
         this.rawType = rawType;
-        this.actualTypeArguments = actualTypeArguments;
+        this.actualTypeArguments = Arrays.asList(actualTypeArguments).isEmpty() ? null : actualTypeArguments;
         if (actualTypeArguments.length > 0) {
             this.type = new SerializableParameterizedType(rawType, actualTypeArguments);
         }
