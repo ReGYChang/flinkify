@@ -1,5 +1,7 @@
 package io.github.regychang.flinkify.common.config;
 
+import com.google.common.base.Functions;
+import com.google.common.collect.Maps;
 import io.github.regychang.flinkify.common.exception.ConfigurationException;
 import io.github.regychang.flinkify.common.exception.ErrCode;
 import io.github.regychang.flinkify.common.utils.CopyUtils;
@@ -148,5 +150,11 @@ public class Configuration implements Serializable {
         Properties properties = new Properties();
         properties.putAll(toMap());
         return properties;
+    }
+
+    public org.apache.flink.configuration.Configuration toFlinkConfig() {
+        Map<String, Object> configMap = toMap();
+        return org.apache.flink.configuration.Configuration.fromMap(
+                Maps.transformValues(configMap, Functions.toStringFunction()));
     }
 }
