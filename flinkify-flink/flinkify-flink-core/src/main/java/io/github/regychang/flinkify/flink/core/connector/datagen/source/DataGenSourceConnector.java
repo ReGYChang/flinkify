@@ -15,7 +15,7 @@ import org.apache.flink.connector.datagen.source.GeneratorFunction;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-import java.lang.reflect.Constructor;
+import java.util.Optional;
 
 import static io.github.regychang.flinkify.flink.core.connector.datagen.config.DataGenOptions.NUMBER_OF_ROWS;
 import static io.github.regychang.flinkify.flink.core.connector.datagen.config.DataGenOptions.ROWS_PER_SECOND;
@@ -35,11 +35,14 @@ public class DataGenSourceConnector<T> extends SourceConnector<T> {
     @Override
     public DataStreamSource<T> getSourceDataStream() throws FlinkException {
         @SuppressWarnings("unchecked")
-        Options options =
-                ((DataGenDeserializationAdapter<T>) getDeserializationAdapter())
-                        .getDeserializationSchema();
+        DataGenDeserializationAdapter<T> deserializationAdapter =
+                Optional.ofNullable((DataGenDeserializationAdapter<T>) getDeserializationAdapter())
+                        .orElse(new DataGenDeserializationAdapter<>(getConfig()));
+
+        Faker faker = new Faker();
+        Options options = deserializationAdapter.getDeserializationSchema();
         GeneratorFunction<Long, T> generatorFunction =
-                createGeneratorFunction(getTypeInfo().getRawType(), options);
+                createGeneratorFunction(faker, getTypeInfo().getRawType(), options);
 
         DataGeneratorSource<T> source =
                 new DataGeneratorSource<>(
@@ -51,17 +54,16 @@ public class DataGenSourceConnector<T> extends SourceConnector<T> {
         return getEnv().fromSource(source, WatermarkStrategy.noWatermarks(), getName());
     }
 
-    private GeneratorFunction<Long, T> createGeneratorFunction(Class<T> clazz, Options options) {
+    private GeneratorFunction<Long, T> createGeneratorFunction(Faker faker, Class<T> clazz, Options options) {
         return index -> {
             try {
-                Constructor<T> constructor = clazz.getConstructor();
-                T object = constructor.newInstance();
-                Faker.fakeData(object, options);
-                return object;
+                return faker.fakeData(clazz, options);
             } catch (Exception e) {
                 throw new FlinkException(
                         ErrCode.STREAMING_CONNECTOR_FAILED,
-                        String.format("Failed to create fake data generator due to: %s", e.getMessage()));
+                        String.format(
+                                "Failed to create fake data generator due to: %s",
+                                e.getMessage()));
             }
         };
     }

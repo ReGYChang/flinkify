@@ -21,6 +21,6 @@ public interface DataGenOptions {
 
     ConfigOption<Long> ROWS_PER_SECOND = ConfigOptions.key("rows-per-second")
             .longType()
-            .noDefaultValue()
+            .defaultValue(1000L)
             .withDescription("");
 }
