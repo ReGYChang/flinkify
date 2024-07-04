@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -167,20 +168,20 @@ public class PostgresSinkConnector<T> extends SinkConnector<T, T> {
                         break;
                     case DATE:
                         if (value instanceof LocalDate) {
-                            statement.setDate(index, java.sql.Date.valueOf((LocalDate) value));
+                            statement.setDate(index, Date.valueOf((LocalDate) value));
                         } else if (value instanceof Date) {
-                            statement.setDate(index, new java.sql.Date(((Date) value).getTime()));
+                            statement.setDate(index, new Date(((Date) value).getTime()));
                         } else {
                             throw new IllegalArgumentException("Unsupported Date type");
                         }
                         break;
                     case TIMESTAMP:
                         if (value instanceof Instant) {
-                            statement.setTimestamp(index, java.sql.Timestamp.from((Instant) value));
+                            statement.setTimestamp(index, Timestamp.from((Instant) value));
                         } else if (value instanceof LocalDateTime) {
-                            statement.setTimestamp(index, java.sql.Timestamp.valueOf((LocalDateTime) value));
+                            statement.setTimestamp(index, Timestamp.valueOf((LocalDateTime) value));
                         } else if (value instanceof Date) {
-                            statement.setTimestamp(index, new java.sql.Timestamp(((Date) value).getTime()));
+                            statement.setTimestamp(index, new Timestamp(((Date) value).getTime()));
                         } else {
                             throw new IllegalArgumentException("Unsupported Timestamp type");
                         }

@@ -86,7 +86,7 @@ public interface PostgresOptions {
 
     ConfigOption<Integer> SPLIT_SIZE = ConfigOptions.key("split-size")
             .intType()
-            .defaultValue(2)
+            .defaultValue(8096)
             .withDescription("");
 
     ConfigOption<StartupMode> STARTUP_MODE = ConfigOptions.key("startup-mode")
