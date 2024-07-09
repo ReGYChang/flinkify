@@ -149,6 +149,8 @@ public class PostgresSinkConnector<T> extends SinkConnector<T, T> {
                     case BIGINT:
                         statement.setLong(index, ((Number) value).longValue());
                         break;
+                    case SMALLINT:
+                        statement.setShort(index, ((Number) value).shortValue());
                     case FLOAT:
                     case REAL:
                         statement.setFloat(index, ((Number) value).floatValue());
@@ -209,7 +211,7 @@ public class PostgresSinkConnector<T> extends SinkConnector<T, T> {
                     default:
                         throw new IllegalArgumentException("Unsupported JDBC type: " + columnInfo.getType());
                 }
-            } catch (ClassCastException | IllegalArgumentException e) {
+            } catch (ClassCastException e) {
                 throw new IllegalArgumentException(
                         String.format(
                                 "Data type mismatch for column '%s'. Expected %s, but got %s",
