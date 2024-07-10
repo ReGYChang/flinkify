@@ -5,12 +5,14 @@ import io.github.regychang.flinkify.common.exception.FlinkException;
 import io.github.regychang.flinkify.common.type.TypeInformation;
 import io.github.regychang.flinkify.flink.core.connector.kafka.serialization.CdcSourceRecordSerializationSchema;
 import io.github.regychang.flinkify.flink.core.connector.kafka.serialization.KafkaSerializationAdapter;
+import io.github.regychang.flinkify.flink.core.connector.kafka.sink.CachingTopicSelector;
 import io.github.regychang.flinkify.flink.core.streaming.FlinkDataStream;
 import io.github.regychang.flinkify.flink.core.streaming.FlinkStreaming;
 import io.github.regychang.flinkify.flink.core.streaming.FlinkStreamingContext;
 import io.github.regychang.flinkify.flink.core.streaming.FlinkStreamingInitializer;
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.kafka.connect.connector.ConnectRecord;
 import org.apache.kafka.connect.source.SourceRecord;
 
 import java.util.ArrayList;
@@ -47,7 +49,8 @@ public class PostgresCdc extends FlinkStreaming {
                                 ((sinkConnector, config) ->
                                         sinkConnector.setSerializationAdapter(
                                                 new KafkaSerializationAdapter<>(
-                                                        new CdcSourceRecordSerializationSchema(config),
+                                                        new CdcSourceRecordSerializationSchema(
+                                                                new CachingTopicSelector<>(ConnectRecord::topic)),
                                                         SOURCE_RECORD_TYPE_INFORMATION))),
                                 SOURCE_RECORD_TYPE_INFORMATION)
                         .build();

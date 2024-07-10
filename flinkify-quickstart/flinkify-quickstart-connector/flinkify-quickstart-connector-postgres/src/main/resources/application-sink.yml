@@ -1,4 +1,5 @@
 flink:
+  job-name: Postgres Sink Connector Quickstart
   sinks:
     - postgres:
         - input-data-type: io.github.regychang.flinkify.quickstart.connector.postgres.sink.Inventory

@@ -1,4 +1,8 @@
 flink:
+  job-name: Postgres CDC Connector Quickstart
+  config:
+    metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
+    metrics.reporter.prom.port: 9249
   sources:
     - postgres-cdc:
         - data-type: org.apache.kafka.connect.source.SourceRecord,org.apache.kafka.connect.source.SourceRecord
@@ -14,7 +18,7 @@ flink:
           slot-name: flink
           decoding-plugin-name: pgoutput
           include-schema-changes: true
-          split-size: 2
+          split-size: 8096
           startup-mode: initial
   sinks:
     - kafka:
