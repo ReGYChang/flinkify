@@ -72,7 +72,8 @@ public class PostgresCdc extends FlinkStreaming {
     protected void execute(FlinkStreamingContext ctx) throws FlinkException {
         DataStreamSource<SourceRecord> sink =
                 ctx.getSourceDataStream(SOURCE_RECORD_TYPE_INFORMATION);
-        FlinkDataStream.ofDataStream(sink, ctx).sink();
+        sink.print();
+//        FlinkDataStream.ofDataStream(sink, ctx).sink();
     }
 
     private static SerializationAdapter<SourceRecord, KafkaRecordSerializationSchema<SourceRecord>>

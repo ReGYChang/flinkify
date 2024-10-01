@@ -5,8 +5,8 @@ import io.github.regychang.flinkify.common.exception.FlinkException;
 import io.github.regychang.flinkify.flink.core.connector.SourceConnector;
 import io.github.regychang.flinkify.flink.core.connector.mysql.config.MySqlOptions;
 
-import com.ververica.cdc.connectors.mysql.source.MySqlSource;
-import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
+import org.apache.flink.cdc.connectors.mysql.source.MySqlSource;
+import org.apache.flink.cdc.debezium.DebeziumDeserializationSchema;
 import io.github.regychang.flinkify.flink.core.utils.debezium.DeserializationUtils;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;

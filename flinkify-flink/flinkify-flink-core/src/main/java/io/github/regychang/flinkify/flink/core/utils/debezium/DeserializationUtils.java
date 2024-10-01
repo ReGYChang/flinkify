@@ -1,6 +1,6 @@
 package io.github.regychang.flinkify.flink.core.utils.debezium;
 
-import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
+import org.apache.flink.cdc.debezium.DebeziumDeserializationSchema;
 import io.github.regychang.flinkify.flink.core.connector.serialization.DeserializationAdapter;
 import java.util.Optional;
 

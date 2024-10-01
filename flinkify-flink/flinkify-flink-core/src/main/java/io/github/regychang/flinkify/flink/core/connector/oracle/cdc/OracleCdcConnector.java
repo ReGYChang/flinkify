@@ -1,13 +1,13 @@
 package io.github.regychang.flinkify.flink.core.connector.oracle.cdc;
 
-import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
+import org.apache.flink.cdc.connectors.oracle.OracleSource;
+import org.apache.flink.cdc.debezium.DebeziumDeserializationSchema;
 import io.github.regychang.flinkify.common.config.Configuration;
 import io.github.regychang.flinkify.common.exception.FlinkException;
 import io.github.regychang.flinkify.flink.core.connector.SourceConnector;
 import io.github.regychang.flinkify.flink.core.connector.oracle.config.OracleOptions;
 
-import com.ververica.cdc.connectors.base.options.StartupOptions;
-import com.ververica.cdc.connectors.oracle.OracleSource;
+import org.apache.flink.cdc.connectors.base.options.StartupOptions;
 import io.github.regychang.flinkify.flink.core.utils.debezium.DeserializationUtils;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;

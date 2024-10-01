@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.regychang</groupId>
         <artifactId>flinkify-quickstart-table</artifactId>
-        <version>0.1.3-SNAPSHOT</version>
+        <version>0.2.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>flinkify-quickstart-table-jdbc</artifactId>
@@ -21,7 +21,7 @@
                     <artifactId>kafka-clients</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.ververica</groupId>
+                    <groupId>org.apache.flink</groupId>
                     <artifactId>flink-connector-oracle-cdc</artifactId>
                 </exclusion>
             </exclusions>
