@@ -7,7 +7,7 @@ flink:
     - postgres-cdc:
         - data-type: org.apache.kafka.connect.source.SourceRecord,org.apache.kafka.connect.source.SourceRecord
           hostname: localhost
-          port: 5432
+          port: 5433
           username: regy
           password: regy
           database: test

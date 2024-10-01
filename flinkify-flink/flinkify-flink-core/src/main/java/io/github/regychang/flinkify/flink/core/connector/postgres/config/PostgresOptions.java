@@ -4,7 +4,7 @@ import io.github.regychang.flinkify.common.config.ConfigOption;
 import io.github.regychang.flinkify.common.config.ConfigOptions;
 import io.github.regychang.flinkify.common.config.Configuration;
 
-import com.ververica.cdc.connectors.base.options.StartupMode;
+import org.apache.flink.cdc.connectors.base.options.StartupMode;
 
 import java.util.List;
 
@@ -77,11 +77,6 @@ public interface PostgresOptions {
     ConfigOption<String> DECODING_PLUGIN_NAME = ConfigOptions.key("decoding-plugin-name")
             .stringType()
             .defaultValue("pgoutput")
-            .withDescription("");
-
-    ConfigOption<Boolean> INCLUDE_SCHEMA_CHANGE = ConfigOptions.key("include-schema-change")
-            .booleanType()
-            .defaultValue(true)
             .withDescription("");
 
     ConfigOption<Integer> SPLIT_SIZE = ConfigOptions.key("split-size")

@@ -4,7 +4,7 @@ import io.github.regychang.flinkify.common.config.ConfigOption;
 import io.github.regychang.flinkify.common.config.ConfigOptions;
 import io.github.regychang.flinkify.common.config.Configuration;
 
-import com.ververica.cdc.connectors.base.options.StartupMode;
+import org.apache.flink.cdc.connectors.base.options.StartupMode;
 
 import java.util.List;
 

@@ -5,11 +5,11 @@ import io.github.regychang.flinkify.common.exception.FlinkException;
 import io.github.regychang.flinkify.flink.core.connector.SourceConnector;
 import io.github.regychang.flinkify.flink.core.connector.postgres.config.PostgresOptions;
 
-import com.ververica.cdc.connectors.base.options.StartupMode;
-import com.ververica.cdc.connectors.base.options.StartupOptions;
-import com.ververica.cdc.connectors.base.source.jdbc.JdbcIncrementalSource;
-import com.ververica.cdc.connectors.postgres.source.PostgresSourceBuilder;
-import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
+import org.apache.flink.cdc.connectors.base.options.StartupMode;
+import org.apache.flink.cdc.connectors.base.options.StartupOptions;
+import org.apache.flink.cdc.connectors.base.source.jdbc.JdbcIncrementalSource;
+import org.apache.flink.cdc.connectors.postgres.source.PostgresSourceBuilder;
+import org.apache.flink.cdc.debezium.DebeziumDeserializationSchema;
 import io.github.regychang.flinkify.flink.core.utils.debezium.DeserializationUtils;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -37,8 +37,6 @@ public class PostgresCdcConnector<T> extends SourceConnector<T> {
 
     private final String decodingPluginName;
 
-    private final Boolean includeSchemaChange;
-
     private final Integer splitSize;
 
     private final Properties debeziumProperties;
@@ -56,7 +54,6 @@ public class PostgresCdcConnector<T> extends SourceConnector<T> {
         this.tableList = config.getNotNull(PostgresOptions.TABLE_LIST).toArray(new String[0]);
         this.slotName = config.getNotNull(PostgresOptions.SLOT_NAME);
         this.decodingPluginName = config.getNotNull(PostgresOptions.DECODING_PLUGIN_NAME);
-        this.includeSchemaChange = config.get(PostgresOptions.INCLUDE_SCHEMA_CHANGE);
         this.splitSize = config.get(PostgresOptions.SPLIT_SIZE);
         this.debeziumProperties = config.get(PostgresOptions.DEBEZIUM_PROPERTIES).toProperties();
         if (config.get(PostgresOptions.STARTUP_MODE) == StartupMode.LATEST_OFFSET) {
@@ -83,7 +80,6 @@ public class PostgresCdcConnector<T> extends SourceConnector<T> {
                         .slotName(slotName)
                         .decodingPluginName(decodingPluginName)
                         .deserializer(deserializationSchema)
-                        .includeSchemaChanges(includeSchemaChange)
                         .splitSize(splitSize)
                         .startupOptions(startupOptions)
                         .debeziumProperties(debeziumProperties)

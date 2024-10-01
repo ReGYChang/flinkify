@@ -1,6 +1,6 @@
 package io.github.regychang.flinkify.flink.core.connector.postgres.serialization;
 
-import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
+import org.apache.flink.cdc.debezium.DebeziumDeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.util.Collector;
