@@ -4,21 +4,20 @@ import io.github.regychang.flinkify.common.config.Configuration;
 import io.github.regychang.flinkify.common.exception.FlinkException;
 import io.github.regychang.flinkify.flink.core.connector.SourceConnector;
 import io.github.regychang.flinkify.flink.core.connector.postgres.config.PostgresOptions;
-import io.github.regychang.flinkify.flink.core.connector.postgres.serialization.JsonDebeziumDeserializationSchema;
 
 import com.ververica.cdc.connectors.base.options.StartupMode;
 import com.ververica.cdc.connectors.base.options.StartupOptions;
 import com.ververica.cdc.connectors.base.source.jdbc.JdbcIncrementalSource;
 import com.ververica.cdc.connectors.postgres.source.PostgresSourceBuilder;
 import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
+import io.github.regychang.flinkify.flink.core.utils.debezium.DeserializationUtils;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.kafka.connect.source.SourceRecord;
 
 import java.util.Properties;
 
-public class PostgresCdcConnector extends SourceConnector<SourceRecord> {
+public class PostgresCdcConnector<T> extends SourceConnector<T> {
 
     private final String hostname;
 
@@ -68,10 +67,12 @@ public class PostgresCdcConnector extends SourceConnector<SourceRecord> {
     }
 
     @Override
-    public DataStreamSource<SourceRecord> getSourceDataStream() throws FlinkException {
-        DebeziumDeserializationSchema<SourceRecord> deserializer = new JsonDebeziumDeserializationSchema();
-        JdbcIncrementalSource<SourceRecord> postgresIncrementalSource =
-                PostgresSourceBuilder.PostgresIncrementalSource.<SourceRecord>builder()
+    public DataStreamSource<T> getSourceDataStream() throws FlinkException {
+        DebeziumDeserializationSchema<T> deserializationSchema =
+                DeserializationUtils.extractDeserializationSchema(getDeserializationAdapter());
+
+        JdbcIncrementalSource<T> postgresIncrementalSource =
+                PostgresSourceBuilder.PostgresIncrementalSource.<T>builder()
                         .hostname(hostname)
                         .port(port)
                         .database(database)
@@ -81,15 +82,15 @@ public class PostgresCdcConnector extends SourceConnector<SourceRecord> {
                         .password(password)
                         .slotName(slotName)
                         .decodingPluginName(decodingPluginName)
-                        .deserializer(deserializer)
+                        .deserializer(deserializationSchema)
                         .includeSchemaChanges(includeSchemaChange)
                         .splitSize(splitSize)
                         .startupOptions(startupOptions)
                         .debeziumProperties(debeziumProperties)
                         .build();
 
-        return getEnv()
-                .fromSource(postgresIncrementalSource, WatermarkStrategy.noWatermarks(), getName())
+        return getEnv().fromSource(
+                        postgresIncrementalSource, WatermarkStrategy.noWatermarks(), getName())
                 .setParallelism(getParallelism());
     }
 }
