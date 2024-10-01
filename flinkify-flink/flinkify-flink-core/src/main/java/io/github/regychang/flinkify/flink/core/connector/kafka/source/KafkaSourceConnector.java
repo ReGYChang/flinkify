@@ -41,7 +41,8 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
         super(env, config);
         this.groupId = config.get(KafkaOptions.GROUP_ID);
         this.offsetResetStrategy = config.get(KafkaOptions.OFFSET_RESET_STRATEGY);
-        this.offsetInitializationTimestamp = config.get(KafkaOptions.OFFSET_INITIALIZATION_TIMESTAMP);
+        this.offsetInitializationTimestamp =
+                config.get(KafkaOptions.OFFSET_INITIALIZATION_TIMESTAMP);
         this.offsetInitializationType = config.get(KafkaOptions.OFFSET_INITIALIZATION_TYPE);
         this.bootStrapServers = config.getNotNull(KafkaOptions.BOOTSTRAP_SERVERS);
         this.topics = config.get(KafkaOptions.TOPICS);
@@ -52,30 +53,43 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
     @SuppressWarnings("unchecked")
     @Override
     public DataStreamSource<T> getSourceDataStream() throws FlinkException {
-        return Try.of(() -> {
-            KafkaDeserializationAdapter<T> deserializer =
-                    Optional.ofNullable((KafkaDeserializationAdapter<T>) getDeserializationAdapter())
-                            .orElseGet(() -> KafkaDeserializationAdapter.valueOnlyDefault(getTypeInfo()));
+        return Try.of(
+                        () -> {
+                            KafkaDeserializationAdapter<T> deserializer =
+                                    Optional.ofNullable(
+                                                    (KafkaDeserializationAdapter<T>)
+                                                            getDeserializationAdapter())
+                                            .orElseGet(
+                                                    () ->
+                                                            KafkaDeserializationAdapter
+                                                                    .valueOnlyDefault(
+                                                                            getTypeInfo()));
 
-            return getEnv()
-                    .fromSource(
-                            createKafkaSource(deserializer),
-                            getWatermarkStrategy(),
-                            getName())
-                    .setParallelism(getParallelism());
-
-        }).getOrElseThrow(e -> {
-            if (e instanceof ClassCastException) {
-                return new FlinkException(
-                        ErrCode.STREAMING_CONNECTOR_FAILED,
-                        String.format("Kafka source connector '%s' deserialization adapter must be '%s'," +
-                                " could not assign other deserialization adapter", getName(), KafkaDeserializationAdapter.class), e);
-            } else {
-                return new FlinkException(
-                        ErrCode.STREAMING_CONNECTOR_FAILED,
-                        String.format("Could not get source from kafka source connector '%s': ", getName()), e);
-            }
-        });
+                            return getEnv().fromSource(
+                                            createKafkaSource(deserializer),
+                                            getWatermarkStrategy(),
+                                            getName())
+                                    .setParallelism(getParallelism());
+                        })
+                .getOrElseThrow(
+                        e -> {
+                            if (e instanceof ClassCastException) {
+                                return new FlinkException(
+                                        ErrCode.STREAMING_CONNECTOR_FAILED,
+                                        String.format(
+                                                "Kafka source connector '%s' deserialization adapter must be '%s',"
+                                                        + " could not assign other deserialization adapter",
+                                                getName(), KafkaDeserializationAdapter.class),
+                                        e);
+                            } else {
+                                return new FlinkException(
+                                        ErrCode.STREAMING_CONNECTOR_FAILED,
+                                        String.format(
+                                                "Could not get source from kafka source connector '%s': ",
+                                                getName()),
+                                        e);
+                            }
+                        });
     }
 
     private KafkaSource<T> createKafkaSource(KafkaDeserializationAdapter<T> deserializer) {
@@ -91,8 +105,8 @@ public class KafkaSourceConnector<T> extends SourceConnector<T> {
                         .setDeserializer(deserializer.getDeserializationSchema())
                         .setProperties(properties);
 
-        return topics == null ?
-                builder.setTopicPattern(Pattern.compile(topicPattern)).build() :
-                builder.setTopics(topics).build();
+        return topics == null
+                ? builder.setTopicPattern(Pattern.compile(topicPattern)).build()
+                : builder.setTopics(topics).build();
     }
 }
