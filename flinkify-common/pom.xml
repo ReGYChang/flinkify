@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.github.regychang</groupId>
         <artifactId>flinkify</artifactId>
-        <version>0.1.3-SNAPSHOT</version>
+        <version>0.2.0</version>
     </parent>
 
     <artifactId>flinkify-common</artifactId>
