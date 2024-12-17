@@ -1,0 +1,15 @@
+flink:
+  job-name: SQL Server CDC Connector Quickstart
+  sources:
+    - sqlserver-cdc:
+        - data-type: java.lang.String
+          hostname: localhost
+          port: 1433
+          username: sa
+          password: YourStrong!Passw0rd
+          database-list:
+            - healthcare_poc
+          table-list:
+            - dbo.IPBDHU
+          include-schema-changes: true
+          parallelism: 10

@@ -1,0 +1,19 @@
+flink:
+  job-name: Sql Server Sink Connector Quickstart
+  sources:
+    - datagen:
+        - data-type: io.github.regychang.flinkify.quickstart.connector.sqlserver.sink.IPBDHU
+          name: datagen-source
+          number-of-rows: 100000000
+          rows-per-second: 100000
+  sinks:
+    - sqlserver:
+        - input-data-type: io.github.regychang.flinkify.quickstart.connector.sqlserver.sink.IPBDHU
+          name: sqlserver-quickstart-sink
+          hostname: localhost
+          port: 1433
+          username: sa
+          password: YourStrong!Passw0rd
+          database: healthcare_poc
+          schema: dbo
+          table: IPBDHU
