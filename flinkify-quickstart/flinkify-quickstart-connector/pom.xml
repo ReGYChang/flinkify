@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.regychang</groupId>
         <artifactId>flinkify-quickstart</artifactId>
-        <version>0.2.1-SNAPSHOT</version>
+        <version>0.2.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>flinkify-quickstart-connector</artifactId>
@@ -24,6 +24,7 @@
         <module>flinkify-quickstart-connector-csv</module>
         <module>flinkify-quickstart-connector-postgres</module>
         <module>flinkify-quickstart-connector-datagen</module>
+        <module>flinkify-quickstart-connector-sqlserver</module>
         <!--        <module>flinkify-quickstart-connector-bigquery</module>-->
     </modules>
 
